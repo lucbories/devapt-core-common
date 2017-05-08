@@ -25,12 +25,14 @@ export default class TopologyRegistry extends RegistryStore
 	 * Create a TopologyStore instance.
 	 * @extends RegistryStore
 	 * 
+	 * @param {LoggerManager} arg_logger_manager - logger manager object.
+	 * 
 	 * @returns {nothing}
 	 */
-	constructor()
+	constructor(arg_logger_manager)
 	{
 		const default_config = load_config({}, undefined, undefined, TRACE)
-		super(default_config.config, context, undefined)
+		super(default_config.config, context, arg_logger_manager)
 
 		this.error = undefined
 		this.initial_config = undefined

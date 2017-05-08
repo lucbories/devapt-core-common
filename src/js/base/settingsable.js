@@ -38,14 +38,21 @@ export default class Settingsable extends Errorable
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_settings, arg_log_context, arg_logger_manager)
+	constructor(arg_settings=fromJS({}), arg_log_context, arg_logger_manager)
 	{
 		const my_context = arg_log_context ? arg_log_context : context
+		
 		let logger_manager = arg_logger_manager ? arg_logger_manager : undefined
 		if ( ! logger_manager)
 		{
-			logger_manager = (arg_settings && arg_settings.logger_manager) ? arg_settings.logger_manager : undefined
+			if (arg_settings.get)
+			{
+				logger_manager = arg_settings.get('logger_manager', undefined)
+			} else {
+				logger_manager = (arg_settings && arg_settings.logger_manager) ? arg_settings.logger_manager : undefined
+			}
 		}
+
 		super(my_context, logger_manager)
 		
 		this.set_settings(arg_settings)

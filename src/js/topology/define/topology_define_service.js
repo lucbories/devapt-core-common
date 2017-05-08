@@ -80,6 +80,7 @@ export default class TopologyDefineService extends TopologyDefineItem
 		this.topology_service_default_file = this.get_setting_js('default_file', undefined)
 		this.topology_service_page_view    = this.get_setting_js('page_view', undefined)
 		this.topology_service_page_menubar = this.get_setting_js('page_menubar', undefined)
+		this.topology_service_on_browser   = this.get_setting_js('execute_on_browser', false)
 		
 		this._errors = undefined
 		
@@ -96,19 +97,19 @@ export default class TopologyDefineService extends TopologyDefineItem
 	is_valid()
 	{
 		try{
-			// CHECK TYPE
+			// TODO: CHECK TYPE
 			assert( T.isString(this.topology_service_type), context)
-			switch(this.topology_service_type) {
-				case 'security':
-				case 'html_assets':
-				case 'middleware':
-				case 'messages':
-				case 'resources_query':
-				case 'rest_api_resources_query':
-				case 'rest_api_models_modifier':
-					break;
-				default: return false
-			}
+			// switch(this.topology_service_type) {
+			// 	case 'security':
+			// 	case 'html_assets':
+			// 	case 'middleware':
+			// 	case 'messages':
+			// 	case 'resources_query':
+			// 	case 'rest_api_resources_query':
+			// 	case 'rest_api_models_modifier':
+			// 		break
+			// 	default: return false
+			// }
 
 			// CHECK ROUTES
 			if (this.topology_service_routes)

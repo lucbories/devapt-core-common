@@ -35,6 +35,8 @@ export default class DistributedMetrics extends DistributedMessage
 		super(arg_sender_name, arg_target_name, { metric:arg_type, metrics:arg_values })
 
 		this.is_distributed_metrics = true
+
+		this.set_channel('metrics')
 	}
     
     
@@ -46,7 +48,7 @@ export default class DistributedMetrics extends DistributedMessage
 	 */
 	get_metrics_type()
 	{
-		return this.payload.metric
+		return this._payload.metric
 	}
     
     
@@ -58,7 +60,7 @@ export default class DistributedMetrics extends DistributedMessage
 	 */
 	get_metrics_values()
 	{
-		return this.payload.metrics
+		return this._payload.metrics
 	}
 	
 	
@@ -77,8 +79,8 @@ export default class DistributedMetrics extends DistributedMessage
 			return false
 		}
 
-		// console.log(context + ':check_msg_format:this.payload.metric=%s, this.payload.metrics=%s', this.payload.metric, this.payload.metrics)
-		if ( T.isString(this.payload.metric) && this.payload.metric.length > 0 && T.isArray(this.payload.metrics) )
+		// console.log(context + ':check_msg_format:this._payload.metric=%s, this._payload.metrics=%s', this._payload.metric, this._payload.metrics)
+		if ( T.isString(this._payload.metric) && this._payload.metric.length > 0 && T.isArray(this._payload.metrics) )
 		{
 			return true
 		}

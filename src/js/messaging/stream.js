@@ -72,6 +72,21 @@ export default class Stream
 
 
 	/**
+	 * Create a Stream instance with an event emitter source stream.
+	 * 
+	 * @param {object} arg_emitter - event emitter.
+	 * @param {string} arg_event_name - event name.
+	 * 
+	 * @returns {Stream}
+	 */
+	static from_emitter_event(arg_emitter, arg_event_name)
+	{
+		return new Stream( Baconjs.fromEvent(arg_emitter, arg_event_name) )
+	}
+
+
+
+	/**
 	 * Get output stream.
 	 * 
 	 * @returns {Baconjs.Bus}
@@ -197,5 +212,40 @@ export default class Stream
 		// 		console.log(value,  context + ':subscribe:value')
 		// 	}
 		// )
+	}
+	
+	
+	
+	/**
+	 * Subscribe to stream errors.
+	 * 
+	 * @param {Function} arg_handler - value handler f(value) => nothing.
+	 * 
+	 * @returns {Function} - unsubscribe function
+	 */
+	on_error(arg_handler)
+	{
+		assert( T.isFunction(arg_handler), context + ':subscribe:bad handler function')
+		
+		this.counters.subscribers_count += 1
+		
+		const unsubscribe = this._transformed_stream.onError(arg_handler)
+		return  () => {
+			this.counters.subscribers_count -= 1
+			unsubscribe()
+		}
+	}
+
+
+
+	/**
+	 * Debounce immediate.
+	 * 
+	 * @param {integer} arg_milliseconds - number of milliseconds. 
+	 */
+	debounce_immediate(arg_milliseconds)
+	{
+		this._transformed_stream = this._transformed_stream.debounceImmediate(arg_milliseconds)
+		return this
 	}
 }

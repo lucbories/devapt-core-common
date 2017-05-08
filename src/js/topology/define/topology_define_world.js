@@ -39,15 +39,26 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 	 * 	}
 	 * 
 	 * @param {string} arg_name - instance name.
-	 * @param {object} arg_settings - instance settings map.
+	 * @param {Immutable.Map|object} arg_settings - instance settings map.
 	 * @param {Runtime} arg_runtime - runtime instance.
+	 * @param {LoggerManager} arg_logger_manager - logger manager object.
 	 * @param {string} arg_log_context - trace context string.
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_name, arg_settings, arg_runtime, arg_log_context)
+	constructor(arg_name, arg_settings, arg_runtime, arg_logger_manager, arg_log_context)
 	{
 		const log_context = arg_log_context ? arg_log_context : context
+
+		if (arg_settings.get)
+		{
+			arg_settings = arg_settings.set('runtime', arg_runtime)
+			arg_settings = arg_settings.set('logger_manager', arg_logger_manager)
+		} else {
+			arg_settings.runtime = arg_runtime
+			arg_settings.logger_manager = arg_logger_manager
+		}
+
 		super(arg_name, arg_settings, 'TopologyDefineWorld', log_context)
 		
 		this.is_topology_define_world = true
@@ -55,6 +66,7 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 		this.topology_type = 'world'
 		
 		this._runtime = arg_runtime
+		assert( T.isObject(this._runtime) && this._runtime.is_server_runtime, context + ':constructor:bad runtime instance')
 
 		this.load_loggers()
 		this.load_security()
@@ -62,9 +74,6 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 		this.declare_collection('plugins', 'plugin', TopologyDefinePlugin, this.load_plugin.bind(this))
 		this.declare_collection('tenants', 'tenant', TopologyDefineTenant)
 		this.declare_collection('nodes',   'node',   TopologyDefineNode)
-
-		assert( T.isObject(this._runtime) && this._runtime.is_server_runtime, context + ':constructor')
-
 		
 		this.info('World is created')
 	}
@@ -83,9 +92,8 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 		const loggers_settings = this.get_setting_js('loggers', {})
 		const traces_settings = this.get_setting_js('traces', {})
 		
-		const runtime = this._runtime
 		loggers_settings.traces = traces_settings
-		runtime.logger_manager.load(loggers_settings)
+		this._runtime.get_logger_manager().load(loggers_settings)
 
 		this.info('load_loggers:async is resolved with success')
 		return Promise.resolve(true)
@@ -102,11 +110,10 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 	{
 		this.enter_group('load_security')
 		
-		const runtime = this._runtime
-		const security_settings = runtime.get_registry().root.get('security')
+		const security_settings = this._runtime.get_registry().root.get('security')
 		// console.log(security_settings, context + ':load_security:security_settings')
 		
-		runtime.security().load(security_settings)
+		this._runtime.security().load(security_settings)
 
 		this.leave_group('load_security:async is resolved with success')
 		return Promise.resolve(true)
@@ -117,7 +124,7 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 	/**
 	 * Load rendering plugins.
 	 * 
-	 * @returns {Promise}
+	 * @returns {Promise} - Promise of Plugin instance.
 	 */
 	load_plugin(arg_plugin)
 	{
@@ -127,14 +134,24 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 		let promise = undefined
 		switch(arg_plugin.topology_plugin_type){
 			case 'rendering': {
-				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_rendering_plugin:bad plugin object')
+				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin:bad plugin object')
+				assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':load_plugin:bad runtime instance' )
+				
 				promise = arg_plugin.load_rendering_plugin(this._runtime)
 				this.leave_group('load_plugin:rendering:async')
 				return promise
 			}
+			case 'services': {
+				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin:bad plugin object')
+				assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':load_plugin:bad runtime instance' )
+				
+				promise = arg_plugin.load_services_plugin(this._runtime)
+				this.leave_group('load_plugin:services:async')
+				return promise
+			}
 			case '...':{
 				this.leave_group('load_plugin:unknow:async')
-				return Promise.resolve(true)
+				return Promise.resolve(false)
 			}
 		}
 
@@ -214,7 +231,7 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 	find_resource_with_credentials(arg_credentials, arg_resource_name, arg_resource_type)
 	{
 		const tenant_name = arg_credentials.get_tenant()
-		const env_name = arg_credentials.get_env() // TODO
+		// const env_name = arg_credentials.get_env() // TODO
 		const application_name = arg_credentials.get_application()
 
 		const tenant = this.tenant(tenant_name)

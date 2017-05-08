@@ -19,13 +19,18 @@ export default class DistributedMessage
     /**
      * Create a DistributedMessage instance.
 	 * 
+	 * 	API:
+	 * 		->get_channel():string - get bus channel name.
+	 * 		->set_channel(arg_channel):nothing - set bus channel name.
+	 * 
 	 * @param {string} arg_sender_name - sender name.
 	 * @param {string} arg_target_name - recipient name.
 	 * @param {object} arg_payload - message payload plain object.
+	 * @param {string} arg_channel - channel name.
 	 * 
      * @returns {nothing}
      */
-	constructor(arg_sender_name, arg_target_name, arg_payload)
+	constructor(arg_sender_name, arg_target_name, arg_payload, arg_channel='default')
 	{
 		assert( T.isString(arg_sender_name) , context + ':bad sender string')
 		assert( T.isString(arg_target_name) , context + ':bad target string')
@@ -33,9 +38,36 @@ export default class DistributedMessage
 
 		this.is_distributed_message = true
 
-		this.sender = arg_sender_name
-		this.target = arg_target_name
-		this.payload = arg_payload
+		this._sender = arg_sender_name
+		this._target = arg_target_name
+		this._payload = arg_payload
+		this._channel = arg_channel
+	}
+
+
+
+	/**
+	 * Get bus channel name.
+	 * 
+	 * @returns {string}
+	 */
+	get_channel()
+	{
+		return this._channel
+	}
+
+
+
+	/**
+	 * Set bus channel name.
+	 * 
+	 * @param {string} arg_channel - bus channel name.
+	 * 
+	 * @returns {nothing}
+	 */
+	set_channel(arg_channel)
+	{
+		this._channel = arg_channel
 	}
     
     
@@ -47,7 +79,7 @@ export default class DistributedMessage
 	 */
 	get_sender()
 	{
-		return this.sender
+		return this._sender
 	}
     
     
@@ -59,7 +91,7 @@ export default class DistributedMessage
 	 */
 	get_target()
 	{
-		return this.target
+		return this._target
 	}
     
     
@@ -71,7 +103,7 @@ export default class DistributedMessage
 	 */
 	get_payload()
 	{
-		return this.payload
+		return this._payload
 	}
 	
 	
@@ -85,7 +117,7 @@ export default class DistributedMessage
 	{
 		// console.log(context + ':check_msg_format:this', this)
 
-		if ( T.isString(this.sender) && this.sender.length > 0 && T.isString(this.target) && this.target.length > 0 && T.isObject(this.payload) )
+		if ( T.isString(this._sender) && this._sender.length > 0 && T.isString(this._target) && this._target.length > 0 && T.isObject(this._payload) )
 		{
 			return true
 		}

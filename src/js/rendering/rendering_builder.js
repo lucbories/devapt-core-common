@@ -47,6 +47,8 @@ export default class RenderingBuilder extends RenderingBuilderAssets
      */
 	constructor(arg_runtime, arg_assets_styles, arg_assets_scripts, arg_assets_img, arg_assets_html, arg_application)
 	{
+		assert( T.isObject(arg_runtime) && arg_runtime.is_base_runtime, context + ':constructor:bad runtime instance' )
+
 		if ( T.isObject(arg_assets_styles) && T.isString(arg_assets_styles.style) && T.isString(arg_assets_styles.script) && T.isString(arg_assets_styles.image) && T.isString(arg_assets_styles.html) )
 		{
 			arg_application = arg_assets_scripts
@@ -59,7 +61,21 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 
 		super(arg_runtime, arg_assets_styles, arg_assets_scripts, arg_assets_img, arg_assets_html, arg_application)
 		
+		assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':constructor:bad this._runtime instance' )
+
 		this.update_trace_enabled()
+	}
+
+
+
+	/**
+	 * Get name for loggers.
+	 * 
+	 * @returns {string}
+	 */
+	get_name()
+	{
+		return 'RenderingBuilder instance'
 	}
 	
 	
@@ -453,6 +469,8 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 	 */
 	_render_content_on_browser(arg_view_name, arg_menubar_name, arg_credentials)
 	{
+		assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':_render_content_on_browser:bad this._runtime instance' )
+		
 		const store = this._runtime.get_state_store()
 		const state = store.get_state()
 

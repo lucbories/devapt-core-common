@@ -4,14 +4,15 @@ import assert from 'assert'
 
 // COMMON IMPORTS
 import T                       from '../utils/types'
-import {is_browser, is_server} from '../utils/is_browser'
+// import {is_browser, is_server} from '../utils/is_browser'
+// import runtime                 from '../base/runtime'
 
 
 let context = 'common/base/loggable'
 
 
 
-const server_runtime_file = '../base/runtime'
+// const server_runtime_file = '../base/runtime'
 // const browser_runtime_file = 'see window.devapt().runtime()'
 
 
@@ -65,7 +66,11 @@ export default class Loggable
 		
 		if ( T.isObject(arg_logger_manager) && arg_logger_manager.is_logger_manager )
 		{
-			this.logger_manager = arg_logger_manager
+			this._logger_manager = arg_logger_manager
+		}
+		else {
+			console.warn(this.get_class() + ':' + this.get_name() + ':no logger manager')
+			// debugger
 		}
 		
 		// TO SET IN SUB CLASSES
@@ -266,28 +271,13 @@ export default class Loggable
 	 */
 	get_logger_manager()
 	{
-		if (! this.logger_manager && ! this.is_server_runtime && ! this.is_client_runtime)
+		if (!this._logger_manager)
 		{
-			if (is_server())
-			{
-				// console.log(context + ':get_logger_manager:name=%s is server', this.get_name())
-				this.logger_manager = require(server_runtime_file).default.logger_manager
-			}
-
-			else if (is_browser())
-			{
-				// console.log(context + ':get_logger_manager:name=%s is browser', this.get_name())
-				const runtime = window.devapt().runtime()
-				this.logger_manager = runtime.get_logger_manager()
-			}
+			console.log(this.get_class() + ':' + this.get_name(), 'bad logger manager')
+			debugger
 		}
-		// else
-		// {
-		// 	console.log(context + ':get_logger_manager:name=%s is runtime', this.get_name())
-		// }
-
-		assert( T.isObject(this.logger_manager) && this.logger_manager.is_logger_manager, context + ':get_logger_manager:bad logger manager object')
-		return this.logger_manager
+		assert( T.isObject(this._logger_manager) && this._logger_manager.is_logger_manager, context + ':get_logger_manager:bad logger manager object')
+		return this._logger_manager
 	}
 
 

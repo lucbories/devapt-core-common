@@ -27,6 +27,11 @@ types_fn.isNotEmptyArray = (o)=>{
 }
 
 
+types_fn.isClass = (o)=>{
+	return types_fn.isFunction(o) /*&& types_fn.isFunction(o.constructor)*/ // TODO ENHANCE CLASS CHECKING
+}
+
+
 // DOM ELEMENT TEST
 // For a tr element: "[object HTMLTableRowElement]"
 types_fn.isElement = (o)=>{

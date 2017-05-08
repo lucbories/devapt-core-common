@@ -18,7 +18,7 @@ if ( is_browser() )
 // import Collection from '../../base/collection'
 import CollectionVersion from '../../base/collection_version'
 import Instance from '../../base/instance'
-import registry from '../registry'
+// import registry from '../registry'
 
 
 let context = 'common/topology/define/topology_define_item'
@@ -121,12 +121,14 @@ export default class TopologyDefineItem extends Instance
 	 */
 	load()
 	{
+		// this.enable_trace()
 		this.enter_group('load')
 		
 		super.load()
 		
 		const promises = []
 		const children_names = Object.keys(this.topology_children)
+		this.debug('load:children_names=' + children_names)
 		children_names.forEach(
 			(child_name)=>{
 				this.debug('load:child=' + child_name)
@@ -139,6 +141,7 @@ export default class TopologyDefineItem extends Instance
 		this.leave_group('load:async wait')
 		return Promise.all(promises).then(
 			(result)=>{
+				// this.disable_trace()
 				this.leave_group('load:async is resolved with ' + (result ? 'success' : 'failure'))
 				return result
 			}
@@ -204,11 +207,11 @@ export default class TopologyDefineItem extends Instance
 		assert( T.isFunction(arg_topology_class), context + ':declare_collection:bad class object for plural=' + arg_plural_name + ',single=' + arg_single_name)
 		
 		// DECLARE COLLECTION
-		const filter_version = (arg_name, arg_version)=>{
-			return (arg_item)=>{
-				return arg_item.get_name() == arg_name && arg_item.get_topology_version() == arg_version
-			}
-		}
+		// const filter_version = (arg_name, arg_version)=>{
+		// 	return (arg_item)=>{
+		// 		return arg_item.get_name() == arg_name && arg_item.get_topology_version() == arg_version
+		// 	}
+		// }
 		this.topology_children[arg_plural_name] = {
 			is_versionned_collection: true,
 			plural:arg_plural_name,
@@ -276,6 +279,11 @@ export default class TopologyDefineItem extends Instance
 		this.enter_group('load_collection of ' + arg_collection_name)
 		// console.info('load_collection of ' + arg_collection_name)
 		
+		const runtime = this.get_runtime()
+		const logger_manager = this.get_logger_manager()
+		assert( T.isObject(runtime) && runtime.is_server_runtime, context + ':load_collection:bad runtime instance')
+		assert( T.isObject(logger_manager) && logger_manager.is_logger_manager, context + ':load_collection:bad logger_manager instance')
+
 		const promises = []
 		// TODO ???
 		const collection_settings = this.get_setting(arg_collection_name, this.get_setting(['resources_by_type', arg_collection_name], undefined))
@@ -289,20 +297,24 @@ export default class TopologyDefineItem extends Instance
 					// console.log(name, 'name')
 					if (! settings.has('tenant'))
 					{
-						settings.set('tenant', this.get_topology_tenant())
+						settings = settings.set('tenant', this.get_topology_tenant())
 					}
 					if (! settings.has('package'))
 					{
-						settings.set('package', this.get_topology_package())
+						settings = settings.set('package', this.get_topology_package())
 					}
 
-					settings.set('name', name)
+					settings = settings.set('name', name)
+					settings = settings.set('runtime', runtime)
+					settings = settings.set('logger_manager', logger_manager)
 					
+					this.info('Creating ' + arg_collection_name + ' item ' + name)
 					const item = new arg_topology_class(name, settings)
 					item.topology_owner = this
 
 					arg_collection.add(item)
 
+					this.info('Loading ' + arg_collection_name + ' item ' + name)
 					let load_promise = item.load()
 
 					if ( T.isFunction(arg_init_cb) )
@@ -409,7 +421,8 @@ export default class TopologyDefineItem extends Instance
 					// CHILD IS A VERSIONNED COLLECTION
 					if ( T.isObject(child) && child.is_versionned_collection)
 					{
-						const all_versions = child.versions.forEach(
+						const all_versioned_items = child.collection.get_all()
+						all_versioned_items.forEach(
 							(item)=>{
 								info.children.push( item.get_topology_info() )
 							}

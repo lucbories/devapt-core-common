@@ -3,16 +3,10 @@
 // COMMON IMPORTS
 import T from '../utils/types'
 import LoggerMsgPost from './logger_msg_post'
-import {is_browser, is_server} from '../utils/is_browser'
+import {is_server} from '../utils/is_browser'
 
 
 // const context = 'common/loggers/logger_manager'
-
-
-
-// GET RUNTIME
-const server_runtime_file = '../base/runtime'
-const browser_runtime_file = 'see window.devapt().runtime()'
 
 
 
@@ -28,10 +22,11 @@ export default class LoggerManager
 	 * @param {object} arg_settings - loggers settings
 	 * @returns {nothing}
 	 */
-	constructor(arg_settings)
+	constructor(arg_runtime, arg_settings)
 	{
 		this.is_logger_manager = true
 		this.loggers = []
+		this._runtime = arg_runtime
 		
 		if (arg_settings)
 		{
@@ -61,22 +56,12 @@ export default class LoggerManager
 			this.loggers = []
 		}
 
-		// GET RUNTIME
-		let runtime = undefined
-		if (is_server())
-		{
-			runtime = require(server_runtime_file).default
-		}
-		else if (is_browser())
-		{
-			runtime = window.devapt().runtime()
-		}
-
 
 		// ADD LOGGER ADAPTERS
-		if (runtime.node)
+		if (this._runtime.node)
 		{
-			this.loggers.push( new LoggerMsgPost(true, runtime.node.get_logs_bus().get_input_stream()) )
+			// console.log('add stream logger')
+			this.loggers.push( new LoggerMsgPost(true, this._runtime.node.get_logs_bus().get_input_stream()) )
 			// this.info('msg logger created')
 		}
 

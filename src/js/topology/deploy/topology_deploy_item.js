@@ -257,7 +257,7 @@ export default class TopologyDeployItem extends DistributedInstance
 		this.enter_group('load_collection of ' + arg_collection_name)
 		
 		const promises = []
-		const collection_settings = this.get_setting(arg_collection_name, undeployd)
+		const collection_settings = this.get_setting(arg_collection_name, undefined)
 		if (collection_settings)
 		{
 			const all_map = collection_settings.toMap()
@@ -374,7 +374,8 @@ export default class TopologyDeployItem extends DistributedInstance
 					// CHILD IS A VERSIONNED COLLECTION
 					if ( T.isObject(child) && child.is_versionned_collection)
 					{
-						const all_versions = child.versions.forEach(
+						const all_versioned_items = child.collection.get_all()
+						all_versioned_items.forEach(
 							(item)=>{
 								info.children.push( item.get_topology_info() )
 							}

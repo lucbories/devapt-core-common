@@ -7,14 +7,14 @@ import Instance                from '../base/instance'
 import DistributedMessage      from '../base/distributed_message'
 import DistributedMetrics      from '../base/distributed_metrics'
 import DistributedLogs         from '../base/distributed_logs'
-import {is_browser, is_server} from '../utils/is_browser'
+// import {is_browser, is_server} from '../utils/is_browser'
 
 
 const context = 'common/base/distributed_instance'
 
 
 
-const server_runtime_file = '../base/runtime'
+// const server_runtime_file = '../base/runtime'
 // const browser_runtime_file = 'see window.devapt().runtime()'
 
 
@@ -32,7 +32,9 @@ export default class DistributedInstance extends Instance
 	 * API:
 	 * 		->load():nothing
 	 * 	    ->load_topology_settings(arg_settings):nothing
+	 * 
 	 * 		->send(DistributedMessage|DistributedMetrics|DistributedLogs):boolean
+	 * 
 	 *      ->enable_on_bus(arg_bus):nothing
 	 *      ->disable_on_bus(arg_bus):nothing
 	 * 
@@ -43,7 +45,7 @@ export default class DistributedInstance extends Instance
 	 * 		->disable_msg():nothing
 	 * 
 	 * API for metrics:
-	 * 		->send_msg(type, values):boolean
+	 * 		->send_metrics(type, values):boolean
 	 * 		->receive_metrics(DistributedMetrics):nothing
 	 * 		->enable_metrics():nothing
 	 * 		->disable_metrics():nothing
@@ -54,24 +56,27 @@ export default class DistributedInstance extends Instance
 	 * 		->enable_logs():nothing
 	 * 		->disable_logs():nothing
 	 * 
+	 * @param {string} arg_collection - collection name.
 	 * @param {string} arg_name - server name
 	 * @param {string} arg_class - server class name
 	 * @param {object} arg_settings - plugin settings map
-	 * @param {string} arg_log_context - trace context string.
+	 * @param {string} arg_log_context - trace context string (optional, default=context).
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_name, arg_class, arg_settings, arg_log_context)
+	constructor(arg_collection, arg_name, arg_class, arg_settings, arg_log_context=context)
 	{
-		const log_context = arg_log_context ? arg_log_context : context
-		
-		super(arg_name, arg_class, arg_settings, log_context)
+		assert( T.isObject(arg_settings.runtime) || (arg_settings.has && arg_settings.has('runtime')), arg_log_context + ':bad runtime instance')
+		assert( T.isObject(arg_settings.logger_manager) || (arg_settings.has && arg_settings.has('logger_manager') ), arg_log_context + ':bad logger_manager instance')
+		super(arg_collection, arg_class, arg_name, arg_settings, arg_log_context, arg_settings.logger_manager)
 		
 		this.is_distributed_instance = true
 
-		this.msg_bus= undefined
-		this.metrics_bus= undefined
-		this.logs_bus= undefined
+		this._msg_bus = undefined
+		this._metrics_bus = undefined
+		this._logs_bus = undefined
+
+		this._bus_unsubscribes = {}
 
 		// DEBUG
 		// this.enable_trace()
@@ -90,27 +95,15 @@ export default class DistributedInstance extends Instance
 
 		super.load()
 
-		
+		// REGISTER BUSES
 		if (! this.is_client_runtime)
 		{
-			let runtime = undefined
-			
-			if (is_server())
-			{
-				runtime = require(server_runtime_file).default
-			}
-
-			if (is_browser())
-			{
-				runtime = window.devapt().runtime()
-			}
-
-			this.msg_bus = runtime.node.get_msg_bus()
-			this.metrics_bus = runtime.node.get_metrics_bus()
-			this.logs_bus = runtime.node.get_logs_bus()
+			this._msg_bus     = this.get_runtime().node.get_msg_bus()
+			this._metrics_bus = this.get_runtime().node.get_metrics_bus()
+			this._logs_bus    = this.get_runtime().node.get_logs_bus()
 		}
 
-		// console.log(context + ':load:name=%s this.metrics_bus', this.get_name(), this.metrics_bus.get_name())
+		console.log(context + ':load:name=%s this._metrics_bus', this.get_name(), this._metrics_bus.get_name())
 	}
 
 
@@ -141,21 +134,21 @@ export default class DistributedInstance extends Instance
 	{
 		assert( T.isObject(arg_msg), context + ':send:bad message object')
 
-		if (this.msg_bus && arg_msg.is_distributed_message)
+		if (this._msg_bus && arg_msg.is_distributed_message)
 		{
-			this.msg_bus.post(arg_msg)
+			this._msg_bus.msg_post(arg_msg)
 			return true
 		}
 
-		if (this.metrics_bus && arg_msg.is_distributed_metrics)
+		if (this._metrics_bus && arg_msg.is_distributed_metrics)
 		{
-			this.metrics_bus.post(arg_msg)
+			this._metrics_bus.msg_post(arg_msg)
 			return true
 		}
 		
-		if (this.logs_bus && arg_msg.is_distributed_logs)
+		if (this._logs_bus && arg_msg.is_distributed_logs)
 		{
-			this.logs_bus.post(arg_msg)
+			this._logs_bus.msg_post(arg_msg)
 			return true
 		}
 
@@ -169,15 +162,15 @@ export default class DistributedInstance extends Instance
 	/**
 	 * Enable distributed messaging.
 	 * 
-	 * @param {Bus} arg_bus - message bus.
+	 * @param {MessageBus} arg_bus - message bus.
+	 * @param {string} arg_channel - channel name string (default='default').
 	 * 
 	 * @returns {nothing}
 	 */
-	enable_on_bus(arg_bus)
+	enable_on_bus(arg_bus, arg_channel='default', arg_method='receive_msg')
 	{
-		var self = this
-		arg_bus.subscribe(this.get_name(), self.receive_msg.bind(self))
-		arg_bus.add_locale_target(this.get_name())
+		const bus_name = arg_bus.get_name() + ':' + arg_channel
+		this._bus_unsubscribes[bus_name] = arg_bus.msg_register(this, arg_channel, arg_method)
 	}
 
 
@@ -185,13 +178,18 @@ export default class DistributedInstance extends Instance
 	/**
 	 * Disable distributed messaging.
 	 * 
-	 * @param {Bus} arg_bus - message bus.
+	 * @param {MessageBus} arg_bus - message bus.
 	 * 
 	 * @returns {nothing}
 	 */
-	disable_on_bus(arg_bus)
+	disable_on_bus(arg_bus, arg_channel='default')
 	{
-		arg_bus.unsubscribe(this.get_name())
+		const bus_name = arg_bus.get_name() + ':' + arg_channel
+		const unsubscribe = this._bus_unsubscribes[bus_name]
+		if ( T.isFunction(unsubscribe) )
+		{
+			unsubscribe()
+		}
 	}
 
 
@@ -199,12 +197,13 @@ export default class DistributedInstance extends Instance
 	// -------------------------------- MESSAGES -------------------------------------
 	
 	/**
-	 * Send a message to an other client.
+	 * Create and send a message to an other client.
 	 * 
 	 * @param {string} arg_target_name - recipient name.
 	 * @param {object} arg_payload - message payload plain object.
+	 * @param {string} arg_channel - channel name string (default='default').
 	 * 
-	 * @returns {boolean} - message send or not
+	 * @returns {boolean} - message send or not.
 	 */
 	send_msg(arg_target_name, arg_payload)
 	{
@@ -215,9 +214,9 @@ export default class DistributedInstance extends Instance
 
 		let msg = new DistributedMessage(this.get_name(), arg_target_name, arg_payload)
 		
-		if (this.msg_bus && msg.check_msg_format(msg) )
+		if (this._msg_bus && msg.check_msg_format(msg) )
 		{
-			this.msg_bus.post(msg)
+			this._msg_bus.msg_post(msg)
 			this.leave_group('send_msg')
 			return true
 		}
@@ -259,8 +258,7 @@ export default class DistributedInstance extends Instance
 	 */
 	enable_msg()
 	{
-		var self = this
-		this.msg_bus.subscribe(this.get_name(), self.receive_msg.bind(self))
+		this.enable_on_bus(this._msg_bus, 'default', 'receive_msg')
 	}
 
 
@@ -272,7 +270,7 @@ export default class DistributedInstance extends Instance
 	 */
 	disable_msg()
 	{
-		this.msg_bus.unsubscribe(this.get_name())
+		this.disable_on_bus(this._msg_bus, 'default')
 	}
     
     
@@ -292,15 +290,15 @@ export default class DistributedInstance extends Instance
 	{
 		this.enter_group('send_metrics')
 		
-		assert( T.isObject(this.metrics_bus), context + ':send_metrics:bad metrics bus object')
+		assert( T.isObject(this._metrics_bus), context + ':send_metrics:bad metrics bus object')
 
 		// console.log(context + ':send_metrics:from=%s, to=%s, type=%s', this.get_name(), arg_target_name, arg_metric_type)
 
 		let msg = new DistributedMetrics(this.get_name(), arg_target_name, arg_metric_type, arg_metrics)
 		
-		if (this.metrics_bus && msg.check_msg_format(msg) )
+		if (this._metrics_bus && msg.check_msg_format(msg) )
 		{
-			this.metrics_bus.post(msg)
+			this._metrics_bus.msg_post(msg)
 
 			// console.log(context + ':send_metrics:from=%s, to=%s, type=%s', this.get_name(), arg_target_name, arg_metric_type)
 			
@@ -347,11 +345,7 @@ export default class DistributedInstance extends Instance
 	 */
 	enable_metrics()
 	{
-		var self = this
-
-		// console.log(context + ':enable_metrics:name=%s, bus=%s', this.get_name(), this.metrics_bus.get_name())
-		
-		this.metrics_bus.subscribe(this.get_name(), self.receive_metrics.bind(self))
+		this.enable_on_bus(this._metrics_bus, 'metrics', 'receive_metrics')
 	}
 
 
@@ -363,7 +357,7 @@ export default class DistributedInstance extends Instance
 	 */
 	disable_metrics()
 	{
-		this.metrics_bus.unsubscribe(this.get_name())
+		this.disable_on_bus(this._metrics_bus, 'metrics')
 	}
 
 
@@ -386,9 +380,9 @@ export default class DistributedInstance extends Instance
 
 		let msg = new DistributedLogs(this.get_name(), arg_target_name, arg_timestamp, arg_level, arg_values)
 		
-		if (this.logs_bus && msg.check_msg_format(msg) )
+		if (this._logs_bus && msg.check_msg_format(msg) )
 		{
-			this.logs_bus.post(msg)
+			this._logs_bus.msg_post(msg)
 			this.leave_group('send_logs')
 			return true
 		}
@@ -431,8 +425,7 @@ export default class DistributedInstance extends Instance
 	 */
 	enable_logs()
 	{
-		var self = this
-		this.logs_bus.subscribe(this.get_name(), self.receive_logs.bind(self))
+		this.enable_on_bus(this._logs_bus, 'logs', 'receive_logs')
 	}
 
 
@@ -444,6 +437,6 @@ export default class DistributedInstance extends Instance
 	 */
 	disable_logs()
 	{
-		this.logs_bus.unsubscribe(this.get_name())
+		this.disable_on_bus(this._logs_bus, 'logs')
 	}
 }

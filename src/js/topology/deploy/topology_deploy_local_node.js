@@ -1,5 +1,6 @@
 // NPM IMPORTS
 import assert from 'assert'
+import _ from 'lodash'
 
 // COMMON IMPORTS
 import T from '../../utils/types'
@@ -22,6 +23,28 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 	/**
 	 * Create a TopologyDeployNode instance.
 	 * @extends TopologyDeployItem
+	 * 
+	 * 	API:
+	 * 		this.deployed_tenants[deployed_tenant_name] = {
+	 *				name:deployed_tenant_name,		// String
+	 *				tenant:defined_tenant,			// TopologyDefineTenant instance
+	 *				services:{
+	 *					svc_name:svc				// TopologyDefinedService instance
+	 *				},
+	 *				applications:{
+	 *					app_name:{
+	 *						name:app_name,				// String
+	 *						tenant:defined_tenant,		// TopologyDefineTenant instance
+	 *						appplication:defined_app,	// TopologyDefinedApplication instance
+	 *						services:{
+	 *							svc_name:svc			// TopologyDefinedService instance
+	 *						}
+	 *						assets:{
+	 *							...						// See TopologyDefinedApplication instance assets
+	 *						}
+	 *					}
+	 *				}
+	 *			}
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {TopologyDefineItem} arg_definition_item - topology definition item.
@@ -53,8 +76,333 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 
 
 	/**
+	 * Get deployed tenants.
+	 * 
+	 * @returns {array} - deployed tenants.
+	 */
+	get_deployed_tenants_names()
+	{
+		this.enter_group('get_deployed_tenants')
+
+		const tenants = Object.keys(this.deployed_tenants)
+
+		this.leave_group('get_deployed_tenants')
+		return tenants
+	}
+
+
+
+	/**
+	 * Get deployed tenant informations.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * 
+	 * @returns {object} - deployed tenant infos.
+	 */
+	get_deployed_tenant_topology(arg_tenant_name)
+	{
+		this.enter_group('get_deployed_tenant_topology')
+
+		// CHECK TENANT NAME
+		if (! this.deployed_tenants || ! (arg_tenant_name in this.deployed_tenants) )
+		{
+			this.leave_group('get_deployed_tenant_topology:tenant not found')
+			return undefined
+		}
+
+		const deployed_tenant_topology = this.deployed_tenants[arg_tenant_name]
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_topology:bad tenant topology')
+			return undefined
+		}
+
+		this.leave_group('get_deployed_tenant_topology')
+		return deployed_tenant_topology
+	}
+
+
+
+	/**
+	 * Get deployed tenants informations.
+	 * 
+	 * @param {boolean} arg_deep - get deep sub items information on true (default:true).
+	 * 
+	 * @returns {object} - deployed tenant infos.
+	 */
+	get_deployed_tenants_infos(arg_deep=true)
+	{
+		this.enter_group('get_deployed_tenants_infos')
+
+		const deployed_tenants_infos = {}
+
+		_.forEach(this.deployed_tenants,
+			(deployed_tenant_topology, tenant_name)=>{
+				if (! deployed_tenant_topology)
+				{
+					this.leave_group('get_deployed_tenants_infos:bad tenant topology')
+					return undefined
+				}
+
+				const tenant = deployed_tenant_topology.tenant
+
+				if (! tenant)
+				{
+					this.leave_group('get_deployed_tenants_infos:bad tenant instance')
+					return undefined
+				}
+				deployed_tenants_infos[tenant_name] = tenant.get_topology_info(arg_deep)
+			}
+		)
+
+		this.leave_group('get_deployed_tenants_infos')
+		return deployed_tenants_infos
+	}
+
+
+
+	/**
+	 * Get deployed tenant informations.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * @param {boolean} arg_deep - get deep sub items information on true (default:true).
+	 * 
+	 * @returns {object} - deployed tenant infos.
+	 */
+	get_deployed_tenant_infos(arg_tenant_name, arg_deep=true)
+	{
+		this.enter_group('get_deployed_tenant_infos')
+
+		const deployed_tenant_topology = this.get_deployed_tenant_topology(arg_tenant_name)
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_infos:bad tenant topology')
+			return undefined
+		}
+
+		const tenant = deployed_tenant_topology.tenant
+
+		if (! tenant)
+		{
+			this.leave_group('get_deployed_tenant_infos:bad tenant instance')
+			return undefined
+		}
+
+		this.leave_group('get_deployed_tenant_infos')
+		return tenant.get_topology_info(arg_deep)
+	}
+
+
+
+	/**
+	 * Get deployed tenant applications names.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * 
+	 * @returns {array} - deployed tenant applications names.
+	 */
+	get_deployed_tenant_applications_names(arg_tenant_name)
+	{
+		this.enter_group('get_deployed_tenant_applications_names')
+
+		const deployed_tenant_topology = this.get_deployed_tenant_topology(arg_tenant_name)
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_applications_names:bad tenant topology')
+			return undefined
+		}
+
+		const apps_names = Object.keys(deployed_tenant_topology.applications)
+
+		this.leave_group('get_deployed_tenant_applications_names')
+		return apps_names
+	}
+
+
+
+	/**
+	 * Get deployed tenant applications infos.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * @param {boolean} arg_deep - get deep sub items information on true (default:true).
+	 * 
+	 * @returns {object} - deployed tenant applications infos.
+	 */
+	get_deployed_tenant_applications_infos(arg_tenant_name, arg_deep=true)
+	{
+		this.enter_group('get_deployed_tenant_applications_infos')
+
+		const deployed_tenant_topology = this.get_deployed_tenant_topology(arg_tenant_name)
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_applications_infos:bad tenant topology')
+			return undefined
+		}
+
+		const apps_infos = {}
+		_.forEach(deployed_tenant_topology.applications,
+			(app, app_name)=>{
+				apps_infos[app_name] = app.get_topology_info(arg_deep)
+			}
+		)
+
+		this.leave_group('get_deployed_tenant_applications_infos')
+		return apps_infos
+	}
+
+
+
+	/**
+	 * Get deployed tenant services names.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * 
+	 * @returns {array} - deployed tenant services names.
+	 */
+	get_deployed_tenant_services_names(arg_tenant_name)
+	{
+		this.enter_group('get_deployed_tenant_services_names')
+
+		const deployed_tenant_topology = this.get_deployed_tenant_topology(arg_tenant_name)
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_services_names:bad tenant topology')
+			return undefined
+		}
+
+		const services_names = Object.keys(deployed_tenant_topology.services)
+
+		this.leave_group('get_deployed_tenant_services_names')
+		return services_names
+	}
+
+
+
+	/**
+	 * Get deployed tenant services infos.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * @param {boolean} arg_deep - get deep sub items information on true (default:true).
+	 * 
+	 * @returns {object} - deployed tenant services infos.
+	 */
+	get_deployed_tenant_services_infos(arg_tenant_name, arg_deep=true)
+	{
+		this.enter_group('get_deployed_tenant_services_infos')
+
+		const deployed_tenant_topology = this.get_deployed_tenant_topology(arg_tenant_name)
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_services_infos:bad tenant topology')
+			return undefined
+		}
+
+		const svcs_infos = {}
+		_.forEach(deployed_tenant_topology.services,
+			(svc, svc_name)=>{
+				svcs_infos[svc_name] = svc.get_topology_info(arg_deep)
+				svcs_infos[svc_name].operations = svc.get_a_provider().get_operations_names()
+			}
+		)
+
+		this.leave_group('get_deployed_tenant_services_infos')
+		return svcs_infos
+	}
+
+
+
+	/**
+	 * Get deployed tenant services infos.
+	 * 
+	 * @param {string} arg_tenant_name - tenant name.
+	 * @param {string} arg_svc_name - service name.
+	 * @param {boolean} arg_deep - get deep sub items information on true (default:true).
+	 * 
+	 * @returns {object} - deployed tenant services infos.
+	 */
+	get_deployed_tenant_service_infos(arg_tenant_name, arg_svc_name, arg_deep=true)
+	{
+		this.enter_group('get_deployed_tenant_service_infos')
+
+		const deployed_tenant_topology = this.get_deployed_tenant_topology(arg_tenant_name)
+		if (! deployed_tenant_topology)
+		{
+			this.leave_group('get_deployed_tenant_service_infos:bad tenant topology')
+			return undefined
+		}
+
+		if (arg_svc_name in deployed_tenant_topology.services)
+		{
+			const svc = deployed_tenant_topology.services[arg_svc_name]
+			const svc_infos = svc.get_topology_info(arg_deep)
+			svc_infos.operations = svc.get_a_provider().get_operations_names()
+			
+			this.leave_group('get_deployed_tenant_service_infos')
+			return svc_infos
+		}
+
+		this.leave_group('get_deployed_tenant_service_infos:service not found for [' + arg_svc_name + ']')
+		return undefined
+	}
+
+
+
+	/**
+	 * Get deployed nodes names.
+	 * 
+	 * @returns {array} - nodes names.
+	 */
+	get_deployed_nodes_names()
+	{
+		this.enter_group('get_deployed_nodes_names')
+
+		const defined_node = this.get_topology_definition_item()
+		const defined_world = defined_node.get_topology_owner()
+		const nodes = defined_world.nodes()
+		const nodes_names = nodes.get_all_names()
+
+		this.leave_group('get_deployed_nodes_names')
+		return nodes_names
+	}
+
+
+
+	/**
+	 * Find a deployed service in tenants services.
+	 * 
+	 * @param {string} arg_svc_name - service name.
+	 * 
+	 * @returns {Service} - deployed service instance.
+	 */
+	find_deployed_service(arg_tenant_name, arg_svc_name)
+	{
+		this.enter_group('find_deployed_service')
+
+		this.debug('find_deployed_service', 'service', arg_svc_name)
+
+		// LOOP ON TENANTS
+		const tenants_names = this.get_deployed_tenants_names()
+		for(const tenant_name in tenants_names)
+		{
+			const svc = this.get_deployed_service(tenant_name, arg_svc_name)
+			if (svc && svc.is_service)
+			{
+				this.debug('find_deployed_service', 'tenant', tenant_name)
+				this.leave_group('find_deployed_service:found')
+				return svc
+			}
+		}
+		
+		this.leave_group('find_deployed_service:not found')
+		return undefined
+	}
+
+
+
+	/**
 	 * Get or create a deployed service.
 	 * 
+	 * @param {string} arg_tenant_name - tenant name.
 	 * @param {string} arg_svc_name - service name.
 	 * 
 	 * @returns {Service} - deployed service instance.
@@ -63,10 +411,24 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 	{
 		this.enter_group('get_deployed_service')
 
+		this.debug('get_deployed_service', 'tenant', arg_tenant_name)
+		this.debug('get_deployed_service', 'service', arg_svc_name)
+
+		// GET TENANT
+		const defined_node = this.get_topology_definition_item()
+		const defined_world = defined_node.get_topology_owner()
+		const defined_tenant = defined_world.tenant(arg_tenant_name)
+		assert( T.isObject(defined_tenant) && defined_tenant.is_topology_define_tenant, context + ':get_deployed_service:bad tenant object for ' + arg_tenant_name)
+
 		// GET TENANT DEPLOYMENT
 		if (! T.isObject(this.deployed_tenants[arg_tenant_name]) )
 		{
-			this.deployed_tenants[arg_tenant_name] = { services:{} }
+			this.deployed_tenants[arg_tenant_name] = {
+				name:arg_tenant_name,
+				tenant:defined_tenant,
+				services:{},
+				applications:{}
+			}
 		}
 		const deployed_tenant = this.deployed_tenants[arg_tenant_name]
 
@@ -76,13 +438,6 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 			this.leave_group('get_deployed_service (already deployed)')
 			return deployed_tenant.services[arg_svc_name]
 		}
-
-		// GET TENANT
-		const defined_node = this.get_topology_definition_item()
-		const defined_world = defined_node.get_topology_owner()
-		const defined_tenant = defined_world.tenant(arg_tenant_name)
-		assert( T.isObject(defined_tenant) && defined_tenant.is_topology_define_tenant, context + ':get_deployed_service:bad tenant object for ' + arg_tenant_name)
-
 		// CREATE SERVICE
 		const defined_service = defined_tenant.get_service(arg_svc_name)
 		let service = undefined
@@ -94,6 +449,7 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 		if (service)
 		{
 			service.enable()
+			this.debug('get_deployed_service:service is enabled')
 		}
 		else
 		{
@@ -123,50 +479,70 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 
 		// LOOP ON TENANTS TO DEPLOY
 		const deployed_tenants = this.get_settings().toJS()
-		Object.keys(deployed_tenants).forEach(
-			(deployed_tenant_name)=>{
-				this.info('loop on tenant:' + deployed_tenant_name)
+		_.forEach(deployed_tenants,
+			(deployed_apps, deployed_tenant_name)=>{
+				// SKIP SPECIAL CASES
+				if (deployed_tenant_name == 'runtime' || deployed_tenant_name == 'logger_manager')
+				{
+					return
+				}
+				
+				this.info('deploy:loop on tenant:' + deployed_tenant_name)
 
+				
 				// GET DEFINED TENANT
 				const defined_tenant = defined_world.tenant(deployed_tenant_name)
 				if (! defined_tenant)
 				{
-					console.log('defined tenants', defined_world.tenants().latest.$items.length )
-					console.log('defined tenants', defined_world.tenants().latest.$items[0].get_name() )
 					this.leave_group('deploy (error):bad tenant for ' + deployed_tenant_name)
-					return Promise.reject('tenant ' + deployed_tenant_name + ' not found for world')
+					return Promise.reject('deploy:tenant ' + deployed_tenant_name + ' not found for world')
 				}
-				this.deployed_services = []
-				this.deployed_services_map = []
+
+				// INIT TENANT
+				this.deployed_tenants[deployed_tenant_name] = {
+					name:deployed_tenant_name,
+					tenant:defined_tenant,
+					services:{},
+					applications:{}
+				}
 
 				// LOOP ON APPLICATIONS TO DEPLOY
-				const deployed_apps = deployed_tenants[deployed_tenant_name]
-				Object.keys(deployed_apps).forEach(
-					(deployed_app_name)=>{
-						this.info('loop on application:' + deployed_app_name)
+				// const deployed_apps = deployed_tenants[deployed_tenant_name]
+				_.forEach(deployed_apps,
+					(deployed_app, deployed_app_name)=>{
+						this.info('deploy:loop on application:' + deployed_app_name)
 
 						// GET DEFINED APPLICATION
 						const defined_app = defined_tenant.application(deployed_app_name)
 						if (! defined_app)
 						{
 							this.leave_group('deploy (error):bad application for ' + deployed_app_name)
-							return Promise.reject('application ' + deployed_app_name + ' not found for tenant ' + deployed_tenant_name)
+							return Promise.reject('deploy:application ' + deployed_app_name + ' not found for tenant ' + deployed_tenant_name)
+						}
+
+						// INIT TENANT APPLICATION
+						const deployed_app_topology = {
+							name:deployed_app_name,
+							tenant:defined_tenant,
+							application:defined_app,
+							services:{},
+							assets:{}
 						}
 						
 						// LOOP ON APPLICATION SERVICES TO DEPLOY
-						const deployed_app_services = deployed_apps[deployed_app_name].services
-						Object.keys(deployed_app_services).forEach(
-							(deployed_svc_name)=>{
-								this.info('loop on service:' + deployed_svc_name)
+						const deployed_app_services = deployed_app.services
+						_.forEach(deployed_app_services,
+							(deployed_app_svc, deployed_svc_name)=>{
+								this.info('deploy:loop on service:' + deployed_svc_name)
 
-								const deployed_app_svc = deployed_app_services[deployed_svc_name]
+								// const deployed_app_svc = deployed_app_services[deployed_svc_name]
 								const service = this.get_deployed_service(deployed_tenant_name, deployed_svc_name)
 
 								// LOOP ON DEPLOYED APPLICATION SERVICE SERVERS
 								service.activate(defined_app, deployed_app_svc)
 								service.enable()
-								this.deployed_services.push(service)
-								this.deployed_services_map[deployed_svc_name] = service
+
+								deployed_app_topology.services[deployed_svc_name] = service
 							}
 						)
 						
@@ -177,11 +553,11 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 						if ( T.isObject(deployed_app_assets.regions) )
 						{
 							assert( T.isObject(deployed_app_assets.regions), context + ':deploy:bad assets.regions object')
-							Object.keys(deployed_app_assets.regions).forEach(
-								(deployed_region_name)=>{
-									this.info('loop on assets region:' + deployed_region_name)
+							_.forEach(deployed_app_assets.regions,
+								(deployed_region, deployed_region_name)=>{
+									this.info('deploy:loop on assets region:' + deployed_region_name)
 
-									const deployed_region = deployed_app_assets.regions[deployed_region_name]
+									// const deployed_region = deployed_app_assets.regions[deployed_region_name]
 									assert( T.isObject(deployed_region), context + ':deploy:bad assets.regions.* object for region ' + deployed_region_name)
 
 									const style_svc_array  = T.isArray(deployed_region.style)  ? deployed_region.style  : []
@@ -199,8 +575,11 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 							)
 						}
 
+						deployed_app_topology.assets = deployed_app_assets
+						this.deployed_tenants[deployed_tenant_name].applications[deployed_app_name] = deployed_app_topology
+
 						// REGISTER ASSETS ON DEPLOYED SERVICES
-						this.deployed_services.forEach(
+						_.forEach(this.deployed_services,
 							(service)=>{
 								service.topology_deploy_assets = deployed_assets
 							}

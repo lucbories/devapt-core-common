@@ -34,18 +34,29 @@ export default class Plugin extends Instance
 	constructor(arg_runtime, arg_manager, arg_name, arg_class, arg_settings, arg_log_context)
 	{
 		const create_context = T.isString(arg_log_context) ? arg_log_context : context
+		assert( T.isObject(arg_runtime) && arg_runtime.is_base_runtime, context + ':constructor:bad runtime instance' )
 		assert( T.isObject(arg_manager) && arg_manager.is_plugins_manager, create_context + ':bad manager object for ' + arg_name + ' - ' + arg_log_context)
 		assert( T.isString(arg_name), create_context + ':bad name string')
 		assert( T.isString(arg_class.toString()), create_context + ':bad class string for ' + arg_name)
 		assert( T.isObject(arg_settings), create_context + ':bad settings object for ' + arg_name)
 		
-		arg_settings.version = T.isString(arg_settings.version) ? arg_settings.version : '0.0.0'
-		
+		if (arg_settings.get)
+		{
+			const version = T.isString( arg_settings.get('version') ) ? arg_settings.get('version') : '0.0.0'
+			arg_settings = arg_settings.set('version', version)
+			arg_settings = arg_settings.set('runtime', arg_runtime)
+			arg_settings = arg_settings.set('logger_manager', arg_runtime.get_logger_manager())
+		} else {
+			arg_settings.version = T.isString(arg_settings.version) ? arg_settings.version : '0.0.0'
+			arg_settings.runtime = arg_runtime
+			arg_settings.logger_manager = arg_runtime.get_logger_manager()
+		}
+
 		super('plugins', (arg_class ? arg_class.toString() : 'Plugin'), arg_name, arg_settings, arg_log_context)
 		
 		this.is_plugin = true
 		
-		this._runtime = arg_runtime
+		// this._runtime = arg_runtime
 		this.$version = arg_settings.version
 		this.manager = arg_manager
 		this.is_enabled = false

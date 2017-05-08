@@ -37,6 +37,8 @@ export default class DistributedLogs extends DistributedMessage
 		super(arg_sender_name, arg_target_name, { ts:arg_timestamp, level:arg_level, source:'SERVER', logs:arg_values })
 
 		this.is_distributed_logs = true
+
+		this.set_channel('logs')
 	}
     
     
@@ -48,7 +50,7 @@ export default class DistributedLogs extends DistributedMessage
 	 */
 	get_logs_ts()
 	{
-		return this.payload.ts
+		return this._payload.ts
 	}
     
     
@@ -60,7 +62,7 @@ export default class DistributedLogs extends DistributedMessage
 	 */
 	get_logs_level()
 	{
-		return this.payload.level
+		return this._payload.level
 	}
     
     
@@ -72,7 +74,7 @@ export default class DistributedLogs extends DistributedMessage
 	 */
 	get_logs_source()
 	{
-		return this.payload.source
+		return this._payload.source
 	}
     
     
@@ -84,7 +86,7 @@ export default class DistributedLogs extends DistributedMessage
 	 */
 	get_logs_values()
 	{
-		return this.payload.logs
+		return this._payload.logs
 	}
 	
 	
@@ -101,7 +103,7 @@ export default class DistributedLogs extends DistributedMessage
 			return false
 		}
 
-		if ( T.isString(this.this.payload.ts) && this.this.payload.ts.length > 0 && T.isString(this.this.payload.level) && this.this.payload.level.length > 0 && T.isArray(this.payload.logs) )
+		if ( T.isString(this.this._payload.ts) && this.this._payload.ts.length > 0 && T.isString(this.this._payload.level) && this.this._payload.level.length > 0 && T.isArray(this._payload.logs) )
 		{
 			return true
 		}

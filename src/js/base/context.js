@@ -84,6 +84,7 @@ export default class Context
 		assert( T.isString(base_dir), context + ':get_absolute_path: bad base dir string')
 
 		// console.log(this.get_world_dir(), 'world_dir')
+		// console.log('get_absolute_path:with ', arg_relative_path1, arg_relative_path2, arg_relative_path3)
 
 		let ext = undefined
 		let p0 = undefined
@@ -114,7 +115,8 @@ export default class Context
 			p1 = path.join(this.get_world_dir(), arg_relative_path1)
 			p2 = path.join(base_dir, arg_relative_path1)
 		}
-		
+		// console.log('get_absolute_path:', p0, p1, p2)
+
 		if ( path.isAbsolute(p0) )
 		{
 			try
@@ -186,6 +188,91 @@ export default class Context
 			return this.get_absolute_path(arg_relative_plugin, arg_relative_path1, arg_relative_path2)
 		}
 		return this.get_absolute_path('plugins', arg_relative_plugin, arg_relative_path1, arg_relative_path2)
+	}
+	
+	
+
+	/**
+	 * Get absolute path of given relative package name.
+	 * 
+	 * @param {string} arg_relative_pkg - package name.
+	 * @param {string} arg_relative_path1 - relative path 1.
+	 * @param {string} arg_relative_path2 - relative path 2.
+	 * 
+	 * @returns {string} - absolute path.
+	 */
+	get_absolute_package_path(arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+	{
+		assert( T.isString(arg_relative_pkg), context + 'get_absolute_package_path: bad package name string')
+		if ( path.isAbsolute(arg_relative_pkg) )
+		{
+			return this.get_absolute_path(arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		}
+		// debugger
+		
+		let p = this.get_absolute_path('../../../node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		// console.log('get_absolute_package_path:../../../node_modules:', p)
+		if (p)
+		{
+			return p
+		}
+		
+		p = this.get_absolute_path('../../node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		// console.log('get_absolute_package_path:../../../node_modules:', p)
+		if (p)
+		{
+			return p
+		}
+		
+		p = this.get_absolute_path('../node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		// console.log('get_absolute_package_path:../../../node_modules:', p)
+		if (p)
+		{
+			return p
+		}
+
+		return this.get_absolute_path('node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+	}
+	
+	
+
+	/**
+	 * Get absolute path of given relative public path.
+	 * 
+	 * @param {string} arg_relative_public - public path.
+	 * @param {string} arg_relative_path1 - relative path 1.
+	 * @param {string} arg_relative_path2 - relative path 2.
+	 * 
+	 * @returns {string} - absolute path.
+	 */
+	get_absolute_public_path(arg_relative_public, arg_relative_path1, arg_relative_path2)
+	{
+		assert( T.isString(arg_relative_public), context + 'get_absolute_public_path: bad path string')
+		
+		if ( path.isAbsolute(arg_relative_public) )
+		{
+			// console.log('get_absolute_public_path:absolute:', arg_relative_public)
+			return this.get_absolute_path(arg_relative_public, arg_relative_path1, arg_relative_path2)
+		}
+		
+		const base_public = path.join(this.get_base_dir(), 'public')
+		const world_public = path.join(this.get_world_dir(), 'public')
+		const searchs = [base_public, world_public, 'public', '..', '../public', '../..', '../../public', '../../..', '../../../public']
+		// console.log('get_absolute_public_path:base_public:', base_public)
+		// console.log('get_absolute_public_path:world_public:', world_public)
+
+		let p = undefined
+		let index = 0
+		let prefix = undefined
+		while( ! p && index < searchs.length )
+		{
+			prefix = searchs[index]
+			p = this.get_absolute_path(prefix, arg_relative_public, arg_relative_path1, arg_relative_path2)
+			// console.log('get_absolute_public_path:prefix=%s:', prefix, p)
+			++index
+		}
+		
+		return p
 	}
 	
 
@@ -270,12 +357,16 @@ export default class Context
 	{
 		// logs.debug('get_url_with_credentials')
 		
+		
+		// TODO ARGS = REQUEST OR CRENDETIALS ??
+
+
 		if ( ! arg_request )
 		{
 			return arg_url + '?{{credentials_url}}'
 		}
 		
-		const credentials_str = this.get_credentials_string(arg_request)
+		const credentials_str = this.get_credentials_string(arg_request ? arg_request.credentials : undefined)
 		
 		if (credentials_str)
 		{

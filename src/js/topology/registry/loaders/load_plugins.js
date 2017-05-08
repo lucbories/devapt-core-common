@@ -26,7 +26,7 @@ function load_plugins(logs, arg_plugins_config/*, arg_base_dir*/)
 		assert(T.isObject(arg_plugins_config), error_msg_bad_config)
 		
 		// LOOP ON PLUGINS
-		const plugins_types = ['rendering']
+		const plugins_types = ['rendering', 'services']
 		Object.keys(arg_plugins_config).forEach(
 			function(plugin_name)
 			{

@@ -1,13 +1,10 @@
 // NPM IMPORTS
 import assert from 'assert'
-// import Bacon from 'baconjs'
 
 // COMMON IMPORTS
 import T                      from '../utils/types'
 import Settingsable           from './settingsable'
 import LoggerManager          from '../loggers/logger_manager'
-// import RenderingDefaultPlugin from '../default_plugins/rendering_default_plugin'
-// import RenderingPlugin        from '../plugins/rendering_plugin'
 
 
 let context = 'browser/runtime'
@@ -36,10 +33,11 @@ export default class RuntimeBase extends Settingsable
 		// INIT LOGGING FEATURE
 		const log_context = arg_log_context ? arg_log_context : context
 		const loggers_settings = undefined
-		const logger_manager = new LoggerManager(loggers_settings)
+		const logger_manager = new LoggerManager(undefined, loggers_settings)
 		
 		super({}, log_context, logger_manager)
-		
+		logger_manager._runtime = this
+
 		this.is_base_runtime = true
 
 		this.current_state = undefined
@@ -62,7 +60,7 @@ export default class RuntimeBase extends Settingsable
 	 */
 	get_logger_manager()
 	{
-		return this.logger_manager
+		return this._logger_manager
 	}
 	
 	

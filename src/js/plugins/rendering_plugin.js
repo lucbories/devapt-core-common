@@ -30,6 +30,9 @@ export default class RenderingPlugin extends FeaturesPlugin
      */
 	constructor(arg_runtime, arg_manager, arg_name, arg_version)
 	{
+		assert( T.isObject(arg_runtime) && arg_runtime.is_base_runtime, context + ':constructor:bad runtime instance for ' + arg_name)
+		assert( T.isObject(arg_manager) && arg_manager.is_plugins_manager, context + ':bad manager object for ' + arg_name)
+		
 		super(arg_runtime, arg_manager, arg_name, 'RenderingPlugin', { version: arg_version }, context)
 		
 		this.is_rendering_plugin = true

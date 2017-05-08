@@ -5,6 +5,7 @@ import Immutable from 'immutable'
 // COMMON IMPORTS
 import T from '../utils/types'
 import Settingsable from './settingsable'
+import runtime from './runtime'
 
 
 const context = 'common/base/stateable'
@@ -39,7 +40,7 @@ export default class Stateable extends Settingsable
 	 * 
 	 * 		->get_name():string - get instance name.
 	 * 
-	 * @param {object} arg_settings - settings plain object
+	 * @param {Immutable.Map|object} arg_settings - settings plain object
 	 * @param {object} arg_runtime - client runtime.
 	 * @param {object} arg_state - component state.
 	 * @param {string} arg_log_context - context of traces of this instance (optional).
@@ -53,11 +54,23 @@ export default class Stateable extends Settingsable
 		super(arg_settings, log_context, arg_logger_manager)
 		
 		this.is_stateable = true
-		
+
+		// GET RUNTIME
 		this._runtime = arg_runtime
+		if ( ! arg_runtime)
+		{
+			if (arg_settings.get)
+			{
+				this._runtime = arg_settings.get('runtime', undefined)
+			} else {
+				this._runtime = (arg_settings && arg_settings.runtime) ? arg_settings.runtime : undefined
+			}
+		}
+		assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':constructor:bad this._runtime instance (' + log_context + ')')
+
 		this._initial_state = arg_state
 		this._state_store = this._runtime.get_state_store()
-		assert( T.isObject(this._state_store), context + ':constructor:bad state_store object')
+		assert( T.isObject(this._state_store), context + ':constructor:bad state_store object (' + log_context + ')')
 		
 		// SET STATE PATH
 		this.state_path = undefined

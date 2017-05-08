@@ -35,7 +35,9 @@ export default class RenderingBuilderAssets extends Loggable
      */
 	constructor(arg_runtime, arg_assets_styles, arg_assets_scripts, arg_assets_img, arg_assets_html, arg_application)
 	{
-		super(context)
+		assert( T.isObject(arg_runtime) && arg_runtime.is_base_runtime, context + ':constructor:bad runtime instance' )
+		
+		super(context, arg_runtime.get_logger_manager())
 
 		this.is_render = true
 
@@ -83,6 +85,7 @@ export default class RenderingBuilderAssets extends Loggable
 	{
 		this.enter_group('get_url_with_credentials')
 
+		// TODO CHECK CRENDETIALS
 		const url = this._runtime.context.get_url_with_credentials(arg_url)
 
 		this.leave_group('get_url_with_credentials')
@@ -181,8 +184,7 @@ export default class RenderingBuilderAssets extends Loggable
 		{
 			assert( T.isString(arg_svc_name), context + ':get_assets_url:bad svc name string')
 
-			const deployed_services = this._runtime.deployed_local_topology.deployed_services_map
-			const service = (arg_svc_name in deployed_services) ? deployed_services[arg_svc_name] : undefined
+			const service =  this._runtime.deployed_local_topology.find_deployed_service(arg_svc_name)
 			assert( T.isObject(service) && service.is_service, context + ':get_assets_script_url:bad service object')
 
 			this.assets_scripts_service_consumer = service.create_consumer()

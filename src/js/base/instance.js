@@ -6,6 +6,7 @@ import T from '../utils/types'
 import uid from '../utils/uid'
 import { is_browser, is_server } from '../utils/is_browser'
 import Stateable from './stateable'
+import runtime from './runtime'
 
 // SERVER INSTANCE
 import topology_registry from '../topology/registry/index'
@@ -36,7 +37,7 @@ export default class Instance extends Stateable
 	 * @param {string} arg_collection - collection name.
 	 * @param {string} arg_class - class name.
 	 * @param {string} arg_name - instance name.
-	 * @param {object} arg_settings - settings plain object
+	 * @param {Immutable.Map|object} arg_settings - settings plain object
 	 * @param {string} arg_log_context - log context.
 	 * @param {LoggerManager} arg_logger_manager - logger manager object (optional).
 	 * 
@@ -64,22 +65,13 @@ export default class Instance extends Stateable
 		const my_info = `[${arg_collection},${my_uid}] `
 		const my_context = arg_log_context ? arg_log_context + my_info : context + my_info
 		
-		
-		// GET RUNTIME
-		const server_runtime_file = '../base/runtime'
-		// const browser_runtime_file = 'see window.devapt().runtime()'
-		
-		let runtime = undefined
-		if (is_server())
-		{
-			runtime = require(server_runtime_file).default
-		}
-		else if (is_browser())
-		{
-			runtime = window.devapt().runtime()
-		}
-		
+		// const runtime = undefined
 		const default_state = {}
+
+		if (! arg_logger_manager && runtime)
+		{
+			arg_logger_manager = runtime.get_logger_manager()
+		}
 		super(arg_settings, runtime, default_state, my_context, arg_logger_manager)
 
 

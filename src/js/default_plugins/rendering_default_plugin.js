@@ -23,9 +23,12 @@ export default class DefaultPlugin extends RenderingPlugin
 {
 	constructor(arg_runtime, arg_manager)
 	{
+		assert( T.isObject(arg_runtime) && arg_runtime.is_base_runtime, context + ':constructor:bad runtime instance' )
+		assert( T.isObject(arg_manager), context + ':constructor:bad plugins manager instance' )
+
 		super(arg_runtime, arg_manager, 'DefaultRendering', '1.0.0')
 
-		const assets_dir = '../../public/assets'
+		const assets_dir = '../../public/'
 		this.add_public_asset('css', '/' + plugin_name + '/normalize.css',    path.join(__dirname, assets_dir, 'css/normalize.css') )
 		
 		this.add_public_asset('img', '/' + plugin_name + '/favico.png',       path.join(__dirname, assets_dir, 'img/favico.png') )

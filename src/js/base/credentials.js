@@ -216,23 +216,6 @@ export default class Credentials
 	 */
 	static get_empty_credentials()
 	{
-		/*const template_datas = {
-			tenant:undefined,
-			env:undefined,
-			application:undefined,
-
-			token:undefined,
-			user_name:undefined,
-			user_pass_digest:undefined,
-			
-			ts_login:undefined,
-			ts_expiration:undefined,
-
-			errors_count:0,
-			renew_count:0,
-
-			hash:undefined
-		}*/
 		return default_credentials
 	}
     
