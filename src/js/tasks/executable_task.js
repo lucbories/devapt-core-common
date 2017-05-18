@@ -21,6 +21,8 @@ export default class ExecutableTask extends Task
 {
 	/**
 	 * Create a ExecutableTask instance.
+	 * @class ExecutableTask
+	 * @extends Task
 	 * 
 	 * @param {object} arg_settings - task settings.
 	 * 

@@ -14,6 +14,7 @@ let context = 'common/services/service_consumer_by_url'
 /**
  * Service consumer base class.
  * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -105,7 +106,8 @@ export default class ServiceConsumerByUrl extends ServiceConsumerBase
 	 * 
 	 * @returns {Promise} - promise of service results.
 	 */
-	consume_local(/*arg_provider, arg_operands*/)
+	/* eslint no-unused-vars: "off" */
+	consume_local(arg_provider, arg_operands)
 	{
 		return Promise.resolve(undefined)
 	}
@@ -244,7 +246,8 @@ export default class ServiceConsumerByUrl extends ServiceConsumerBase
 	 * 
 	 * @returns {Promise} - promise of service results.
 	 */
-	consume_remote(/*arg_provider, arg_operands*/)
+	/* eslint no-unused-vars: "off" */
+	consume_remote(arg_provider, arg_operands)
 	{
 		return Promise.resolve(undefined)
 	}

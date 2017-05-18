@@ -7,7 +7,7 @@ import T from '../utils/types'
 import CacheAdapter from './cache_adapter'
 
 
-let context = 'common/cache/cache_adapter_cache_manager'
+const context = 'common/cache/cache_adapter_cache_manager'
 
 
 /*
@@ -29,28 +29,29 @@ node-cache-manager-memcached-store
 
 
 /**
- * @file Cache base class.
+ * Cache base class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+* 		->get(arg_key:string, arg_default):Promise
+* 		->mget(arg_keys:array, arg_default:any|array):Promise
+* 		->has(arg_key:string):Promise
+* 		->set(arg_key:string, arg_value, arg_ttl=undefined):Promise
+* 		->set_ttl(arg_key:string, arg_ttl):Promise
+* 		->get_ttl(arg_key:string):Promise
+* 		->get_keys():Promise
+* 		->remove(arg_keys:string|array):Promise
+* 		->flush():nothing - delete all entries.
+* 		->close():nothing - clear interval timeout for checks.
+* 
  */
 export default class CacheAdapterCacheManager extends CacheAdapter
 {
 	/**
 	 * Create Cache instance to manage cached datas.
-	 * 
-	 * API:
-	 * 		->get(arg_key:string, arg_default):Promise
-	 * 		->mget(arg_keys:array, arg_default:any|array):Promise
-	 * 		->has(arg_key:string):Promise
-	 * 		->set(arg_key:string, arg_value, arg_ttl=undefined):Promise
-	 * 		->set_ttl(arg_key:string, arg_ttl):Promise
-	 * 		->get_ttl(arg_key:string):Promise
-	 * 		->get_keys():Promise
-	 * 		->remove(arg_keys:string|array):Promise
-	 * 		->flush():nothing - delete all entries.
-	 * 		->close():nothing - clear interval timeout for checks.
 	 * 
 	 * @param {object} arg_settings - cache engine settings.
 	 * 
@@ -60,23 +61,37 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 	{
 		super(arg_settings)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_cache_adapter_cache_manager = true
 
-		const options = {ttl: 5} // seconds
-		options.ttl = T.isNumber(arg_settings.ttl) ? arg_settings.ttl / 1000 : options.ttl
+		/**
+		 * Cache storage engines.
+		 * @type {array}
+		 */
+		this._engine_stores = []
 
-		this.engine_stores = []
+		/**
+		 * Cache storage engine.
+		 * @type {CacheManager.engine}
+		 */
+		this._engine = undefined
+
 		this.init_stores(arg_settings.stores)
 
-		if ( this.engine_stores.length > 1 )
+		if ( this._engine_stores.length > 1 )
 		{
-			this.engine = CacheManager.multiCaching(this.engine_stores)
-		} else if (this.engine_stores.length == 0)
+			this._engine = CacheManager.multiCaching(this._engine_stores)
+		} else if (this._engine_stores.length == 0)
 		{
-			this.engine = CacheManager.caching({store: 'memory', max: 100, ttl: options.ttl / 1000 /*seconds*/})
-		} else if (this.engine_stores.length == 1)
+			const options = {ttl: 5} // seconds
+			options.ttl = T.isNumber(arg_settings.ttl) ? arg_settings.ttl / 1000 : options.ttl
+			this._engine = CacheManager.caching({store: 'memory', max: 100, ttl: options.ttl / 1000 /*seconds*/})
+		} else if (this._engine_stores.length == 1)
 		{
-			this.engine = this.engine_stores[0]
+			this._engine = this._engine_stores[0]
 		}
 	}
 
@@ -154,7 +169,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 			}
 			if (store)
 			{
-				this.engine_stores.push(store)
+				this._engine_stores.push(store)
 			}
 		})
 		
@@ -174,7 +189,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.get(arg_key, (err, value)=> {
+				this._engine.get(arg_key, (err, value)=> {
 					if (err)
 					{
 						reject(err)
@@ -220,7 +235,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 			(arg_key)=>{
 				const promise = new Promise(
 					(resolve, reject)=>{
-						this.engine.get(arg_key, (err, value)=> {
+						this._engine.get(arg_key, (err, value)=> {
 							if (err)
 							{
 								reject(err)
@@ -255,7 +270,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 	{
 		// let promise = new Promise(
 		// 	(resolve, reject)=>{
-		// 		this.engine.get(arg_key, (err, value)=> {
+		// 		this._engine.get(arg_key, (err, value)=> {
 		// 			if (err)
 		// 			{
 		// 				reject(err)
@@ -268,7 +283,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 		// )
 		
 		// return promise
-		return this.engine.get(arg_key).then( (result)=>{ return (result == undefined ? false : true) } )
+		return this._engine.get(arg_key).then( (result)=>{ return (result == undefined ? false : true) } )
 	}
 
 
@@ -287,7 +302,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 		arg_ttl = T.isNumber(arg_ttl) ? arg_ttl / 1000 : undefined
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.set(arg_key, arg_value, { ttl:arg_ttl }, (err, success)=> {
+				this._engine.set(arg_key, arg_value, { ttl:arg_ttl }, (err, success)=> {
 					if (err)
 					{
 						reject(err)
@@ -332,7 +347,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.ttl(arg_key, (err, value)=> {
+				this._engine.ttl(arg_key, (err, value)=> {
 					if (err)
 					{
 						reject(err)
@@ -357,7 +372,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.keys( (err, keys)=> {
+				this._engine.keys( (err, keys)=> {
 					if (err)
 					{
 						reject(err)
@@ -386,7 +401,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 		{
 			let promise = new Promise(
 				(resolve, reject)=>{
-					this.engine.del(arg_keys, (err, keys)=> {
+					this._engine.del(arg_keys, (err, keys)=> {
 						if (err)
 						{
 							reject(err)
@@ -427,7 +442,7 @@ export default class CacheAdapterCacheManager extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.reset( (err, undefined)=> {
+				this._engine.reset( (err, undefined)=> {
 					if (err)
 					{
 						reject(err)

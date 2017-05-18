@@ -50,6 +50,18 @@ export default class StreamBusEngine extends BusEngine
 
 	
 	/**
+	 * List engine channels.
+	 * 
+	 * @returns {array}
+	 */
+	channel_list()
+	{
+		return Object.keys(this._channels)
+	}
+	
+
+	
+	/**
 	 * Add a channel.
 	 * 
 	 * @param {string} arg_channel - channel name.
@@ -68,6 +80,7 @@ export default class StreamBusEngine extends BusEngine
 	 * Send a message into a channel.
 	 * 
 	 * @param {string} arg_channel - channel name string.
+	 * @param {object} arg_payload - payload data object.
 	 * 
 	 * @returns {Stream} - input bus stream
 	 */
@@ -75,7 +88,7 @@ export default class StreamBusEngine extends BusEngine
 	{
 		assert( T.isString(arg_channel), this.get_context() + ':channel_send:bad channel name')
 		assert( arg_payload, this.get_context() + ':channel_send:bad payload data')
-		assert( arg_channel in this._channels, this.get_context() + ':channel_send:channel stream not found')
+		assert( arg_channel in this._channels, this.get_context() + ':channel_send:channel [' + arg_channel + '] stream not found')
 		this._channels[arg_channel].push(arg_payload)
 	}
 	
@@ -92,12 +105,12 @@ export default class StreamBusEngine extends BusEngine
 	 */
 	channel_on(arg_channel, arg_handler, arg_predicate=undefined)
 	{
-		assert( T.isString(arg_channel), this.get_context() + ':channel_on:bad channel name')
-		assert( T.isFunction(arg_handler), this.get_context() + ':channel_on:bad handler function')
-		assert( arg_channel in this._channels, this.get_context() + ':channel_on:channel stream not found')
+		assert( T.isString(arg_channel), this.get_context() + ':channel_on:bad channel name on engine [' + this.get_name() + ']')
+		assert( T.isFunction(arg_handler), this.get_context() + ':channel_on:bad handler function on engine [' + this.get_name() + '] for channel [' + arg_channel + ']')
+		assert( arg_channel in this._channels, this.get_context() + ':channel_on:channel [' + arg_channel + '] stream not found on engine [' + this.get_name() + ']')
 		this._channels[arg_channel].subscribe(
 			(value) => {
-				// console.log(context + ':subscribe:received value', value)
+				// console.log(context + ':subscribe:bus[' + this.get_name() + '] channel [' + arg_channel + '] received value', value)
 				
 				// FILTER BY PREDICATE
 				if ( T.isFunction(arg_predicate) && arg_predicate(value) )

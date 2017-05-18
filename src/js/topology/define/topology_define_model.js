@@ -2,17 +2,14 @@
 // import assert from 'assert'
 
 // COMMON IMPORTS
-import T from '../../utils/types'
-import TopologyDefineItem from './topology_define_item'
+// import T from '../../utils/types'
+import TopologyDefineItem       from './topology_define_item'
+import TopologyDefineDatasource from './topology_define_datasource'
 
 
-let context = 'common/topology/define/topology_define_model'
+const context = 'common/topology/define/topology_define_model'
 
-
-
-/**
- * @file Model class: describe a Model topology item.
- * 
+/*
  * FORMAT: {
  * 		
  *			{
@@ -85,35 +82,35 @@ let context = 'common/topology/define/topology_define_model'
  *					}
  *				}
  *			}
+*/
+
+/**
+ * Model class: describe a Model topology item.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* SETTINGS FORMAT:
+* 	"modelss":
+* 		"modelA":
+*			"plural":"users",
+*				
+*			"datasource": "cx_auth",
+*			"container": "users",
+* 			"cache": Object with "ttl": 500 ,
+*
+*			"security":...,
+* 			"triggers":...,
+* 			"associations": ...,
+* 			"fields":...
+* 		"modelB":...
+* 
  */
 export default class TopologyDefineModel extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineModel instance.
-	 * @extends TopologyDefineItem
-	 * 
-	 * SETTINGS FORMAT:
-	 * 	"modelss":{
-	 * 		"modelA":{
-	 *			"plural":"users",
-	 *				
-	 *			"datasource": "cx_auth",
-	 *			"container": "users",
-	 * 			"cache": { "ttl": 500 },
-	 *
-	 *			"security":{...},
-	 * 			"triggers":{...},
-	 * 			"associations": {...},
-	 * 			"fields":{...}
-	 * 		},
-	 * 		"modelB":{
-	 *			...
-	 * 		}
-	 * 	}
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

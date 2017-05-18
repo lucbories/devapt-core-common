@@ -12,7 +12,8 @@ let context = 'common/base/registered_service'
 
 
 /**
- * @file Registered service class.
+ * Registered service class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -20,9 +21,10 @@ export default class RegisteredService extends Instance
 {
 	/**
 	 * Create a registered service instance.
-	 * @extends Instance
-	 * @param {string} arg_name - instance name
-	 * @param {object} arg_settings - instance settings map
+	 * 
+	 * @param {string} arg_name - instance name.
+	 * @param {object} arg_settings - instance settings map.
+	 * 
 	 * @returns {nothing}
 	 */
 	constructor(arg_name, arg_settings)
@@ -36,6 +38,10 @@ export default class RegisteredService extends Instance
 		
 		super('registered_services', 'RegisteredService', arg_name, arg_settings)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_registered_services = true
 	}
 	

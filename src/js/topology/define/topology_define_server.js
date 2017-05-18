@@ -20,28 +20,24 @@ export default class TopologyDefineServer extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineServer instance.
+	 * @class TopologyDefineServer
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"servers":{
-	 * 		"serverA":{
+	 * 	"servers":
+	 * 		"serverA":
 	 * 			"type":"express",
 	 * 			"port":8080,
 	 * 			"protocole":"http",
 	 * 			"middlewares":[],
 	 * 			"use_socketio":true,
 	 * 			
-	 * 			"security": {
-	 * 				"authentication": {
-	 * 					"enabled":false,
-	 * 					"plugins":["file_users"]
-	 * 				}
-	 *			}
-	 * 		},
-	 * 		"serverB":{
-	 *			...
-	 * 		}
-	 * 	}
+	 * 			"security":
+	 * 				"authentication":
+	 * 					Objects with:
+	 * 						"enabled":false,
+	 * 						"plugins":["file_users"]
+	 * 		"serverB":...
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

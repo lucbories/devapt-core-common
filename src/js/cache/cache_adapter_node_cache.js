@@ -12,33 +12,34 @@ import CacheAdapter from './cache_adapter'
 
 
 /**
- * @file Cache adapter for node-cache.
+ * Cache adapter for node-cache.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+* 		->constructor(arg_settings={ttl:5000, check_period:1000}) - time unit is milliseconds
+* 
+* 		->get(arg_key:string, arg_default):Promise
+* 		->mget(arg_keys:array, arg_default:any|array):Promise
+* 		->has(arg_key:string):Promise
+* 		->set(arg_key:string, arg_value, arg_ttl=undefined):Promise
+* 
+* 		->set_ttl(arg_key:string, arg_ttl):Promise
+* 		->get_ttl(arg_key:string):Promise
+* 
+* 		->get_keys():Promise
+* 		->remove(arg_keys:string|array):Promise
+* 
+* 		->flush():nothing - delete all entries.
+* 		->close():nothing - clear interval timeout for checks.
+* 
  */
 export default class CacheAdapterNodecache extends CacheAdapter
 {
 	/**
 	 * Create Cache instance to manage cached datas.
-	 * 
-	 * API:
-	 * 		->constructor(arg_settings={ttl:5000, check_period:1000}) - time unit is milliseconds
-	 * 
-	 * 		->get(arg_key:string, arg_default):Promise
-	 * 		->mget(arg_keys:array, arg_default:any|array):Promise
-	 * 		->has(arg_key:string):Promise
-	 * 		->set(arg_key:string, arg_value, arg_ttl=undefined):Promise
-	 * 
-	 * 		->set_ttl(arg_key:string, arg_ttl):Promise
-	 * 		->get_ttl(arg_key:string):Promise
-	 * 
-	 * 		->get_keys():Promise
-	 * 		->remove(arg_keys:string|array):Promise
-	 * 
-	 * 		->flush():nothing - delete all entries.
-	 * 		->close():nothing - clear interval timeout for checks.
 	 * 
 	 * @param {object} arg_settings - cache engine settings.
 	 * 
@@ -48,13 +49,21 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		super(arg_settings)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_cache_adapter_node_cache = true
 
 		const options = {stdTTL: 1, checkperiod: 5} // in seconds
 		options.stdTTL = T.isNumber(arg_settings.ttl) ? arg_settings.ttl / 1000 : options.stdTTL
 		options.checkperiod = T.isNumber(arg_settings.check_period) ? arg_settings.check_period / 1000 : options.checkperiod
 
-		this.engine = new NodeCache(options)
+		/**
+		 * Cache storage engine.
+		 * @type {NodeCache}
+		 */
+		this._engine = new NodeCache(options)
 	}
 
 
@@ -71,7 +80,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.get(arg_key, (err, value)=> {
+				this._engine.get(arg_key, (err, value)=> {
 					if (err)
 					{
 						reject(err)
@@ -104,7 +113,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.mget(arg_keys, (err, value)=> {
+				this._engine.mget(arg_keys, (err, value)=> {
 					if (err)
 					{
 						reject(err)
@@ -136,7 +145,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.get(arg_key, (err, value)=> {
+				this._engine.get(arg_key, (err, value)=> {
 					if (err)
 					{
 						reject(err)
@@ -165,7 +174,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.set(arg_key, arg_value, arg_ttl / 1000, (err, success)=> {
+				this._engine.set(arg_key, arg_value, arg_ttl / 1000, (err, success)=> {
 					if (err)
 					{
 						reject(err)
@@ -193,7 +202,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.ttl(arg_key, arg_ttl / 1000, (err, success)=> {
+				this._engine.ttl(arg_key, arg_ttl / 1000, (err, success)=> {
 					if (err)
 					{
 						reject(err)
@@ -220,7 +229,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.getTtl(arg_key, (err, ttl)=> {
+				this._engine.getTtl(arg_key, (err, ttl)=> {
 					if (err)
 					{
 						reject(err)
@@ -245,7 +254,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.get_keys( (err, keys)=> {
+				this._engine.get_keys( (err, keys)=> {
 					if (err)
 					{
 						reject(err)
@@ -272,7 +281,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.del(arg_keys, (err, success)=> {
+				this._engine.del(arg_keys, (err, success)=> {
 					if (err)
 					{
 						reject(err)
@@ -297,7 +306,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.flushAll()
+				this._engine.flushAll()
 				resolve()
 			}
 		)
@@ -316,7 +325,7 @@ export default class CacheAdapterNodecache extends CacheAdapter
 	{
 		let promise = new Promise(
 			(resolve, reject)=>{
-				this.engine.close()
+				this._engine.close()
 				resolve()
 			}
 		)

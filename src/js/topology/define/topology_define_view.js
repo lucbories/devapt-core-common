@@ -20,6 +20,7 @@ export default class TopologyDefineView extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineView instance.
+	 * @class TopologyDefineView
 	 * @extends TopologyDefineItem
 	 * 
 	 * @param {string} arg_name - instance name.

@@ -21,42 +21,35 @@ export default class TopologyDefineService extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineService instance.
+	 * @class TopologyDefineService
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"services":{
-	 * 		"serviceA":{
+	 * 	"services":
+	 * 		"serviceA":
 	 * 			"type":"security",
 	 * 			"routes":[
-	 * 				{
+	 * 				Objects with:
 	 * 					"route":"/login",
 	 * 					"action":"login"
-	 * 				}
 	 * 			]
-	 * 		},
-	 * 		"serviceB":{
+	 * 		"serviceB":
 	 * 			"type":"html_assets",
 	 * 			"routes":[
-	 * 				{
+	 * 				Objects with:
 	 * 					"route":"/assets2",
 	 * 					"directory":"./public/tutorial-1",
 	 * 					"default_file":"index.html"
-	 * 				},
 	 * 			]
-	 * 		},
-	 * 		"serviceC":{
+	 * 		"serviceC":
 	 * 			"type":"messages"
-	 * 		},
 	 * 		"serviceCDe":"middleware",
 	 * 			"routes":[
-	 * 				{
+	 * 				Objects with:
 	 * 					"route":"/home",
 	 * 					"page_view":"metrics_tabs",
-	 * 					"page_menubar":"default_menubar"
-	 * 				}
+	 * 					"page_menubar":"default_menubar"=
 	 * 			]
-	 *		}
-	 * 	}
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

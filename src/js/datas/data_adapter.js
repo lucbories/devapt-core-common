@@ -13,52 +13,53 @@ let context = 'common/data/data_adapter'
 
 
 /**
- * @file DataAdapter class.
+ * DataAdapter class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->constructor(arg_database, arg_models_schemas)
+* 		
+* 		->suspend()
+* 		->resume()
+* 
+* 		->add_model_schema(arg_model_schema)
+* 		->remove_model_schema(arg_model_name)
+* 		->get_model_schema(arg_model_name):TopologyRuntimeModelSchema
+* 
+* 		->get_collection(arg_model_name):DataCollection
+* 
+* 		->load_database(arg_topology_database)
+* 		->load_model(arg_model_schema)
+* 		->unload_model(arg_model_name)
+* 		->load_associations()
+* 
+*	 	->new_record(arg_model_name, arg_record_datas, arg_record_id):DataRecord - create a new data record instance, not saved.
+*	 	->delete_record(arg_model_name, arg_record_id):Promise(boolean) - delete an existing data record.
+* 		->update_record(arg_model_name, arg_record_datas, arg_record_id):Promise(DataRecord) - update an existing data record.
+* 		->has_record(arg_model_name, arg_record_id):Promise(boolean) - test if a data record exists with an id.
+* 		
+* 		->find_one_record(arg_model_name, arg_record_id):Promise(DataRecord) - find an existing data record with an id.
+* 		->find_or_create_record(arg_model_name, arg_record_id):Promise(DataRecord) - find an existing data record with an id.
+* 		->find_records(arg_model_name, arg_query):Promise(DataRecordArray) - find existing data records with a query.
+* 		->find_all_records(arg_model_name):Promise(DataRecordArray) - find all xisting data records.
+* 
+* 	PRIVATE:
+* 		->_emit(arg_event, arg_datas=undefined):nothing
+* 
+* 
+* 	USAGE ON BROWSER:
+* 		see DataStore
+* 
+* 
  */
 export default class DataAdapter extends Loggable
 {
 	/**
 	 * DataAdapter class is responsible to manage one source of records for many model.
 	 * DataAdapter instances are managed by a DataStore instance.
-	 * 
-	 * 	API:
-	 * 		->constructor(arg_database, arg_models_schemas)
-	 * 		
-	 * 		->suspend()
-	 * 		->resume()
-	 * 
-	 * 		->add_model_schema(arg_model_schema)
-	 * 		->remove_model_schema(arg_model_name)
-	 * 		->get_model_schema(arg_model_name):TopologyRuntimeModelSchema
-	 * 
-	 * 		->get_collection(arg_model_name):DataCollection
-	 * 
-	 * 		->load_database(arg_topology_database)
-	 * 		->load_model(arg_model_schema)
-	 * 		->unload_model(arg_model_name)
-	 * 		->load_associations()
-	 * 
-	 *	 	->new_record(arg_model_name, arg_record_datas, arg_record_id):DataRecord - create a new data record instance, not saved.
-	 *	 	->delete_record(arg_model_name, arg_record_id):Promise(boolean) - delete an existing data record.
-	 * 		->update_record(arg_model_name, arg_record_datas, arg_record_id):Promise(DataRecord) - update an existing data record.
-	 * 		->has_record(arg_model_name, arg_record_id):Promise(boolean) - test if a data record exists with an id.
-	 * 		
-	 * 		->find_one_record(arg_model_name, arg_record_id):Promise(DataRecord) - find an existing data record with an id.
-	 * 		->find_or_create_record(arg_model_name, arg_record_id):Promise(DataRecord) - find an existing data record with an id.
-	 * 		->find_records(arg_model_name, arg_query):Promise(DataRecordArray) - find existing data records with a query.
-	 * 		->find_all_records(arg_model_name):Promise(DataRecordArray) - find all xisting data records.
-	 * 
-	 * 	PRIVATE:
-	 * 		->_emit(arg_event, arg_datas=undefined):nothing
-	 * 
-	 * 
-	 * 	USAGE ON BROWSER:
-	 * 		see DataStore
-	 * 
 	 * 
 	 * @param {CacheManager} arg_cache_manager - cache manager instance.
 	 * @param {TopologyRuntimeDatabase} arg_database - topology database.
@@ -74,7 +75,12 @@ export default class DataAdapter extends Loggable
 
 		super(context)
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_data_adapter = true
+
 		this._cache_manager = arg_cache_manager
 
 		// TOPOLOGY ITEMS
@@ -88,6 +94,10 @@ export default class DataAdapter extends Loggable
 		this._includes = {}
 
 		// LOAD DATABASE AND MODEL
+		/**
+		 * Database promise.
+		 * @type {Promise}
+		 */
 		this.database_promise = this.load_database(arg_database).then(
 			(result)=>{
 				if (result)
@@ -125,7 +135,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {nothing}
 	 */
-	_emit(arg_event/*, arg_datas=undefined*/) // TODO
+	/* eslint no-unused-vars: "off" */
+	_emit(arg_event, arg_datas=undefined) // TODO
 	{
 		this.debug(context + ':emit:' + arg_event)
 	}
@@ -394,7 +405,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(boolean)
 	 */
-	create_record(/*arg_model_name, arg_record_datas*/)
+	/* eslint no-unused-vars: "off" */
+	create_record(arg_model_name, arg_record_datas)
 	{
 		return Promise.resolve(false)
 	}
@@ -409,7 +421,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(boolean)
 	 */
-	delete_record(/*arg_model_name, arg_record_id*/)
+	/* eslint no-unused-vars: "off" */
+	delete_record(arg_model_name, arg_record_id)
 	{
 		return Promise.resolve(false)
 	}
@@ -424,7 +437,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(boolean)
 	 */
-	update_record(/*arg_model_name, arg_record_datas*/)
+	/* eslint no-unused-vars: "off" */
+	update_record(arg_model_name, arg_record_datas)
 	{
 		return Promise.resolve(false)
 	}
@@ -439,7 +453,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(boolean)
 	 */
-	has_record(/*arg_model_name, arg_record_id*/)
+	/* eslint no-unused-vars: "off" */
+	has_record(arg_model_name, arg_record_id)
 	{
 		return Promise.resolve(false)
 	}
@@ -454,7 +469,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(DataRecord)
 	 */
-	find_one_record(/*arg_model_name, arg_record_id*/)
+	/* eslint no-unused-vars: "off" */
+	find_one_record(arg_model_name, arg_record_id)
 	{
 		return Promise.resolve(undefined)
 	}
@@ -470,7 +486,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(DataRecord)
 	 */
-	find_or_create_record(/*arg_model_name, arg_record_datas, arg_record_id*/)
+	/* eslint no-unused-vars: "off" */
+	find_or_create_record(arg_model_name, arg_record_datas, arg_record_id)
 	{
 		return Promise.resolve(undefined)
 	}
@@ -485,7 +502,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(DataRecordArray)
 	 */
-	find_records(/*arg_model_name, arg_query*/)
+	/* eslint no-unused-vars: "off" */
+	find_records(arg_model_name, arg_query)
 	{
 		return Promise.resolve(undefined)
 	}
@@ -499,7 +517,8 @@ export default class DataAdapter extends Loggable
 	 * 
 	 * @returns {Promise} - Promise(DataRecordArray)
 	 */
-	find_all_records(/*arg_model_name*/)
+	/* eslint no-unused-vars: "off" */
+	find_all_records(arg_model_name)
 	{
 		return Promise.resolve(undefined)
 	}
@@ -543,4 +562,3 @@ write()
 read()
 
 */
-

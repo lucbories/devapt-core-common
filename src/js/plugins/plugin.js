@@ -11,17 +11,15 @@ let context = 'common/plugins/plugin'
 
 
 /**
- * @file Plugins base class.
+ * Plugins base class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
  */
 export default class Plugin extends Instance
 {
 	/**
 	 * Create a plugin instance.
-	 * @extends Instance
 	 * 
 	 * @param {PluginsManager} arg_manager - plugins manager.
 	 * @param {string} arg_name - plugin name.
@@ -54,11 +52,28 @@ export default class Plugin extends Instance
 
 		super('plugins', (arg_class ? arg_class.toString() : 'Plugin'), arg_name, arg_settings, arg_log_context)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_plugin = true
 		
-		// this._runtime = arg_runtime
+		/**
+		 * Plugin version.
+		 * @type {string}
+		 */
 		this.$version = arg_settings.version
+
+		/**
+		 * Plugins manager.
+		 * @type {PluginManager}
+		 */
 		this.manager = arg_manager
+
+		/**
+		 * Enabled flag.
+		 * @type {boolean}
+		 */
 		this.is_enabled = false
 	}
 
@@ -84,7 +99,8 @@ export default class Plugin extends Instance
 	 * 
 	 * @returns {object} - a promise object of a boolean result (success:true, failure:false).
 	 */
-	enable(/*arg_context*/)
+	/* eslint no-unused-vars: "off" */
+	enable(arg_context)
 	{
 		this.is_enabled = true
 		this.manager.enabled_plugins.add(this)
@@ -101,7 +117,8 @@ export default class Plugin extends Instance
 	 * 
 	 * @returns {object} - a promise object of a boolean result (success:true, failure:false).
 	 */
-	disable(/*arg_context*/)
+	/* eslint no-unused-vars: "off" */
+	disable(arg_context)
 	{
 		this.is_enabled = false
 		this.manager.enabled_plugins.remove(this)

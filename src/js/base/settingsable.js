@@ -12,25 +12,28 @@ const context = 'common/base/settingsable'
 
 
 /**
- * @file Settingsable base class: child classes are able to manage settings.
+ * Settingsable base class: child classes are able to manage settings.
+ * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* Settings are immutable values which define instance initial configuration.
+* Settings are not intended to act as a mutable state.
+* 
+* API:
+* 		set_settings(arg_settings:plain object or Immutable object):nothing - replace settings Immutable.Map
+* 		get_settings(): Immutable.Map - get settings tree.
+* 		has_setting(arg_name:string|array): boolean - test if a value is avalaible for given key or path.
+* 		get_setting(arg_name:string|array, arg_default): Immutable or js value - get value from a path or a key.
+* 		set_setting(arg_name:string|array, arg_value): nothing - set or replace a value at given key or path.
+* 
  */
 export default class Settingsable extends Errorable
 {
 	/**
 	 * Create a Settingsable instance.
-	 * @extends Loggable
-	 * 
-	 * Settings are immutable values which define instance initial configuration.
-	 * Settings are not intended to act as a mutable state.
-	 * 
-	 * API:
-	 * 		set_settings(arg_settings:plain object or Immutable object):nothing - replace settings Immutable.Map
-	 * 		get_settings(): Immutable.Map - get settings tree.
-	 * 		has_setting(arg_name:string|array): boolean - test if a value is avalaible for given key or path.
-	 * 		get_setting(arg_name:string|array, arg_default): Immutable or js value - get value from a path or a key.
-	 * 		set_setting(arg_name:string|array, arg_value): nothing - set or replace a value at given key or path.
 	 * 
 	 * @param {Immutable.Map|object} arg_settings - instance settings map.
 	 * @param {string} arg_log_context - trace context string.
@@ -54,6 +57,18 @@ export default class Settingsable extends Errorable
 		}
 
 		super(my_context, logger_manager)
+		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
+		this.is_settable = true
+
+		/**
+		 * Instance settings (default undefined).
+		 * @type {object|Immutable.Map}
+		 */
+		this.$settings = undefined
 		
 		this.set_settings(arg_settings)
 	}

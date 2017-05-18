@@ -10,18 +10,20 @@ let context = 'common/base/distributed_message'
 
 
 /**
- * @file DistributedMessage class for distributed communication.
+ * DistributedMessage class for distributed communication.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->get_channel():string - get bus channel name.
+* 		->set_channel(arg_channel):nothing - set bus channel name.
  */
 export default class DistributedMessage
 {
     /**
      * Create a DistributedMessage instance.
-	 * 
-	 * 	API:
-	 * 		->get_channel():string - get bus channel name.
-	 * 		->set_channel(arg_channel):nothing - set bus channel name.
 	 * 
 	 * @param {string} arg_sender_name - sender name.
 	 * @param {string} arg_target_name - recipient name.
@@ -36,11 +38,34 @@ export default class DistributedMessage
 		assert( T.isString(arg_target_name) , context + ':bad target string')
 		assert( T.isObject(arg_payload), context + ':bad payload object')
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_distributed_message = true
 
+		/**
+		 * Message sender name.
+		 * @type {string}
+		 */
 		this._sender = arg_sender_name
+
+		/**
+		 * Message target name.
+		 * @type {string}
+		 */
 		this._target = arg_target_name
+
+		/**
+		 * Message payload object.
+		 * @type {object}
+		 */
 		this._payload = arg_payload
+
+		/**
+		 * Message channel name.
+		 * @type {string}
+		 */
 		this._channel = arg_channel
 	}
 

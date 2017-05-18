@@ -6,12 +6,13 @@ import T from '../utils/types'
 import DistributedMessage from './distributed_message'
 
 
-let context = 'common/base/distributed_metrics'
+const context = 'common/base/distributed_metrics'
 
 
 
 /**
- * @file DistributedMetrics class for distributed communication.
+ * DistributedMetrics class for distributed communication.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -24,19 +25,24 @@ export default class DistributedMetrics extends DistributedMessage
 	 * @param {string} arg_target_name - recipient name.
 	 * @param {string} arg_type - metrics type string.
 	 * @param {array} arg_values - metrics values array.
+	 * @param {string} arg_channel - channel name.
 	 * 
      * @returns {nothing}
      */
-	constructor(arg_sender_name, arg_target_name, arg_type, arg_values)
+	constructor(arg_sender_name, arg_target_name, arg_type, arg_values, arg_channel='metrics')
 	{
 		assert( T.isString(arg_type) , context + ':bad metric type string')
 		assert( T.isArray(arg_values), context + ':bad metrics values array')
 
-		super(arg_sender_name, arg_target_name, { metric:arg_type, metrics:arg_values })
+		super(arg_sender_name, arg_target_name, { metric:arg_type, metrics:arg_values }, arg_channel)
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_distributed_metrics = true
 
-		this.set_channel('metrics')
+		this.set_channel(arg_channel)
 	}
     
     

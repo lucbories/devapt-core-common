@@ -21,11 +21,12 @@ export default class TopologyDefineField extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineField instance.
+	 * @class TopologyDefineField
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"fields":{
-	 * 		"fieldA":{
+	 * 	"fields":
+	 * 		"fieldA":
 	 *			// DATA
 	 *			"type": "integer",
 	 *			"auto_increment": false,
@@ -47,11 +48,7 @@ export default class TopologyDefineField extends TopologyDefineItem
 	 *			"placeholder": "Enter lastname",
 	 *			"is_editable": "0",
 	 *			"is_visible": "0"
-	 * 		},
-	 * 		"fieldB":{
-	 *			...
-	 * 		}
-	 * 	}
+	 * 		"fieldB":...
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

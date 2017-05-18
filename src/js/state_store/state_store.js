@@ -11,17 +11,15 @@ let context = 'common/state_store/store'
 
 
 /**
- * @file Base class to deal with state storing and mutations.
+ * Base class to deal with state storing and mutations.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
  */
 export default class StateStore extends Loggable
 {
 	/**
 	 * Create a state Store instance.
-	 * @extends Loggable
 	 * 
 	 * @param {string} arg_log_context - trace context.
 	 * @param {LoggerManager} arg_logger_manager - logger manager object (optional).
@@ -60,7 +58,8 @@ export default class StateStore extends Loggable
 	 * 
 	 * @returns {nothing}
 	 */
-	set_state(/*arg_state*/)
+	/* eslint no-unused-vars: "off" */
+	set_state(arg_state)
 	{
 	}
 	
@@ -74,7 +73,8 @@ export default class StateStore extends Loggable
 	 * 
 	 * @returns {nothing}
 	 */
-	dispatch(/*arg_action*/)
+	/* eslint no-unused-vars: "off" */
+	dispatch(arg_action)
 	{
 	}
 	
@@ -103,7 +103,8 @@ export default class StateStore extends Loggable
 	 * 
 	 * @returns {function} - unsubscribe function
 	 */
-	subscribe(/*arg_handle*/)
+	/* eslint no-unused-vars: "off" */
+	subscribe(arg_handle)
 	{
 	}
 }

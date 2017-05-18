@@ -23,16 +23,43 @@ const STATUS_ENABLED = 'enabled'
 const STATUS_DISABLED = 'disabled'
 
 
+
 /**
- * @file Service base class.
+ * Service base class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->is_unknow():boolean - STATUS_UNKNOW ?
+* 		->is_error():boolean - STATUS_ERROR ?
+* 		->is_created():boolean - STATUS_CREATED ?
+* 		->is_enabled():boolean - STATUS_ENABLED ?
+* 		->is_disabled():boolean - STATUS_DISABLED ?
+* 
+* 		->enable():boolean - Enable service.
+* 		->disable():boolean - Disable service.
+* 
+* 		->activate(arg_application, arg_app_svc_cfg):nothing - Activate a service feature for an application.
+* 		->activate_on_server(arg_application, arg_server, arg_app_svc_cfg):nothing - Activate a service feature for an application on a server.
+* 
+* 		->get_providers():Collection - Get service providers.
+* 		->get_a_provider(arg_strategy):ServiceProvider|null - Get one service provider corresponding to the given strategy.
+* 		->get_provider_by_app_server(arg_app_name, arg_server_name):ServiceProvider|null - Get one service provider corresponding to the given application and server.
+* 		->create_provider(arg_name, arg_service):ServiceProvider - Create a new ServiceProvider instance for this service.
+* 		->create_consumer():ServiceConsumer - Create a new ServiceConsumer instance.
+* 		->provider(arg_name):ServiceProvider - Get a service provider by its name.
+* 
+* 		->get_topology_info(arg_deep=true, arg_visited={}):object - Get topology item informations.
+* 		->get_assets_services_names(arg_region='any'):object - Get assets services names.
+* 
  */
 export default class Service extends Instance
 {
 	// STATIC CONST ACCESSORS
 	static STATUS_UNKNOW()   { return STATUS_UNKNOW }
-	static STATUS_ERROR()	{ return STATUS_ERROR }
+	static STATUS_ERROR()	 { return STATUS_ERROR }
 	static STATUS_CREATED()  { return STATUS_CREATED }
 	static STATUS_ENABLED()  { return STATUS_ENABLED }
 	static STATUS_DISABLED() { return STATUS_DISABLED }
@@ -41,30 +68,6 @@ export default class Service extends Instance
 	
 	/**
 	 * Create a service instance.
-	 * @extends Instance
-	 * 
-	 * 	API:
-	 * 		->is_unknow():boolean - STATUS_UNKNOW ?
-	 * 		->is_error():boolean - STATUS_ERROR ?
-	 * 		->is_created():boolean - STATUS_CREATED ?
-	 * 		->is_enabled():boolean - STATUS_ENABLED ?
-	 * 		->is_disabled():boolean - STATUS_DISABLED ?
-	 * 
-	 * 		->enable():boolean - Enable service.
-	 * 		->disable():boolean - Disable service.
-	 * 
-	 * 		->activate(arg_application, arg_app_svc_cfg):nothing - Activate a service feature for an application.
-	 * 		->activate_on_server(arg_application, arg_server, arg_app_svc_cfg):nothing - Activate a service feature for an application on a server.
-	 * 
-	 * 		->get_providers():Collection - Get service providers.
-	 * 		->get_a_provider(arg_strategy):ServiceProvider|null - Get one service provider corresponding to the given strategy.
-	 * 		->get_provider_by_app_server(arg_app_name, arg_server_name):ServiceProvider|null - Get one service provider corresponding to the given application and server.
-	 * 		->create_provider(arg_name, arg_service):ServiceProvider - Create a new ServiceProvider instance for this service.
-	 * 		->create_consumer():ServiceConsumer - Create a new ServiceConsumer instance.
-	 * 		->provider(arg_name):ServiceProvider - Get a service provider by its name.
-	 * 
-	 * 		->get_topology_info(arg_deep=true, arg_visited={}):object - Get topology item informations.
-	 * 		->get_assets_services_names(arg_region='any'):object - Get assets services names.
 	 * 
 	 * @param {string} arg_name - plugin name
 	 * @param {object} arg_settings - plugin settings map
@@ -78,8 +81,16 @@ export default class Service extends Instance
 		
 		this.status = STATUS_UNKNOW
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_service = true
 		
+		/**
+		 * Service status.
+		 * @type {string}
+		 */
 		this.status = Service.STATUS_CREATED
 
 		this._activator = new ServiceActivator(this)
@@ -176,11 +187,10 @@ export default class Service extends Instance
 	 * 
 	 * @param {Application} arg_application - Application instance.
 	 * @param {Server} arg_server - Server instance.
-	 * @param {object} arg_app_svc_cfg - service configuration on application.
 	 * 
 	 * @returns {nothing}
 	 */
-	activate_on_server(arg_application, arg_server/*, arg_app_svc_cfg*/)
+	activate_on_server(arg_application, arg_server)
 	{
 		assert( T.isObject(arg_application) && arg_application.is_topology_define_application , context + ':bad application object')
 		assert( T.isObject(arg_server) && arg_server.is_server , context + ':bad server object')
@@ -346,6 +356,8 @@ export default class Service extends Instance
 
 	/**
 	 * Get assets services names.
+	 * 
+	 * @param {string} arg_region - region name.
 	 * 
 	 * @returns {object} - assets { style:'', script:'', image:'', html:'' }
 	 */

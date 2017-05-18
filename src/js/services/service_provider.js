@@ -98,7 +98,7 @@ export default class ServiceProvider extends Instance
 	 */
 	get_operations_names()
 	{
-		return ['devapt-disconnect', 'devapt-subscribe', 'devapt-unsubscribe']
+		return ['devapt-disconnect', 'devapt-subscribe', 'devapt-unsubscribe', 'devapt-subscription']
 	}
 
 
@@ -113,6 +113,7 @@ export default class ServiceProvider extends Instance
 	produce(arg_request)
 	{
 		const operation = arg_request.get_operation()
+		const operands = arg_request.get_operands()
 		const response = new ServiceResponse(arg_request)
 
 		// SUBSCRIBE TO PROVIDER STREAM DATAS
@@ -122,13 +123,13 @@ export default class ServiceProvider extends Instance
 			
 			if (socket)
 			{
-				this.unsubscribe(socket)
+				this.unsubscribe(socket, operands)
 				socket.disconnect(0)
-				response.set_results(['done'])
+				response.set_results( ['done'].concat(operands) )
 				return Promise.resolve(response)
 			}
 			
-			response.set_results([ { error:'bad socket' } ])
+			response.set_results( [ { error:'bad socket' } ].concat(operands) )
 			return Promise.resolve(response)
 		}
 
@@ -139,12 +140,12 @@ export default class ServiceProvider extends Instance
 			
 			if (socket)
 			{
-				this.subscribe(socket)
-				response.set_results(['done'])
+				this.subscribe(socket, operands)
+				response.set_results( ['done'].concat(operands) )
 				return Promise.resolve(response)
 			}
 			
-			response.set_results([ { error:'bad socket' } ])
+			response.set_results([ { error:'bad socket' } ].concat(operands) )
 			return Promise.resolve(response)
 		}
 
@@ -155,16 +156,25 @@ export default class ServiceProvider extends Instance
 			
 			if (socket)
 			{
-				this.unsubscribe(socket)
-				response.set_results(['done'])
+				this.unsubscribe(socket, operands)
+				response.set_results( ['done'].concat(operands) )
 				return Promise.resolve(response)
 			}
 
-			response.set_results([ { error:'bad socket' } ])
+			response.set_results( [ { error:'bad socket' } ].concat(operands) )
 			return Promise.resolve(response)
 		}
 
-		response.set_results([ { error:'operation not found' } ])
+		// SUBSCRIPTION
+		if (operation == 'devapt-subscription')
+		{
+			response.set_results(operands)
+			return Promise.resolve(response)
+		}
+
+		response.set_has_error(true)
+		response.set_error('produce:error:operation failure [' + operation + '] not found')
+		response.set_results(undefined)
 		return Promise.resolve(response)
 	}
 	
@@ -197,11 +207,12 @@ export default class ServiceProvider extends Instance
 	/**
 	 * Add a subscriber socket.
 	 * 
-	 * @param {object} arg_socket - subscribing socket.
+	 * @param {object} arg_socket   - subscribing socket.
+	 * @param {any}    arg_operands - service subscription option (optional, unused yet).
 	 * 
 	 * @returns {nothing}
 	 */
-	subscribe(arg_socket)
+	subscribe(arg_socket/*, arg_operands*/)
 	{
 		// const svc_name = this.service.get_name()
 		// console.info(context + ':subscribe:socket subscribe on /' + svc_name, arg_socket.id)
@@ -214,11 +225,12 @@ export default class ServiceProvider extends Instance
 	/**
 	 * Remove a subscriber socket.
 	 * 
-	 * @param {object} arg_socket - subscribing socket.
+	 * @param {object} arg_socket   - subscribing socket.
+	 * @param {any}    arg_operands - service subscription option (optional, unused yet).
 	 * 
 	 * @returns {nothing}
 	 */
-	unsubscribe(arg_socket)
+	unsubscribe(arg_socket/*, arg_operands*/)
 	{
 		// const svc_name = this.service.get_name()
 
@@ -230,7 +242,7 @@ export default class ServiceProvider extends Instance
 	/**
 	 * Post a message on the bus.
 	 * 
-	 * @param {object} arg_msg - message payload.
+	 * @param {object} arg_datas - response values.
 	 * 
 	 * @returns {nothing}
 	 */
@@ -241,7 +253,7 @@ export default class ServiceProvider extends Instance
 		this.subscribers_sockets.forEach(
 			(socket) => {
 				// console.log(context + ':post:emit datas for ' + svc_name)
-				socket.emit('post', { service:svc_name, operation:'post', result:'done', datas:arg_datas })
+				socket.emit('devapt-subscription', { service:svc_name, operation:'devapt-subscription', result:'done', datas:arg_datas })
 			}
 		)
 	}

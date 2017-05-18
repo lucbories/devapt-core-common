@@ -19,6 +19,8 @@ export default class Task
 {
 	/**
 	 * Create a Task instance.
+	 * @class Task
+	 * @extends Object
 	 * 
 	 * API:
 	 * 		->constructor(arg_settings)

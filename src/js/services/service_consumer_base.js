@@ -14,28 +14,31 @@ let context = 'common/services/service_consumer_base'
 /**
  * Service consumer base class.
  * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->get_service():Service - Get service instance.
+* 
+* 		->prepare_args(arg_operands):array - Enhance operands if needed (abstract).
+* 
+* 		->consume(...args):Promise - Consume datas from service producer.
+* 
+* 		->is_service_on_same_node():boolean - Is requested service on the same Node ?
+* 
+* 		->consume_from_server(arg_operands):Promise - Consume service on a server.
+* 		->consume_from_browser(arg_operands):Promise - Consume a service from a browser.
+* 
+* 		->consume_local(arg_provider, arg_operands):Promise - Consume a service on the same host (abstract).
+* 		->consume_remote(arg_operands):Promise - Consume a service on a remote host (abstract).
+* 
  */
 export default class ServiceConsumerBase extends Instance
 {
 	/**
 	 * Create a service consumer.
-	 * 
-	 * 	API:
-	 * 		->get_service():Service - Get service instance.
-	 * 
-	 * 		->prepare_args(arg_operands):array - Enhance operands if needed (abstract).
-	 * 
-	 * 		->consume(...args):Promise - Consume datas from service producer.
-	 * 
-	 * 		->is_service_on_same_node():boolean - Is requested service on the same Node ?
-	 * 
-	 * 		->consume_from_server(arg_operands):Promise - Consume service on a server.
-	 * 		->consume_from_browser(arg_operands):Promise - Consume a service from a browser.
-	 * 
-	 * 		->consume_local(arg_provider, arg_operands):Promise - Consume a service on the same host (abstract).
-	 * 		->consume_remote(arg_operands):Promise - Consume a service on a remote host (abstract).
 	 * 
 	 * @param {string} arg_consumer_name - consumer name.
 	 * @param {Service} arg_service_instance - service instance.
@@ -69,10 +72,12 @@ export default class ServiceConsumerBase extends Instance
 	
 	
 	/**
-	 * Enhance operands if needed
+	 * Enhance operands if needed.
 	 * @abstract
-	 * @params {array} arg_operands - Variable list of operands
-	 * @returns {array} - array of operands
+	 * 
+	 * @params {array} arg_operands - Variable list of operands.
+	 * 
+	 * @returns {array} - array of operands.
 	 */
 	prepare_args(arg_operands)
 	{
@@ -200,7 +205,8 @@ export default class ServiceConsumerBase extends Instance
 	 * 
 	 * @returns {Promise} - promise of service results.
 	 */
-	consume_local(/*arg_provider, arg_operands*/)
+	/* eslint no-unused-vars: "off" */
+	consume_local(arg_provider, arg_operands)
 	{
 		return Promise.resolve(undefined)
 	}
@@ -215,7 +221,8 @@ export default class ServiceConsumerBase extends Instance
 	 * 
 	 * @returns {Promise} - promise of service results.
 	 */
-	consume_remote(/*arg_operands*/)
+	/* eslint no-unused-vars: "off" */
+	consume_remote(arg_operands)
 	{
 		return Promise.resolve(undefined)
 	}

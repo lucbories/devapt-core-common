@@ -383,7 +383,7 @@ private_devapt.private_ajax.get_json = private_devapt.private_ajax.get_html
 
 // *********************************************************************************
 // SERVICES HELPERS
-function devapt_get_service(arg_svc_name, arg_svc_cfg)
+private_devapt.get_service = function(arg_svc_name, arg_svc_cfg)
 {
 	var devapt = window.devapt()
 	var rt = devapt.runtime()
@@ -399,46 +399,67 @@ function devapt_get_service(arg_svc_name, arg_svc_cfg)
 }
 
 
-function devapt_subscribe_service(arg_svc_promise, arg_operands=undefined, arg_callback=undefined)
+private_devapt.subscribe_service = function(arg_svc_promise, arg_operands=undefined, arg_callback=undefined, arg_subscribe_method='devapt-subscribe', arg_subscription_method='devapt-subscription')
 {
+	var subscribe_method = arg_subscribe_method
+	var subscription_method = arg_subscription_method
+
 	arg_svc_promise.then(
 		function(svc)
 		{
-			// SUBSCRIBE TO POST
-			var method = 'post'
-
-			if ( ! (method in svc) )
+			// CHECK SERVICE SUBSCRIBE METHOD
+			if ( ! (subscribe_method in svc) )
 			{
-				console.error('method [post] not found for service [' + svc.get_name() + ']')
+				console.error('method [' + subscribe_method + '] not found for service [' + svc.get_name() + ']')
 				return
 			}
 
-			var result_stream = svc[method](arg_operands)
-			var unsubscribe = result_stream.subscribe(
+			// SUBSCRIBE TO SUBSCRIBE RESPONSE
+			var subscribe_stream = svc[subscribe_method](arg_operands)
+			var subscribe_unsubscribe = subscribe_stream.subscribe(
 				function(response)
 				{
-					console.log('service [' + svc.get_name() + '] receive method [' + method + '] response', response)
+					console.log('service [' + svc.get_name() + '] receive method [' + subscribe_method + '] response', response)
+
+					subscribe_unsubscribe()
 					
-					if (arg_callback)
+					// CHECK SERVICE SUBSCRIPTION METHOD
+					if ( ! (subscription_method in svc) )
 					{
-						arg_callback(response)
+						console.error('method [' + subscription_method + '] not found for service [' + svc.get_name() + ']')
+						return
 					}
+
+					// SUBSCRIBE TO SUBSCRIPTION METHOD
+					var subscription_stream = svc[subscription_method](arg_operands)
+					var unsubscribe = subscription_stream.subscribe(
+						function(response)
+						{
+							console.log('service [' + svc.get_name() + '] receive method [' + subscription_method + '] response', response)
+							
+							if (arg_callback)
+							{
+								arg_callback(response)
+							}
+						}
+					)
+				
+					// REGISTER UNSUBSCRIPTION FUNCTION
+					if (! svc[subscription_method].unsubscribes )
+					{
+						svc[subscription_method].unsubscribes = []
+					}
+					svc[subscription_method].unsubscribes.push(unsubscribe)
 				}
 			)
-			
-			if (! svc['post'].unsubscribes )
-			{
-				svc['post'].unsubscribes = []
-			}
-			svc['post'].unsubscribes.push(unsubscribe)
 
-			console.log(method + ' subscribed for service [' + svc.get_name() + ']')
+			// console.log('[' + request_method + '] subscribed for service [' + svc.get_name() + ']')
 		}
 	)
 }
 
 
-function devapt_request_service(arg_svc_promise, arg_operation, arg_operands=undefined, arg_callback=undefined)
+private_devapt.request_service = function(arg_svc_promise, arg_operation, arg_operands=undefined, arg_callback=undefined)
 {
 	if (! arg_svc_promise || ! arg_svc_promise.then)
 	{
@@ -482,7 +503,7 @@ function devapt_request_service(arg_svc_promise, arg_operation, arg_operands=und
 					unsubscribe()
 				}
 			)
-			console.log('devapt_request_service:' + arg_operation + ' requested for service [' + svc.get_name() + ']')
+			// console.log('devapt_request_service:' + arg_operation + ' requested for service [' + svc.get_name() + ']')
 			
 			return result_stream
 		}

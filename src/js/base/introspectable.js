@@ -11,37 +11,37 @@ let context = 'common/base/introspectable'
 
 
 /**
- * @file Base class to build easily classes.
+ * Base class to build easily classes.
+ * @abstract
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* 	Property record format:
+* 		{
+*			name:string,
+*			type:string,
+*			value:any,
+*			private:boolean,
+*			getter:boolean,
+* 			setter:boolean,
+*			tester:boolean
+* 		}
+* 	API:
+* 		->has_property(arg_name):boolean - test if instance has given named property.
+* 		->add_property(arg_record:object):boolean - add given named property.
+* 		
+* 		->set_property_value(arg_name, arg_value)
+* 		->set_properties_values(arg_values:object|array):boolean - set properties values with arg_values as { prop_name_1:value1, ... }
+* 		
+* 		->has_method(arg_name):boolean - test if instance has given named method.
+* 		->add_method(arg_record:object):boolean - add given named method.
  */
 export default class Introspectable
 {
 	/**
 	 * Create an Introspectable instance.
-	 * @abstract
-	 * 
-	 * 	Property record format:
-	 * 		{
-	 *			name:string,
-	 *			type:string,
-	 *			value:any,
-	 *			private:boolean,
-	 *			getter:boolean,
-	 * 			setter:boolean,
-	 *			tester:boolean
-	 * 		}
-	 * 	API:
-	 * 		->has_property(arg_name):boolean - test if instance has given named property.
-	 * 		->add_property(arg_record:object):boolean - add given named property.
-	 * 		
-	 * 		->set_property_value(arg_name, arg_value)
-	 * 		->set_properties_values(arg_values:object|array):boolean - set properties values with arg_values as { prop_name_1:value1, ... }
-	 * 		
-	 * 		->has_method(arg_name):boolean - test if instance has given named method.
-	 * 		->add_method(arg_record:object):boolean - add given named method.
 	 * 
 	 * @param {object} arg_properties - properties records as { name:'...', type:'', getter:true, setter: true, tester:true }.
 	 * @param {object} arg_methods - methods records as { name:'...', type:'', functor:(...)=>{} }
@@ -51,11 +51,34 @@ export default class Introspectable
 	 */
 	constructor(arg_properties=[], arg_methods=[], arg_values=undefined)
 	{
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_introspectable = true
 		
+		/**
+		 * Properties map.
+		 * @type {object}
+		 */
 		this._properties = {}
+
+		/**
+		 * Properties names array.
+		 * @type {array}
+		 */
 		this._properties_names = []
+
+		/**
+		 * Methods map.
+		 * @type {object}
+		 */
 		this._methods = {}
+
+		/**
+		 * Methods names array.
+		 * @type {array}
+		 */
 		this._methods_names = []
 
 		// REGISTER PROPERTIES
@@ -129,11 +152,19 @@ export default class Introspectable
 		}
 
 		// BUILD ATTRIBUTE
+		/**
+		 * Property value.
+		 * @type {any}
+		 */
 		this[this_name] = value
 
 		// BUILD GETTER
 		if (getter)
 		{
+			/**
+			 * Property getter.
+			 * @type {function}
+			 */
 			this['get_' + name] = ()=>{
 				return this[this_name]
 			}
@@ -142,6 +173,10 @@ export default class Introspectable
 		// BUILD SETTER
 		if (setter)
 		{
+			/**
+			 * Property setter.
+			 * @type {function}
+			 */
 			this['set_' + name] = (arg_value)=>{
 				this.set_property_value(name, arg_value, this_name)
 			}
@@ -150,6 +185,10 @@ export default class Introspectable
 		// BUILD TESTER
 		if (tester)
 		{
+			/**
+			 * Property tester.
+			 * @type {function}
+			 */
 			this['has_' + name] = ()=>{
 				return this[this_name] ? true : false
 			}
@@ -171,8 +210,13 @@ export default class Introspectable
 	 */
 	set_property_value(arg_name, arg_value, arg_this_name)
 	{
-		const attr_name = arg_this_name ? arg_this_name : arg_name
-		this[attr_name] = arg_value
+		const name = arg_this_name ? arg_this_name : arg_name
+
+		/**
+		 * Property value.
+		 * @type {any}
+		 */
+		this[name] = arg_value
 	}
 
 

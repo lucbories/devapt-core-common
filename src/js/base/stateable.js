@@ -5,7 +5,6 @@ import Immutable from 'immutable'
 // COMMON IMPORTS
 import T from '../utils/types'
 import Settingsable from './settingsable'
-import runtime from './runtime'
 
 
 const context = 'common/base/stateable'
@@ -13,32 +12,33 @@ const context = 'common/base/stateable'
 
 
 /**
- * @file Stateable base class.
+ * Stateable base class.
+ * @abstract
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+* 		->get_initial_state():plain object - get state at creation.
+* 		->get_state():plain object - get current state.
+* 		->get_state_store():object - get state store.
+* 		->get_state_path():array|string - get state path into store.
+* 		->get_state_value(arg_key_or_path, arg_default_value=undefined):any - get a state value at path.
+* 
+* 		->handle_state_change(arg_previous_state, arg_new_state):nothing - handle state changes (to be implemented in sub classes)
+* 		->register_state_value_change_handle(arg_path, arg_listener):nothing - Register a state value change listener.
+* 
+* 		->dispatch_action(arg_action_type, arg_options):nothing - dispatch state changes actions.
+* 
+* 		->get_name():string - get instance name.
+* 
  */
 export default class Stateable extends Settingsable
 {
 	
 	/**
 	 * Creates an instance of Stateable: an object with an observable mutable state.
-	 * @extends Settingsable
-	 * 
-	 * API:
-	 * 		->get_initial_state():plain object - get state at creation.
-	 * 		->get_state():plain object - get current state.
-	 * 		->get_state_store():object - get state store.
-	 * 		->get_state_path():array|string - get state path into store.
-	 * 		->get_state_value(arg_key_or_path, arg_default_value=undefined):any - get a state value at path.
-	 * 
-	 * 		->handle_state_change(arg_previous_state, arg_new_state):nothing - handle state changes (to be implemented in sub classes)
-	 * 		->register_state_value_change_handle(arg_path, arg_listener):nothing - Register a state value change listener.
-	 * 
-	 * 		->dispatch_action(arg_action_type, arg_options):nothing - dispatch state changes actions.
-	 * 
-	 * 		->get_name():string - get instance name.
 	 * 
 	 * @param {Immutable.Map|object} arg_settings - settings plain object
 	 * @param {object} arg_runtime - client runtime.
@@ -53,9 +53,17 @@ export default class Stateable extends Settingsable
 		const log_context = arg_log_context ? arg_log_context : context
 		super(arg_settings, log_context, arg_logger_manager)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_stateable = true
 
 		// GET RUNTIME
+		/**
+		 * Runtime isntance.
+		 * @type {Runtime}
+		 */
 		this._runtime = arg_runtime
 		if ( ! arg_runtime)
 		{
@@ -68,17 +76,34 @@ export default class Stateable extends Settingsable
 		}
 		assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':constructor:bad this._runtime instance (' + log_context + ')')
 
+		/**
+		 * Initial state.
+		 * @type {object}
+		 */
 		this._initial_state = arg_state
+
+		/**
+		 * State store.
+		 * @type {StateStore}
+		 */
 		this._state_store = this._runtime.get_state_store()
 		assert( T.isObject(this._state_store), context + ':constructor:bad state_store object (' + log_context + ')')
 		
 		// SET STATE PATH
+		/**
+		 * State path in runtime state.
+		 * @type {array}
+		 */
 		this.state_path = undefined
 		if ( arg_state && T.isFunction(arg_state.has) && T.isFunction(arg_state.get) && arg_state.has('state_path') )
 		{
 			this.state_path = arg_state.get('state_path').toArray()
 		}
 
+		/**
+		 * State changes handlers.
+		 * @type {array}
+		 */
 		this._state_value_listeners = []
 
 		// console.info(context + ':constructor:creating component ' + this.get_name())

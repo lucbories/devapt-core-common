@@ -20,6 +20,7 @@ export default class TopologyDefineMenu extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineMenu instance.
+	 * @class TopologyDefineMenu
 	 * @extends TopologyDefineItem
 	 * 
 	 * @param {string} arg_name - instance name.

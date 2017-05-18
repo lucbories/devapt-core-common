@@ -6,7 +6,7 @@ import T from '../utils/types'
 import Loggable from '../base/loggable'
 
 
-let context = 'common/data/data_store'
+const context = 'common/data/data_store'
 
 /*
 createRecord is used for creating new records on the client side. This will return a new record in the created.uncommitted state.
@@ -35,66 +35,64 @@ unloadRecord
 */
 
 /**
- * @file DataStore class.
+ * DataStore class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->constructor()
+* 		
+* 		// DATA ADAPTERS MANAGEMENT
+* 		->add_adapter(arg_adapter):boolean
+* 		->remove_adapter(arg_adapter):boolean
+* 		->suspend_adapter(arg_adapter):boolean
+* 		->resume_adapter(arg_adapter):boolean
+* 		
+* 		// DATA COLLECTIONS MANAGEMENT
+* 		->get_collection(arg_model_name):DataCollection - get a data collection for a model.
+* 		->add_collection(arg_collection):boolean - add a data collection.
+* 		->remove_collection(arg_collection):boolean - remove a data collection.
+* 
+* 		// WRAPPERS FOR DATA COLLECTIONS OPERATIONS
+* 		->create_record(arg_collection_name, arg_record_id, arg_record_datas):Promise(DataRecord) - create a new data record.
+* 		->delete_record(arg_collection_name, arg_record_id):Promise(boolean) - delete an existing data record.
+* 		->update_record(arg_collection_name, arg_record_id, arg_record_datas):Promise(DataRecord) - update an existing data record.
+* 		->has_record(arg_collection_name, arg_record_id):Promise(boolean) - test if a data record exists with an id.
+* 		
+* 		->find_one_record(arg_collection_name, arg_record_id):Promise(DataRecord) - find an existing data record with an id.
+* 		->find_records(arg_collection_name, arg_query):Promise(DataRecordArray) - find existing data records with a query.
+* 		->find_all_records(arg_collection_name):Promise(DataRecordArray) - find all xisting data records.
+* 
+* 
+* 	USAGE ON BROWSER:
+* 		var memory_cache = new CacheAdapterNodeCache( {ttl:5000, check_period:2000} )
+* 		var cache_manager = new CacheManager([memory_cache])
+* 
+* 		var rest_settings = {...}
+* 		var models_settings = {...}
+* 		var rest_adapter = new DataAdapterRest(rest_settings, models_settings)
+* 		var ds = new DataStore(cache_manager, [rest_adapter])
+* 		ds.set_tenant('my tenant')
+* 		ds.set_credentials('*', app.get_credentials())
+* 		ds.set_credentials('cars', {token:'...'} )
+* 		
+* 		var cars = ds.get_collection('cars')
+* 		var car_12 = cars.find_one_record('12')
+* 
+* 		or
+* 
+* 		var car_13 = ds.find_one_record('cars', '13')
+* 		
+* 		var car_14 = ds.create_record('cars', '14', { engine:'gazol', color:'red' } )
+* Each application on the browser has credentials for one tenant.
+ * 
  */
 export default class DataStore extends Loggable
 {
 	/**
 	 * Data store class is the main interface between datas consumers (views) and producers (adapters).
-	 * 
-	 * Each application on the browser has crendtials for one tenant.
-	 * 
-	 * 
-	 * 	API:
-	 * 		->constructor()
-	 * 		
-	 * 		// DATA ADAPTERS MANAGEMENT
-	 * 		->add_adapter(arg_adapter):boolean
-	 * 		->remove_adapter(arg_adapter):boolean
-	 * 		->suspend_adapter(arg_adapter):boolean
-	 * 		->resume_adapter(arg_adapter):boolean
-	 * 		
-	 * 		// DATA COLLECTIONS MANAGEMENT
-	 * 		->get_collection(arg_model_name):DataCollection - get a data collection for a model.
-	 * 		->add_collection(arg_collection):boolean - add a data collection.
-	 * 		->remove_collection(arg_collection):boolean - remove a data collection.
-	 * 
-	 * 		// WRAPPERS FOR DATA COLLECTIONS OPERATIONS
-	 * 		->create_record(arg_collection_name, arg_record_id, arg_record_datas):Promise(DataRecord) - create a new data record.
-	 * 		->delete_record(arg_collection_name, arg_record_id):Promise(boolean) - delete an existing data record.
-	 * 		->update_record(arg_collection_name, arg_record_id, arg_record_datas):Promise(DataRecord) - update an existing data record.
-	 * 		->has_record(arg_collection_name, arg_record_id):Promise(boolean) - test if a data record exists with an id.
-	 * 		
-	 * 		->find_one_record(arg_collection_name, arg_record_id):Promise(DataRecord) - find an existing data record with an id.
-	 * 		->find_records(arg_collection_name, arg_query):Promise(DataRecordArray) - find existing data records with a query.
-	 * 		->find_all_records(arg_collection_name):Promise(DataRecordArray) - find all xisting data records.
-	 * 
-	 * 
-	 * 	USAGE ON BROWSER:
-	 * 		var memory_cache = new CacheAdapterNodeCache( {ttl:5000, check_period:2000} )
-	 * 		var cache_manager = new CacheManager([memory_cache])
-	 * 
-	 * 		var rest_settings = {...}
-	 * 		var models_settings = {...}
-	 * 		var rest_adapter = new DataAdapterRest(rest_settings, models_settings)
-	 * 		var ds = new DataStore(cache_manager, [rest_adapter])
-	 * 		ds.set_tenant('my tenant')
-	 * 		ds.set_credentials('*', app.get_credentials())
-	 * 		ds.set_credentials('cars', {token:'...'} )
-	 * 		
-	 * 		var cars = ds.get_collection('cars')
-	 * 		var car_12 = cars.find_one_record('12')
-	 * 
-	 * 		or
-	 * 
-	 * 		var car_13 = ds.find_one_record('cars', '13')
-	 * 		
-	 * 		var car_14 = ds.create_record('cars', '14', { engine:'gazol', color:'red' } )
-	 * 
 	 * 
 	 * @param {CacheManager} arg_cache_manager - cache manager instance.
 	 * @param {array} arg_data_adapters - data adapters array.
@@ -108,6 +106,10 @@ export default class DataStore extends Loggable
 
 		super(context)
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_data_store = true
 
 		this._cache_manager = arg_cache_manager
@@ -127,7 +129,8 @@ export default class DataStore extends Loggable
 	 * 
 	 * @returns {nothing}
 	 */
-	_emit(arg_event/*, arg_datas=undefined*/) // TODO
+	/* eslint no-unused-vars: "off" */
+	_emit(arg_event, arg_datas=undefined) // TODO
 	{
 		this.debug(context + ':emit:' + arg_event)
 	}

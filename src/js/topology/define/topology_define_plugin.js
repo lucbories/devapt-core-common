@@ -12,29 +12,26 @@ let context = 'common/topology/define/topology_define_plugin'
 
 
 /**
- * @file TopologyDefinePlugin class: describe a Plugin topology item.
+ * TopologyDefinePlugin class: describe a Plugin topology item.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* SETTINGS FORMAT:
+* 	"plugins":
+* 		"pluginA":
+*			"type":"...", // rendering, services
+* 			"file":"..."
+* 		"pluginB":
+*			"type":"...",
+* 			"package":"..."
+* 
  */
 export default class TopologyDefinePlugin extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefinePlugin instance.
-	 * @extends TopologyDefineItem
-	 * 
-	 * SETTINGS FORMAT:
-	 * 	"plugins":{
-	 * 		"pluginA":{
-	 *			"type":"...", // rendering
-	 * 			"file":"..."
-	 * 		},
-	 * 		"pluginB":{
-	 *			"type":"...",
-	 * 			"package":"..."
-	 * 		}
-	 * 	}
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.
@@ -136,7 +133,7 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 
 
 	/**
-	 * Load rendering plugins.
+	 * Create plugins.
 	 * 
 	 * @param {RuntimeBase} - arg_runtime - Runtime instance.
 	 * @param {Class} - arg_plugin_class - Plugin class.

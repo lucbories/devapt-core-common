@@ -22,19 +22,16 @@ export default class TopologyDefineTenant extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineTenant instance.
+	 * @class TopologyDefineTenant
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"tenants":{
-	 * 		"packages":{
-	 *			"packageA":{...}
-	 * 		},
-	 * 		"applications":{
-	 *			"applicationA":{...}
-	 * 		},
-	 * 		"security":{
-	 * 			...
-	 * 		}
+	 * 	  Object with:
+	 * 		"packages":
+	 *			"packageA":...
+	 * 		"applications":
+	 *			"applicationA":...
+	 * 		"security":...
 	 * 	}
 	 * 
 	 * @param {string} arg_name - instance name.

@@ -30,10 +30,17 @@ function load_nodes(logs, arg_nodes_config, arg_base_dir)
 		// CHECK MODULES
 		assert(T.isObject(arg_nodes_config), error_msg_bad_config)
 		
-		// LOOP ON PLUGINS
+		// LOOP ON NODES
+		let has_error = false
 		Object.keys(arg_nodes_config).forEach(
 			function(node_name)
 			{
+				// SKIP PROCESSING ON ERROR
+				if (has_error)
+				{
+					return
+				}
+
 				let node_obj = arg_nodes_config[node_name]
 				
 				// CHECK ATTRIBUTES
@@ -43,6 +50,13 @@ function load_nodes(logs, arg_nodes_config, arg_base_dir)
 				assert(T.isObject(node_obj.servers), error_msg_bad_node_servers)
 				
 				load_node_servers(logs, node_obj.servers, node_name, node_obj.host, arg_base_dir)
+				console.log(context + ':load_nodes:servers=[%s]', JSON.stringify(node_obj.servers))
+
+				if (node_obj.servers.error)
+				{
+					arg_nodes_config = { error: node_obj.servers.error }
+					has_error = true
+				}
 			}
 		)
 	}
@@ -59,20 +73,24 @@ function load_node_servers(logs, arg_servers_config, arg_node_name, arg_host/*, 
 {
 	logs.info(context, 'loading config.nodes.' + arg_node_name + '.servers')
 	
+	let current_server = undefined
 	try{
 		// CHECK MODULES
 		assert(T.isObject(arg_servers_config), error_msg_bad_config)
 		
 		// LOOP ON PLUGINS
 		Object.keys(arg_servers_config).forEach(
-			function(node_name)
+			function(server_name)
 			{
-				logs.info(context, 'loading config.nodes.' + arg_node_name + '.servers.' + node_name)
-				let server_obj = arg_servers_config[node_name]
+				current_server = server_name
+
+				logs.info(context, 'loading config.nodes.' + arg_node_name + '.servers.' + server_name)
+
+				let server_obj = arg_servers_config[server_name]
 				
 				// CHECK ATTRIBUTES
 				assert(T.isObject(server_obj), error_msg_bad_node_servers_server)
-				assert(T.isNumber(server_obj.port), error_msg_bad_node_servers_server_port)
+				assert(T.isNotEmptyStringOrNumber(server_obj.port), error_msg_bad_node_servers_server_port)
 				assert(T.isString(server_obj.type), error_msg_bad_node_servers_server_type)
 				assert(T.isString(server_obj.protocole), error_msg_bad_node_servers_server_protocole)
 				
@@ -85,9 +103,10 @@ function load_node_servers(logs, arg_servers_config, arg_node_name, arg_host/*, 
 	}
 	catch(e)
 	{
-		arg_servers_config = { error: { context:context + ':load servers for node [' + arg_node_name + ']', exception:e } }
+		arg_servers_config = { error: { context:context + ':load servers for node [' + arg_node_name + '] server [' + current_server + ']', exception:e } }
 	}
 	
+	console.log(context + ':load_node_servers:servers=[%s]', JSON.stringify(arg_servers_config))
 	return arg_servers_config
 }
 

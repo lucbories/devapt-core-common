@@ -3,54 +3,52 @@
 import assert from 'assert'
 
 // COMMON IMPORTS
-import T                       from '../utils/types'
-// import {is_browser, is_server} from '../utils/is_browser'
-// import runtime                 from '../base/runtime'
+import T from '../utils/types'
 
 
-let context = 'common/base/loggable'
+const context = 'common/base/loggable'
 
-
-
-// const server_runtime_file = '../base/runtime'
-// const browser_runtime_file = 'see window.devapt().runtime()'
 
 
 /**
- * @file Base class to deal with traces.
+ * Base class to deal with traces.
+ * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+* 		get_context():string - get instance context.
+* 		get_class):string - get instance class.
+* 		get_name():string - get instance name.
+* 
+* 		should_trace(arg_traces_cfg:plain object):boolean - test if loggers should trace this instance.
+* 
+* 		get_logger_manager():LoggerManager
+* 		update_trace_enabled():nothing
+* 
+* 		enable_trace():nothing
+* 		disable_trace():nothing
+* 		get_trace():boolean
+* 		set_trace(arg_value):nothing
+* 		toggle_trace():nothing
+* 
+* 		debug(...args):nothing
+* 		info(...args):nothing
+* 		warn(...args):nothing
+* 		error(...args):nothing
+* 
+* 		enter_group(arg_group) leave_group(arg_group):nothing
+* 		separate_level_1():nothing
+* 		separate_level_2():nothing
+* 		separate_level_3():nothing
+* 
  */
 export default class Loggable
 {
 	/**
 	 * Create a Loggable instance.
-	 * 
-	 * API:
-	 * 		get_context():string - get instance context.
-	 * 		get_class):string - get instance class.
-	 * 		get_name():string - get instance name.
-	 * 
-	 * 		should_trace(arg_traces_cfg:plain object):boolean - test if loggers should trace this instance.
-	 * 
-	 * 		get_logger_manager():LoggerManager
-	 * 		update_trace_enabled():nothing
-	 * 
-	 * 		enable_trace():nothing
-	 * 		disable_trace():nothing
-	 * 		get_trace():boolean
-	 * 		set_trace(arg_value):nothing
-	 * 		toggle_trace():nothing
-	 * 
-	 * 		debug(...args):nothing
-	 * 		info(...args):nothing
-	 * 		warn(...args):nothing
-	 * 		error(...args):nothing
-	 * 
-	 * 		enter_group(arg_group) leave_group(arg_group):nothing
-	 * 		separate_level_1():nothing
-	 * 		separate_level_2():nothing
-	 * 		separate_level_3():nothing
 	 * 
 	 * @param {string} arg_log_context - trace context.
 	 * @param {LoggerManager} arg_logger_manager - logger manager instance.
@@ -59,11 +57,30 @@ export default class Loggable
 	 */
 	constructor(arg_log_context, arg_logger_manager)
 	{
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_loggable = true
+		
+		/**
+		 * Log context.
+		 * @type {string}
+		 */
 		this.$context = T.isString(arg_log_context) ? arg_log_context : context
 		
+		/**
+		 * Trace is enabled for this flag.
+		 * @type {boolean}
+		 */
 		this.is_trace_enabled = true
 		
+		/**
+		 * Logger manager instance (default undefined)
+		 * @type {LoggerManager}
+		 */
+		this._logger_manager = undefined
+
 		if ( T.isObject(arg_logger_manager) && arg_logger_manager.is_logger_manager )
 		{
 			this._logger_manager = arg_logger_manager

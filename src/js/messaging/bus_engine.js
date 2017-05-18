@@ -11,24 +11,27 @@ let context = 'common/messaging/bus_engine'
 
 
 /**
- * @file Interface for bus engine.
+ * Interface for bus engine.
+ * @abstract
  * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+*   ->constructor(arg_name, arg_settings, arg_log_context).
+* 
+*   ->channel_list()
+*   ->channel_add(arg_channel)
+*   ->channel_send(arg_channel, arg_payload)
+*   ->channel_on(arg_channel, arg_handler)
+*   ->channel_transform(arg_in_channel, arg_out_channel, arg_xform_handler).
+* 
  */
 export default class BusEngine extends Instance
 {
 	/**
 	 * Create a bus.
-	 * @abstract
-	 * 
-	 * API:
-	 *   ->constructor(arg_name, arg_settings, arg_log_context).
-	 * 
-	 *   ->channel_add(arg_channel)
-	 *   ->channel_send(arg_channel, arg_payload)
-	 *   ->channel_on(arg_channel, arg_handler)
-	 *   ->channel_transform(arg_in_channel, arg_out_channel, arg_xform_handler).
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - settings.
@@ -41,7 +44,23 @@ export default class BusEngine extends Instance
 	{
 		super('buses', 'BusEngine', arg_name, arg_settings, arg_log_context, arg_logger_manager)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_bus_engine = true
+	}
+	
+
+	
+	/**
+	 * List engine channels.
+	 * 
+	 * @returns {array}
+	 */
+	channel_list()
+	{
+		throw new Error('channel_list:Not yet implemented')
 	}
 	
 
@@ -65,6 +84,7 @@ export default class BusEngine extends Instance
 	 * Send a message into a channel.
 	 * 
 	 * @param {string} arg_channel - channel name string.
+	 * @param {object} arg_payload - payload data object.
 	 * 
 	 * @returns {nothing}
 	 */
@@ -86,6 +106,7 @@ export default class BusEngine extends Instance
 	 * 
 	 * @returns {function} - unsubscribe function.
 	 */
+	/* eslint no-unused-vars: "off" */
 	channel_on(arg_channel, arg_handler, arg_predicate=undefined)
 	{
 		assert( T.isString(arg_channel), this.get_context() + ':channel_on:bad channel name')

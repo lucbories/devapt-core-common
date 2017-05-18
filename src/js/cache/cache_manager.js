@@ -4,22 +4,17 @@ import assert from 'assert'
 // COMMON IMPORTS
 import T from '../utils/types'
 
-let context = 'common/cache/cache_manager'
+const context = 'common/cache/cache_manager'
 
 
 
 /**
- * @file Cache manager class.
+ * Cache manager class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
- */
-export default class CacheManager
-{
-	/**
-	 * Create Cache instance to manage cached datas.
-	 * 
+ * 
+ * @example
 	 * API:
 	 * 		get(arg_key:string, arg_default):Promise
 	 * 		mget(arg_keys:array, arg_default:any|array):Promise
@@ -34,6 +29,12 @@ export default class CacheManager
 	 * 
 	 * 		add_adapter(arg_cache_adapter):nothing - add a cache adapters.
 	 * 
+ */
+export default class CacheManager
+{
+	/**
+	 * Create Cache instance to manage cached datas.
+	 * 
 	 * @param {array} arg_cache_adapters - cache adapters.
 	 * 
      * @returns {nothing}
@@ -42,8 +43,18 @@ export default class CacheManager
 	{
 		assert( T.isArray(arg_cache_adapters), context + ':constructor:bad cache adapters array')
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_cache_manager = true
-		this.cache_adapters = arg_cache_adapters
+
+		
+		/**
+		 * Cache adapters array.
+		 * @type {array}
+		 */
+		this._cache_adapters = arg_cache_adapters
 	}
 
 
@@ -58,17 +69,17 @@ export default class CacheManager
 	 */
 	get(arg_key, arg_default=undefined)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve(arg_default)
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].get(arg_key, arg_default)
+			return this._cache_adapters[0].get(arg_key, arg_default)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				return adapter.get(arg_key, arg_default)
 			}
@@ -88,17 +99,17 @@ export default class CacheManager
 	 */
 	mget(arg_keys, arg_default=undefined)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve([arg_default])
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].mget(arg_keys, arg_default)
+			return this._cache_adapters[0].mget(arg_keys, arg_default)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.mget(arg_keys, arg_default) )
 			}
@@ -117,17 +128,17 @@ export default class CacheManager
 	 */
 	has(arg_key)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve(false)
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].has(arg_key)
+			return this._cache_adapters[0].has(arg_key)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.has(arg_key) )
 			}
@@ -148,17 +159,17 @@ export default class CacheManager
 	 */
 	set(arg_key, arg_value, arg_ttl=undefined)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve()
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].set(arg_key, arg_value, arg_ttl)
+			return this._cache_adapters[0].set(arg_key, arg_value, arg_ttl)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.set(arg_key, arg_value, arg_ttl) )
 			}
@@ -178,17 +189,17 @@ export default class CacheManager
 	 */
 	set_ttl(arg_key, arg_ttl)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve()
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].set_ttl(arg_key, arg_ttl)
+			return this._cache_adapters[0].set_ttl(arg_key, arg_ttl)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.set_ttl(arg_key, arg_ttl) )
 			}
@@ -207,17 +218,17 @@ export default class CacheManager
 	 */
 	get_ttl(arg_key)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve()
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].get_ttl(arg_key)
+			return this._cache_adapters[0].get_ttl(arg_key)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.get_ttl(arg_key) )
 			}
@@ -234,16 +245,16 @@ export default class CacheManager
 	 */
 	get_keys()
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve([])
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].get_keys()
+			return this._cache_adapters[0].get_keys()
 		}
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.get_keys() )
 			}
@@ -262,17 +273,17 @@ export default class CacheManager
 	 */
 	remove(arg_keys)
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve()
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].remove(arg_keys)
+			return this._cache_adapters[0].remove(arg_keys)
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.remove(arg_keys) )
 			}
@@ -289,17 +300,17 @@ export default class CacheManager
 	 */
 	flush()
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve()
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].flush()
+			return this._cache_adapters[0].flush()
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.flush() )
 			}
@@ -316,17 +327,17 @@ export default class CacheManager
 	 */
 	close()
 	{
-		if (this.cache_adapters.length == 0)
+		if (this._cache_adapters.length == 0)
 		{
 			return Promise.resolve()
 		}
-		if (this.cache_adapters.length == 1)
+		if (this._cache_adapters.length == 1)
 		{
-			return this.cache_adapters[0].close()
+			return this._cache_adapters[0].close()
 		}
 
 		let promises = []
-		this.cache_adapters.forEach(
+		this._cache_adapters.forEach(
 			(adapter)=>{
 				promises.push( adapter.close() )
 			}
@@ -347,7 +358,7 @@ export default class CacheManager
 	{
 		assert( T.isObject(arg_cache_adapter) && arg_cache_adapter.is_cache_adapter, context + ':add_adapter:bad cache adapters array')
 
-		this.cache_adapters.push(arg_cache_adapter)
+		this._cache_adapters.push(arg_cache_adapter)
 	}
 }
 

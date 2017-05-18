@@ -15,50 +15,47 @@ if ( is_browser() )
 }
 
 // COMMON IMPORTS
-// import Collection from '../../base/collection'
 import CollectionVersion from '../../base/collection_version'
 import Instance from '../../base/instance'
-// import registry from '../registry'
 
 
-let context = 'common/topology/define/topology_define_item'
-
+const context = 'common/topology/define/topology_define_item'
 
 
 
 /**
- * @file TopologyDefineItem class.
+ * TopologyDefineItem class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* A Topology item is a runtime dynamic object corresponding to a static topology registry item.
+* Each item has a name, a tenant, a package, a version and initial settings.
+* Item sub class instances can have collections of children items.
+* 
+* Topology registry is shared and synchronized between all topology nodes with a master node to acknoledge changes.
+* Topology runtime is the dynamic corresponding part of a topology registry and is instancied on each node.
+* 
+* API:
+* 		->load():nothing - load Topology item settings.
+* 		->get_topology_info(arg_deep=true, arg_visited={}):object - get topology item informations.
+* 		->get_children():object - gt topology children items.
+* 		
+* 		->get_topology_type():string     - get resource topology type.
+* 		->get_topology_tenant():string   - get resource topology tenant.
+* 		->get_topology_package():string  - get resource topology package.
+* 		->get_topology_version():string  - get resource topology version.
+* 		->get_topology_uid_desc():string - get resource topology uid description.
+* 		->get_topology_uid():string      - get resource topology uid.
+* 		->get_topology_security():object - get resource topology security.
+* 
+* 
  */
 export default class TopologyDefineItem extends Instance
 {
 	/**
 	 * Create a topology item instance.
-	 * @extends Instance
-	 * 
-	 * A Topology item is a runtime dynamic object corresponding to a static topology registry item.
-	 * Each item has a name, a tenant, a package, a version and initial settings.
-	 * Item sub class instances can have collections of children items.
-	 * 
-	 * Topology registry is shared and synchronized between all topology nodes with a master node to acknoledge changes.
-	 * Topology runtime is the dynamic corresponding part of a topology registry and is instancied on each node.
-	 * 
-	 * API:
-	 * 		->load():nothing - load Topology item settings.
-	 * 		->get_topology_info(arg_deep=true, arg_visited={}):object - get topology item informations.
-	 * 		->get_children():object - gt topology children items.
-	 * 		
-	 * 		->get_topology_type():string     - get resource topology type.
-	 * 		->get_topology_tenant():string   - get resource topology tenant.
-	 * 		->get_topology_package():string  - get resource topology package.
-	 * 		->get_topology_version():string  - get resource topology version.
-	 * 		->get_topology_uid_desc():string - get resource topology uid description.
-	 * 		->get_topology_uid():string      - get resource topology uid.
-	 * 		->get_topology_security():object - get resource topology security.
-	 * 
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.
@@ -440,7 +437,10 @@ export default class TopologyDefineItem extends Instance
 	/**
 	 * Dump topology item informations.
 	 * 
-	 * @param {object} arg_info - topology info object.
+	 * @param {object}   arg_info  - topology info object.
+	 * @param {string}   arg_tabs  - separator.
+	 * @param {string}   arg_eol   - end of line char.
+	 * @param {function} arg_write - output function.
 	 * 
 	 * @returns {nothing}
 	 */
@@ -468,7 +468,9 @@ export default class TopologyDefineItem extends Instance
 
 
 	/**
-	 * Get children names
+	 * Get children names.
+	 * 
+	 * @returns {array}
 	 */
 	get_children_names()
 	{
@@ -479,6 +481,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology type.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_type()
 	{
@@ -489,6 +493,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology tenant.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_tenant()
 	{
@@ -499,6 +505,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology package.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_package()
 	{
@@ -509,6 +517,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology version.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_version()
 	{
@@ -519,6 +529,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology uid description.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_uid_desc()
 	{
@@ -529,6 +541,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology uid.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_uid()
 	{
@@ -539,6 +553,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get resource topology security.
+	 * 
+	 * @returns {object}
 	 */
 	get_topology_security()
 	{
@@ -561,6 +577,8 @@ export default class TopologyDefineItem extends Instance
 
 	/**
 	 * Get topology owner.
+	 * 
+	 * @returns {string}
 	 */
 	get_topology_owner()
 	{

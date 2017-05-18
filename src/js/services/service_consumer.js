@@ -11,6 +11,7 @@ let context = 'common/services/service_consumer'
 /**
  * Service consumer base class.
  * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */

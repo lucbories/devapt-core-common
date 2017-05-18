@@ -23,7 +23,6 @@ const SOURCES = [SOURCE_LOCAL_FILE, SOURCE_MASTER, SOURCE_MSG_BUS, SOURCE_REMOTE
 
 // GET RUNTIME
 const server_runtime_file = '../../base/runtime'
-const browser_runtime_file = 'see window.devapt().runtime()'
 
 let runtime = undefined
 
@@ -41,13 +40,19 @@ else if (is_browser())
 
 /**
  * Json providier class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
  */
 export default class JsonProvider
 {
     /**
-     * Create a Provider instance
+     * Create a Provider instance.
+	 * 
+	 * @param {object} arg_settings - provider config.
+	 * 
+	 * @returns {nothing}
      */
 	constructor(arg_settings)
     {
@@ -60,11 +65,13 @@ export default class JsonProvider
 		this.source = this.$settings.source
 		assert( SOURCES.indexOf(this.source) > -1, context + ':bad source string, should be part of [' + SOURCES + ']')
 	}
+
     
     
     /**
-     * Provide JSON datas
-     * @returns {object} JSON datas Promise
+     * Provide JSON datas.
+	 * 
+     * @returns {object} JSON datas Promise.
      */
 	provide_json()
 	{
@@ -81,12 +88,15 @@ export default class JsonProvider
 		// logs.debug(context, 'leave')
 		return promise
 	}
+
     
     
     /**
-     * Provide JSON datas inside a promise
-     * @param {function} resolve - a promise should be resolved
-     * @param {function} reject - a promise should be rejected
+     * Provide JSON datas inside a promise.
+	 * 
+     * @param {function} resolve - a promise should be resolved.
+     * @param {function} reject - a promise should be rejected.
+	 * 
      * @returns {nothing}
      */
 	provide_json_self(resolve, reject)

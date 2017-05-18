@@ -22,6 +22,16 @@ types_fn.isNotEmptyString = (o)=>{
 }
 
 
+types_fn.isStringOrNumber = (o)=>{
+	return types_fn.isString(o) || types_fn.isNumber(o)
+}
+
+
+types_fn.isNotEmptyStringOrNumber = (o)=>{
+	return types_fn.isNotEmptyString(o) || types_fn.isNumber(o)
+}
+
+
 types_fn.isNotEmptyArray = (o)=>{
 	return types_fn.isArray(o) && o.length > 0
 }

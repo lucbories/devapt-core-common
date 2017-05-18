@@ -11,11 +11,47 @@ let context = 'common/data/data_collection'
 
 
 /**
- * @file DataCollection class.
+ * DataCollection class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->constructor(arg_cache_manager,arg_data_adapter,arg_model_schema)
+* 		
+* 		->get_name():string - get tenant to use inside this datastore.
+* 		->get_cache_manager():CacheManager - get cache manager instance.
+* 		->get_adapter():DataAdapter - get data adapter instance.
+* 		->get_model():DataModel - get collection model instance.
+* 
+*		->validate_record(arg_record):Promise(boolean) - test if given datas are valid for collection model.
+*		->new_record(arg_record_datas, arg_record_id) - create a new record instance.
+* 		->create_record(arg_record):Promise(DataRecord) - create an existing unsaved data record.
+* 		->delete_record(arg_record):Promise(boolean) - delete an existing data record.
+* 		->update_record(arg_record):Promise(DataRecord) - update an existing data record.
+* 		->reload_record(arg_record):Promise(DataRecord) - reload an existing data record.
+* 		->has_record(arg_record_id):Promise(boolean) - test if a data record exists with an id.
+* 		
+* 		->find_one_record(arg_record_id):Promise(DataRecord) - find an existing data record with an id.
+* 		->find_records(arg_query):Promise(DataRecordArray) - find existing data records with a query.
+* 		->find_all_records():Promise(DataRecordArray) - find all xisting data records.
+* 
+* 	PRIVATE:
+* 		->_emit(arg_event, arg_datas=undefined):nothing
+* 		->_trigger(arg_event, arg_datas):nothing
+* 		->_has_cached_record_by_id(arg_id):Promise(boolean)
+* 		->_get_cached_record_by_id(arg_id):Promise(DataRecord)
+* 		->_set_cached_record_by_id(arg_record):Promise(boolean)
+* 		->_remove_cached_record_by_id(arg_id):Promise(boolean)
+* 
+* 
+* 	USAGE ON BROWSER:
+* 		// ds is a DataStore instance
+* 		var cars = ds.get_collection('cars')
+* 		var car_12 = cars.find_one_record('12')
+* 
+* 
  */
 export default class DataCollection extends Loggable
 {
@@ -23,41 +59,6 @@ export default class DataCollection extends Loggable
 	 * DataCollection class is responsible to manage one model records from one adapter:
 	 *  all records operations, cached records, model logic (field value validation, triggers).
 	 * DataCollection instances are managed by a DataStore instance.
-	 * 
-	 * 	API:
-	 * 		->constructor(arg_cache_manager,arg_data_adapter,arg_model_schema)
-	 * 		
-	 * 		->get_name():string - get tenant to use inside this datastore.
-	 * 		->get_cache_manager():CacheManager - get cache manager instance.
-	 * 		->get_adapter():DataAdapter - get data adapter instance.
-	 * 		->get_model():DataModel - get collection model instance.
-	 * 
-	 *		->validate_record(arg_record):Promise(boolean) - test if given datas are valid for collection model.
-	 *		->new_record(arg_record_datas, arg_record_id) - create a new record instance.
-	 * 		->create_record(arg_record):Promise(DataRecord) - create an existing unsaved data record.
-	 * 		->delete_record(arg_record):Promise(boolean) - delete an existing data record.
-	 * 		->update_record(arg_record):Promise(DataRecord) - update an existing data record.
-	 * 		->reload_record(arg_record):Promise(DataRecord) - reload an existing data record.
-	 * 		->has_record(arg_record_id):Promise(boolean) - test if a data record exists with an id.
-	 * 		
-	 * 		->find_one_record(arg_record_id):Promise(DataRecord) - find an existing data record with an id.
-	 * 		->find_records(arg_query):Promise(DataRecordArray) - find existing data records with a query.
-	 * 		->find_all_records():Promise(DataRecordArray) - find all xisting data records.
-	 * 
-	 * 	PRIVATE:
-	 * 		->_emit(arg_event, arg_datas=undefined):nothing
-	 * 		->_trigger(arg_event, arg_datas):nothing
-	 * 		->_has_cached_record_by_id(arg_id):Promise(boolean)
-	 * 		->_get_cached_record_by_id(arg_id):Promise(DataRecord)
-	 * 		->_set_cached_record_by_id(arg_record):Promise(boolean)
-	 * 		->_remove_cached_record_by_id(arg_id):Promise(boolean)
-	 * 
-	 * 
-	 * 	USAGE ON BROWSER:
-	 * 		// ds is a DataStore instance
-	 * 		var cars = ds.get_collection('cars')
-	 * 		var car_12 = cars.find_one_record('12')
-	 * 
 	 * 
 	 * @param {CacheManager} arg_cache_manager - cache manager instance.
 	 * @param {DataAdapter} arg_data_adapter - collection data adapter.
@@ -76,6 +77,10 @@ export default class DataCollection extends Loggable
 
 		super(context)
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_data_collection = true
 
 		this._cache_manager = arg_cache_manager

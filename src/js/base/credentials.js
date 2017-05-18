@@ -35,30 +35,30 @@ const default_credentials = {
 
 
 /**
- * @file Credentials class: contains authentication informations.
+ * Authentication informations, used on server and on browser.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+* @example
+* 	API:
+* 		->set_credentials(arg_datas):nothing - check and set crendtials datas.
+* 		
+* 		->dump():string - dump credentials to a readable string without sensitive datas.
+* 		->digest_password(arg_string):string - hash credentials password (static).
+* 		
+* 		->serialize(arg_app_secret):string - transform credentials to a string.
+* 		->deserialize(string, arg_app_secret):boolean - load credentials from a string.string
+* 
+* 		->encrypt(arg_app_key):string - encrypted string.
+* 		->decrypt(arg_string, arg_app_key):boolean - success or failure.
+* 
+* 		->extract(arg_string):object - extract a record with credentials values from a formatted string.
  */
 export default class Credentials
 {
     /**
      * Create a Credentials instance. Store credentials values into an immutable Map.
-	 * 
-	 * 	API:
-	 * 		->set_credentials(arg_datas):nothing - check and set crendtials datas.
-	 * 		
-	 * 		->dump():string - dump credentials to a readable string without sensitive datas.
-	 * 		->digest_password(arg_string):string - hash credentials password (static).
-	 * 		
-	 * 		->serialize(arg_app_secret):string - transform credentials to a string.
-	 * 		->deserialize(string, arg_app_secret):boolean - load credentials from a string.string
-	 * 
-	 * 		->encrypt(arg_app_key):string - encrypted string.
-	 * 		->decrypt(arg_string, arg_app_key):boolean - success or failure.
-	 * 
-	 * 		->extract(arg_string):object - extract a record with credentials values from a formatted string.
 	 * 
      * @param {object} arg_datas - credentials datas object.
 	 * 
@@ -67,14 +67,28 @@ export default class Credentials
 	constructor(arg_datas=default_credentials, update_handler=undefined)
 	{
 		assert( T.isObject(arg_datas), context + ':bad runtime object')
+		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_credentials = true
 
+		/**
+		 * Credentials settings.
+		 * @type {Immutable.Map}
+		 */
 		this._credentials = fromJS(default_credentials)
+
 		// this._crypt_mode = 'AES-CBC' // (other modes include: CFB, OFB, CTR, and GCM)
 		// this._crypt_key_length = 32
 		// this._crypt_iv_length = 8
 		// this._crypt_num_iterations = 10
 
+		/**
+		 * Update handler.
+		 * @type {function}
+		 */
 		this.update_handler = update_handler
 
 		this.set_credentials(arg_datas)

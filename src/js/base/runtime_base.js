@@ -12,17 +12,16 @@ let context = 'browser/runtime'
 
 
 /**
- * @file base class for runtime - main library interface.
+ * Base class for runtime - main library interface.
+ * @abstract
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
  */
 export default class RuntimeBase extends Settingsable
 {
 	/**
 	 * Create Runtime base instance.
-	 * @extends Settingsable
 	 * 
 	 * @param {string} arg_log_context - logging context.
 	 * 
@@ -38,9 +37,22 @@ export default class RuntimeBase extends Settingsable
 		super({}, log_context, logger_manager)
 		logger_manager._runtime = this
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_base_runtime = true
 
+		/**
+		 * Runtime state (defautl undefined).
+		 * @type {object}
+		 */
 		this.current_state = undefined
+
+		/**
+		 * Runtime state store (defautl undefined).
+		 * @type {object}
+		 */
 		this._state_store = undefined
 		
 		if ( ! this.is_server_runtime )

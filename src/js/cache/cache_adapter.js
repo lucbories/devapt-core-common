@@ -4,33 +4,34 @@ import assert from 'assert'
 // COMMON IMPORTS
 import T from '../utils/types'
 
-let context = 'common/cache/cache_adapter'
+const context = 'common/cache/cache_adapter'
 
 
 
 /**
- * @file CacheAdapter base class.
+ * CacheAdapter base class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+ * API:
+* 		->get(arg_key:string, arg_default):Promise - get a cached value with its key.
+* 		->mget(arg_keys:array, arg_default:any|array):Promise - get cached values with their keys.
+* 		->has(arg_key:string):Promise - testif a cached value exists with given key.
+* 		->set(arg_key:string, arg_value, arg_ttl=undefined):Promise - set a cached value with its key and ttl.
+* 		->set_ttl(arg_key:string, arg_ttl):Promise - set cached value ttl.
+* 		->get_ttl(arg_key:string):Promise - get cached value ttl.
+* 		->get_keys():Promise - get all cached values keys.
+* 		->remove(arg_key:string|array):Promise - remove a cached value.
+* 		->flush():nothing - delete all entries.
+* 		->close():nothing - clear interval timeout for checks.
+ * 
  */
 export default class CacheAdapter
 {
 	/**
 	 * Create CacheAdapter instance to manage cached datas.
-	 * 
-	 * API:
-	 * 		->get(arg_key:string, arg_default):Promise - get a cached value with its key.
-	 * 		->mget(arg_keys:array, arg_default:any|array):Promise - get cached values with their keys.
-	 * 		->has(arg_key:string):Promise - testif a cached value exists with given key.
-	 * 		->set(arg_key:string, arg_value, arg_ttl=undefined):Promise - set a cached value with its key and ttl.
-	 * 		->set_ttl(arg_key:string, arg_ttl):Promise - set cached value ttl.
-	 * 		->get_ttl(arg_key:string):Promise - get cached value ttl.
-	 * 		->get_keys():Promise - get all cached values keys.
-	 * 		->remove(arg_key:string|array):Promise - remove a cached value.
-	 * 		->flush():nothing - delete all entries.
-	 * 		->close():nothing - clear interval timeout for checks.
 	 * 
 	 * @param {object} arg_settings - cache engine settings.
 	 * 
@@ -40,6 +41,10 @@ export default class CacheAdapter
 	{
 		assert( T.isObject(arg_settings), context + ':constructor:bad settigns object')
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_cache_adapter = true
 	}
 

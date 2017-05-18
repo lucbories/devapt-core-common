@@ -8,54 +8,54 @@ import Errorable from './errorable'
 import Instance  from './instance'
 
 
-let context = 'common/base/collection_base'
+const context = 'common/base/collection_base'
 
 
 
 /**
- * @file CollectionBase class.
+ * Base class for all collections classes.
+ * @abstract
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+  API:
+ * 		->set_all(arg_items):nothing - Set all collection items.
+ * 		->get_all(arg_types):array - Get all collection items or filter items with given type.
+ * 		->get_all_names(arg_types):array - Get all items names with or without a filter on items types.
+ * 		->get_all_ids():array - Get all items ids with or without a filter on items types.
+ * 
+ * 		->item(arg_name):Instance - Get an item by its name.
+ * 
+ * 		->get_count():number - Get all items count.
+ * 		->get_first():object|undefined - Get first item.
+ * 		->get_last():object|undefined - Get last item.
+ * 
+ * 		->add(arg_item):nothing - Add an item to the collection.
+ * 		->add_first(arg_item):nothing - Add an item to the collection at the first position.
+ * 		->remove(arg_item):nothing - Remove an item from the collection.
+ * 		->has(arg_item):boolean -  Test if an item is inside the collection.
+ * 
+ * 		->find_by_name(arg_name):Instance|undefined - Find an item by its name into the collection.
+ * 		->find_by_id(arg_id):Instance|undefined - Find an item by its id into the collection.
+ * 		->find_by_attr(arg_attr_name, arg_attr_value):Instance|undefined - Find an item by one of its attributes into the collection.
+ * 		->find_by_filter(arg_filter_function):Instance|undefined - Find an item by a filter function.
+ * 
+ * 		->filter_by_attr(arg_attr_name, arg_attr_value):array - Filter items by one of theirs attributes into the collection.
+ * 		->filter_by_filter(arg_filter_function):array - Filter items by a filter function.
+ * 
+ * 		->get_accepted_types():array - Get all collection accepted types.
+ * 		->set_accepted_types(arg_types):nothing - Set all collection accepted types.
+ * 		->add_accepted_type(arg_type):nothing - Add one collection accepted type.
+ * 		->has_accepted_type(arg_type):boolean - Test if collection has given accepted type.
+ * 
+ * 		->forEach(arg_cb):nothing - forEach wrapper on ordered items.
  */
 export default class CollectionBase extends Errorable
 {
 	/**
 	 * Create a collection of Instance objects.
-	 * @private
-	 * 
-	 * API:
-	 * 		->set_all(arg_items):nothing - Set all collection items.
-	 * 		->get_all(arg_types):array - Get all collection items or filter items with given type.
-	 * 		->get_all_names(arg_types):array - Get all items names with or without a filter on items types.
-	 * 		->get_all_ids():array - Get all items ids with or without a filter on items types.
-	 * 
-	 * 		->item(arg_name):Instance - Get an item by its name.
-	 * 
-	 * 		->get_count():number - Get all items count.
-	 * 		->get_first():object|undefined - Get first item.
-	 * 		->get_last():object|undefined - Get last item.
-	 * 
-	 * 		->add(arg_item):nothing - Add an item to the collection.
-	 * 		->add_first(arg_item):nothing - Add an item to the collection at the first position.
-	 * 		->remove(arg_item):nothing - Remove an item from the collection.
-	 * 		->has(arg_item):boolean -  Test if an item is inside the collection.
-	 * 
-	 * 		->find_by_name(arg_name):Instance|undefined - Find an item by its name into the collection.
-	 * 		->find_by_id(arg_id):Instance|undefined - Find an item by its id into the collection.
-	 * 		->find_by_attr(arg_attr_name, arg_attr_value):Instance|undefined - Find an item by one of its attributes into the collection.
-	 * 		->find_by_filter(arg_filter_function):Instance|undefined - Find an item by a filter function.
-	 * 
-	 * 		->filter_by_attr(arg_attr_name, arg_attr_value):array - Filter items by one of theirs attributes into the collection.
-	 * 		->filter_by_filter(arg_filter_function):array - Filter items by a filter function.
-	 * 
-	 * 		->get_accepted_types():array - Get all collection accepted types.
-	 * 		->set_accepted_types(arg_types):nothing - Set all collection accepted types.
-	 * 		->add_accepted_type(arg_type):nothing - Add one collection accepted type.
-	 * 		->has_accepted_type(arg_type):boolean - Test if collection has given accepted type.
-	 * 
-	 * 		->forEach(arg_cb):nothing - forEach wrapper on ordered items.
 	 * 
 	 * @returns {nothing}
 	 */
@@ -63,13 +63,35 @@ export default class CollectionBase extends Errorable
 	{
 		super(context, undefined)
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_collection_base  = true
 
-		this.$items_array   = []
-		this.$items_by_name = {}
-		this.$items_by_id   = {}
+		/**
+		 * Items array.
+		 * @type {array}
+		 */
+		this._items_array   = []
 
-		this.$accepted_types = ['*']
+		/**
+		 * Items names map.
+		 * @type {object}
+		 */
+		this._items_by_name = {}
+
+		/**
+		 * Items ids map.
+		 * @type {object}
+		 */
+		this._items_by_id   = {}
+
+		/**
+		 * Accepted types array.
+		 * @type {array}
+		 */
+		this._accepted_types = ['*']
 	}
 
 
@@ -82,7 +104,7 @@ export default class CollectionBase extends Errorable
 	toString()
 	{
 		let str = '['
-		_.forEach(this.$items_array, (item, index)=>(index > 0 ? ',' : '') + item.get_name() )
+		_.forEach(this._items_array, (item, index)=>(index > 0 ? ',' : '') + item.get_name() )
 		return str + ']'
 	}
 	
@@ -104,9 +126,9 @@ export default class CollectionBase extends Errorable
 		console.log('set_all', str, typeof arg_items)
 
 		// RESET STORES
-		this.$items_array   = []
-		this.$items_by_name = {}
-		this.$items_by_id   = {}
+		this._items_array   = []
+		this._items_by_name = {}
+		this._items_by_id   = {}
 
 		// ONE INSTANCE IS GIVEN
 		if ( T.isObject(arg_items) && arg_items instanceof Instance )
@@ -131,6 +153,34 @@ export default class CollectionBase extends Errorable
 
 		console.error(context + '::bad given items type (not an Instance, object, array)')
 	}
+
+
+
+	/**
+	 * Set all collection items.
+	 * @private
+	 * 
+	 * @param {array} arg_items - Instance objects array.
+	 * 
+	 * @returns {nothing}
+	 */
+	_set_all(arg_items)
+	{
+		this._items_array = arg_items
+	}
+
+
+
+	/**
+	 * Get all collection items.
+	 * @private
+	 * 
+	 * @returns {array}
+	 */
+	_get_all()
+	{
+		return this._items_array
+	}
 	
 	
 	
@@ -146,19 +196,19 @@ export default class CollectionBase extends Errorable
 		// NO TYPE FILTER
 		if (! arg_types)
 		{
-			return _.toArray( this.$items_array )
+			return _.toArray( this._items_array )
 		}
 
 		// ONE TYPE FILTER
 		if ( T.isString(arg_types) )
 		{
-			return _.filter(this.$items_array, item => item.get_types() == arg_types )
+			return _.filter(this._items_array, item => item.get_types() == arg_types )
 		}
 
 		// MANY TYPES FILTER
 		if ( T.isArray(arg_types) )
 		{
-			return _.filter(this.$items_array, item => arg_types.indexOf( item.get_types() ) >= 0 )
+			return _.filter(this._items_array, item => arg_types.indexOf( item.get_types() ) >= 0 )
 		}
 
 		return []
@@ -178,19 +228,19 @@ export default class CollectionBase extends Errorable
 		// NO TYPE FILTER
 		if (! arg_types)
 		{
-			return _.map(this.$items_array, (item) => item.get_name() )
+			return _.map(this._items_array, (item) => item.get_name() )
 		}
 
 		// ONE TYPE FILTER
 		if ( T.isString(arg_types) )
 		{
-			return _.filter( this.$items_array, item => item.get_types() == arg_types ).map( (item) => item.get_name() )
+			return _.filter( this._items_array, item => item.get_types() == arg_types ).map( (item) => item.get_name() )
 		}
 
 		// MANY TYPES FILTER
 		if ( T.isArray(arg_types) )
 		{
-			return _.filter( this.$items_array, item => arg_types.indexOf( item.get_types() ) >= 0 ).map( (item) => item.get_name() )
+			return _.filter( this._items_array, item => arg_types.indexOf( item.get_types() ) >= 0 ).map( (item) => item.get_name() )
 		}
 
 		return []
@@ -205,7 +255,7 @@ export default class CollectionBase extends Errorable
 	 */
 	get_all_ids()
 	{
-		return _.map(this.$items_array, (item) => item.get_id() )
+		return _.map(this._items_array, (item) => item.get_id() )
 	}
 	
 	
@@ -219,7 +269,7 @@ export default class CollectionBase extends Errorable
 	 */
 	item(arg_name)
 	{
-		return this.$items_by_name ? this.$items_by_name[arg_name] : undefined
+		return this._items_by_name ? this._items_by_name[arg_name] : undefined
 	}
 	
 	
@@ -233,7 +283,7 @@ export default class CollectionBase extends Errorable
 	 */
 	get(arg_name)
 	{
-		return this.$items_by_name ? this.$items_by_name[arg_name] : undefined
+		return this._items_by_name ? this._items_by_name[arg_name] : undefined
 	}
 	
 	
@@ -287,7 +337,7 @@ export default class CollectionBase extends Errorable
 	 */
 	get_count()
 	{
-		return _.size(this.$items_array)
+		return _.size(this._items_array)
 	}
     
     
@@ -299,7 +349,7 @@ export default class CollectionBase extends Errorable
 	 */
 	get_first()
     {
-		return _.first(this.$items_array)
+		return _.first(this._items_array)
 	}
 	
 	
@@ -311,7 +361,7 @@ export default class CollectionBase extends Errorable
 	 */
 	get_last()
     {
-		return _.last(this.$items_array)
+		return _.last(this._items_array)
 	}
 
 
@@ -380,7 +430,7 @@ export default class CollectionBase extends Errorable
 		if ( T.isObject(arg_item) && arg_item instanceof Instance )
 		{
 			const name = arg_item.get_name()
-			if (name in this.$items_by_name)
+			if (name in this._items_by_name)
 			{
 				this._remove(arg_item)
 				return
@@ -428,9 +478,9 @@ export default class CollectionBase extends Errorable
 		const name = arg_item.get_name()
 		const id   = arg_item.get_id()
 
-		this.$items_array.push(arg_item)
-		this.$items_by_name[name] = arg_item
-		this.$items_by_id[id] = arg_item
+		this._items_array.push(arg_item)
+		this._items_by_name[name] = arg_item
+		this._items_by_id[id] = arg_item
 	}
 	
 	
@@ -453,9 +503,9 @@ export default class CollectionBase extends Errorable
 		const name = arg_item.get_name()
 		const id   = arg_item.get_id()
 
-		this.$items_array = [arg_item].concat(this.$items_array)
-		this.$items_by_name[name] = arg_item
-		this.$items_by_id[id] = arg_item
+		this._items_array = [arg_item].concat(this._items_array)
+		this._items_by_name[name] = arg_item
+		this._items_by_id[id] = arg_item
 	}
 	
 	
@@ -472,11 +522,11 @@ export default class CollectionBase extends Errorable
 	{
 		const name  = arg_item.get_name()
 		const id    = arg_item.get_id()
-		const index = this.$items_array.indexOf(arg_item)
+		const index = this._items_array.indexOf(arg_item)
 
-		this.$items_array.splice(index, 1)
-		delete this.$items_by_name[name]
-		delete this.$items_by_id[id]
+		this._items_array.splice(index, 1)
+		delete this._items_by_name[name]
+		delete this._items_by_id[id]
 	}
 	
 	
@@ -492,7 +542,7 @@ export default class CollectionBase extends Errorable
 	_has(arg_item)
 	{
 		const name = arg_item.get_name()
-		return (name in this.$items_by_name)
+		return (name in this._items_by_name)
 	}
 	
 	
@@ -508,7 +558,7 @@ export default class CollectionBase extends Errorable
 	 */
 	find_by_name(arg_name)
 	{
-		return this.$items_by_name[arg_name]
+		return this._items_by_name[arg_name]
 	}
 	
 	
@@ -522,7 +572,7 @@ export default class CollectionBase extends Errorable
 	 */
 	find_by_id(arg_id)
 	{
-		return this.$items_by_id[arg_id]
+		return this._items_by_id[arg_id]
 	}
 	
 	
@@ -537,7 +587,7 @@ export default class CollectionBase extends Errorable
 	 */
 	find_by_attr(arg_attr_name, arg_attr_value)
 	{
-		return _.find(this.$items_array, item => (arg_attr_name in item) && item[arg_attr_name] == arg_attr_value)
+		return _.find(this._items_array, item => (arg_attr_name in item) && item[arg_attr_name] == arg_attr_value)
 	}
 	
 	
@@ -551,7 +601,7 @@ export default class CollectionBase extends Errorable
 	 */
 	find_by_filter(arg_filter_function)
 	{
-		return _.find(this.$items_array, item => arg_filter_function(item) )
+		return _.find(this._items_array, item => arg_filter_function(item) )
 	}
 	
 	
@@ -566,7 +616,7 @@ export default class CollectionBase extends Errorable
 	 */
 	filter_by_attr(arg_attr_name, arg_attr_value)
 	{
-		return _.filter(this.$items_array, item => (arg_attr_name in item) && item[arg_attr_name] == arg_attr_value)
+		return _.filter(this._items_array, item => (arg_attr_name in item) && item[arg_attr_name] == arg_attr_value)
 	}
 	
 	
@@ -580,7 +630,7 @@ export default class CollectionBase extends Errorable
 	 */
 	filter_by_filter(arg_filter_function)
 	{
-		return _.filter(this.$items_array, item => arg_filter_function(item) )
+		return _.filter(this._items_array, item => arg_filter_function(item) )
 	}
 	
 	
@@ -592,7 +642,7 @@ export default class CollectionBase extends Errorable
 	 */
 	get_accepted_types()
 	{
-		this.$accepted_types
+		this._accepted_types
 	}
 	
 	
@@ -607,7 +657,7 @@ export default class CollectionBase extends Errorable
 	set_accepted_types(arg_types)
 	{
 		assert(T.isArray(arg_types), context + ':bad accepted types array')
-		this.$accepted_types = arg_types
+		this._accepted_types = arg_types
 	}
 	
 	
@@ -622,7 +672,7 @@ export default class CollectionBase extends Errorable
 	add_accepted_type(arg_type)
 	{
 		assert(T.isString(arg_type), context + ':bad accepted type string')
-		this.$accepted_types.push(arg_type)
+		this._accepted_types.push(arg_type)
 	}
 	
 	
@@ -636,7 +686,7 @@ export default class CollectionBase extends Errorable
 	 */
 	has_accepted_type(arg_type)
 	{
-		return this.$accepted_types.indexOf(arg_type) > -1
+		return this._accepted_types.indexOf(arg_type) > -1
 	}
 	
 	
@@ -650,6 +700,6 @@ export default class CollectionBase extends Errorable
 	 */
 	forEach(arg_cb)
 	{
-		_.forEach(this.$items_array, arg_cb)
+		_.forEach(this._items_array, arg_cb)
 	}
 }

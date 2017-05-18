@@ -22,7 +22,8 @@ const TRACE = false // TODO configure from runtime settings
 export default class TopologyRegistry extends RegistryStore
 {
 	/**
-	 * Create a TopologyStore instance.
+	 * Create a TopologyRegistry instance.
+	 * @class TopologyRegistry
 	 * @extends RegistryStore
 	 * 
 	 * @param {LoggerManager} arg_logger_manager - logger manager object.

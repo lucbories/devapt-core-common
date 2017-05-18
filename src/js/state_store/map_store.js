@@ -10,17 +10,15 @@ let context = 'common/state_store/redux_store'
 
 
 /**
- * @file Immutable.Map class to deal with state storing and mutations.
+ * Immutable.Map class to deal with state storing and mutations.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
  */
 export default class MapStore extends StateStore
 {
 	/**
 	 * Create a Immutable.Map state Store instance.
-	 * @extends StateStore
 	 * 
 	 * @param {object} arg_initial_state - initial state.
 	 * @param {string} arg_log_context - trace context.
@@ -74,7 +72,8 @@ export default class MapStore extends StateStore
 	 * 
 	 * @returns {nothing}
 	 */
-	dispatch(/*arg_action*/)
+	/* eslint no-unused-vars: "off" */
+	dispatch(arg_action)
 	{
 		throw Error('Map store does not implement dispatch method')
 	}
@@ -88,7 +87,8 @@ export default class MapStore extends StateStore
 	 * 
 	 * @returns {function} - unsubscribe function
 	 */
-	subscribe(/*arg_handle*/)
+	/* eslint no-unused-vars: "off" */
+	subscribe(arg_handle)
 	{
 		throw Error('Map store does not implement subscribe method')
 	}

@@ -12,42 +12,43 @@ let context = 'common/data/data_record'
 
 
 /**
- * @file DataRecord class.
+ * DataRecord class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* 
+* 	API:
+* 		->constructor(arg_collection, arg_id, arg_attributes)
+* 
+* 		->get_collection():DataCollection - get record collection.
+* 
+* 		->get_type():string - get record type.
+* 		->get_id():string - get record id.
+* 		->get_id_field_name():string - get record id.
+* 		->get_attributes():Immutable.Map - get record attributes.
+* 
+* 		->set(arg_attribute_name, arg_attribute_value):boolean - set an attribute value.
+* 		->get(arg_attribute_name):any - get an attribute value.
+* 
+* 		->save():Promise - save all changed attributes to the collection store.
+* 		->rollback():boolean - disguard any unsaved changed attributes.
+* 		->remove():Promise - remove record from collection store.
+* 		->reload():Promise - restore attributes from collection store.
+* 
+* 		->serialize():string - transform attributes map to a string.
+* 		->deserialize(string):boolean - load attributes from a string.
+* 
+* 		->fill(arg_datas):boolean - fill attributes with given datas.
+* 		->clear():boolean - fill attributes with default datas.
+* 
+* 
  */
 export default class DataRecord
 {
 	/**
 	 * Data record class, contains one collection item attributes.
-	 * 
-	 * 
-	 * 	API:
-	 * 		->constructor(arg_collection, arg_id, arg_attributes)
-	 * 
-	 * 		->get_collection():DataCollection - get record collection.
-	 * 
-	 * 		->get_type():string - get record type.
-	 * 		->get_id():string - get record id.
-	 * 		->get_id_field_name():string - get record id.
-	 * 		->get_attributes():Immutable.Map - get record attributes.
-	 * 
-	 * 		->set(arg_attribute_name, arg_attribute_value):boolean - set an attribute value.
-	 * 		->get(arg_attribute_name):any - get an attribute value.
-	 * 
-	 * 		->save():Promise - save all changed attributes to the collection store.
-	 * 		->rollback():boolean - disguard any unsaved changed attributes.
-	 * 		->remove():Promise - remove record from collection store.
-	 * 		->reload():Promise - restore attributes from collection store.
-	 * 
-	 * 		->serialize():string - transform attributes map to a string.
-	 * 		->deserialize(string):boolean - load attributes from a string.
-	 * 
-	 * 		->fill(arg_datas):boolean - fill attributes with given datas.
-	 * 		->clear():boolean - fill attributes with default datas.
-	 * 
 	 * 
 	 * @param {DataCollection} arg_data_collection - data collection: contains schema.
 	 * @param {string} arg_id - data id, unique in collection.
@@ -60,7 +61,11 @@ export default class DataRecord
 		assert( T.isObject(arg_data_collection) && arg_data_collection.is_data_collection, context + ':constructor:bad model object')
 		assert( T.isString(arg_id) && arg_id.length > 0, context + ':constructor:bad id string')
 		assert( T.isObject(arg_attributes), context + ':constructor:bad attributes object')
-
+		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_data_record = true
 
 		this._collection = arg_data_collection
@@ -91,6 +96,7 @@ export default class DataRecord
 	 * 
 	 * @returns {nothing}
 	 */
+	/* eslint no-unused-vars: "off" */
 	_emit(arg_event, arg_datas=undefined) // TODO
 	{
 	}
@@ -409,7 +415,8 @@ export default class DataRecord
 	 *  
 	 * @returns {boolean} - success.
 	 */
-	deserialize() // TODO
+	/* eslint no-unused-vars: "off" */
+	deserialize(arg_serialized) // TODO
 	{
 		return false
 	}

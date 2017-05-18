@@ -20,20 +20,17 @@ export default class TopologyDefineCommand extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineCommand instance.
+	 * @class TopologyDefineCommand
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"commands":{
-	 * 		"cmdA":{
+	 * 	"commands":
+	 * 		"cmdA":
 	 * 			"url":"myUrl",
 	 * 			"view":"myView",
 	 * 			"menubar":"myMenubar",
 	 * 			"label":"myLabel"
-	 * 		},
-	 * 		"cmdB":{
-	 *			...
-	 * 		}
-	 * 	}
+	 * 		"cmdB":...
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

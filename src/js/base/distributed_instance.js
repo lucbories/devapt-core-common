@@ -7,54 +7,51 @@ import Instance                from '../base/instance'
 import DistributedMessage      from '../base/distributed_message'
 import DistributedMetrics      from '../base/distributed_metrics'
 import DistributedLogs         from '../base/distributed_logs'
-// import {is_browser, is_server} from '../utils/is_browser'
 
 
 const context = 'common/base/distributed_instance'
 
 
 
-// const server_runtime_file = '../base/runtime'
-// const browser_runtime_file = 'see window.devapt().runtime()'
-
-
 /**
- * @file Distributed instance base class: enable communication inside a node or between nodes.
+ * Distributed instances base class: enable communication inside a node or between nodes.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+* 		->load():nothing
+* 	    ->load_topology_settings(arg_settings):nothing
+* 
+* 		->send(DistributedMessage|DistributedMetrics|DistributedLogs):boolean
+* 
+*      ->enable_on_bus(arg_bus):nothing
+*      ->disable_on_bus(arg_bus):nothing
+* 
+* API for messages:
+* 		->send_msg(target, payload):boolean
+* 		->receive_msg(DistributedMessage):nothing
+* 		->enable_msg():nothing
+* 		->disable_msg():nothing
+* 
+* API for metrics:
+* 		->send_metrics(type, values):boolean
+* 		->receive_metrics(DistributedMetrics):nothing
+* 		->enable_metrics():nothing
+* 		->disable_metrics():nothing
+* 
+* API for logs:
+* 		->send_logs(ts, level, texts):boolean
+* 		->receive_logs(DistributedLogs):nothing
+* 		->enable_logs():nothing
+* 		->disable_logs():nothing
+ * 
  */
 export default class DistributedInstance extends Instance
 {
 	/**
 	 * Create a DistributedInstance.
-	 * @extends Instance
-	 * 
-	 * API:
-	 * 		->load():nothing
-	 * 	    ->load_topology_settings(arg_settings):nothing
-	 * 
-	 * 		->send(DistributedMessage|DistributedMetrics|DistributedLogs):boolean
-	 * 
-	 *      ->enable_on_bus(arg_bus):nothing
-	 *      ->disable_on_bus(arg_bus):nothing
-	 * 
-	 * API for messages:
-	 * 		->send_msg(target, payload):boolean
-	 * 		->receive_msg(DistributedMessage):nothing
-	 * 		->enable_msg():nothing
-	 * 		->disable_msg():nothing
-	 * 
-	 * API for metrics:
-	 * 		->send_metrics(type, values):boolean
-	 * 		->receive_metrics(DistributedMetrics):nothing
-	 * 		->enable_metrics():nothing
-	 * 		->disable_metrics():nothing
-	 * 
-	 * API for logs:
-	 * 		->send_logs(ts, level, texts):boolean
-	 * 		->receive_logs(DistributedLogs):nothing
-	 * 		->enable_logs():nothing
-	 * 		->disable_logs():nothing
 	 * 
 	 * @param {string} arg_collection - collection name.
 	 * @param {string} arg_name - server name
@@ -70,12 +67,34 @@ export default class DistributedInstance extends Instance
 		assert( T.isObject(arg_settings.logger_manager) || (arg_settings.has && arg_settings.has('logger_manager') ), arg_log_context + ':bad logger_manager instance')
 		super(arg_collection, arg_class, arg_name, arg_settings, arg_log_context, arg_settings.logger_manager)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_distributed_instance = true
 
+		/**
+		 * Messages bus instance.
+		 * @type {MessageBus}
+		 */
 		this._msg_bus = undefined
-		this._metrics_bus = undefined
-		this._logs_bus = undefined
 
+		/**
+		 * Metrics messages bus instance.
+		 * @type {MessageBus}
+		 */
+		this._metrics_bus = undefined
+		
+		/**
+		 * Logs messages bus instance.
+		 * @type {MessageBus}
+		 */
+		this._logs_bus = undefined
+		
+		/**
+		 * Bus unsubscribes handlers map.
+		 * @type {object}
+		 */
 		this._bus_unsubscribes = {}
 
 		// DEBUG
@@ -115,10 +134,14 @@ export default class DistributedInstance extends Instance
 	 * 
 	 * @returns {nothing}
 	 */
-	load_topology_settings(/*arg_settings*/)
+	load_topology_settings(arg_settings)
 	{
 		this.enter_group('load_topology_settings')
+
+		arg_settings = undefined
+
 		this.leave_group('load_topology_settings')
+		return arg_settings
 	}
 
 
@@ -164,6 +187,7 @@ export default class DistributedInstance extends Instance
 	 * 
 	 * @param {MessageBus} arg_bus - message bus.
 	 * @param {string} arg_channel - channel name string (default='default').
+	 * @param {string} arg_method  - receiveing method name string (default='receive_msg').
 	 * 
 	 * @returns {nothing}
 	 */
@@ -179,6 +203,7 @@ export default class DistributedInstance extends Instance
 	 * Disable distributed messaging.
 	 * 
 	 * @param {MessageBus} arg_bus - message bus.
+	 * @param {string} arg_channel - bus channel string (default='default').
 	 * 
 	 * @returns {nothing}
 	 */
@@ -205,14 +230,14 @@ export default class DistributedInstance extends Instance
 	 * 
 	 * @returns {boolean} - message send or not.
 	 */
-	send_msg(arg_target_name, arg_payload)
+	send_msg(arg_target_name, arg_payload, arg_channel)
 	{
 		// DEBUG
 		// this.enable_trace()
 
 		this.enter_group('send_msg')
 
-		let msg = new DistributedMessage(this.get_name(), arg_target_name, arg_payload)
+		let msg = new DistributedMessage(this.get_name(), arg_target_name, arg_payload, arg_channel)
 		
 		if (this._msg_bus && msg.check_msg_format(msg) )
 		{

@@ -22,29 +22,25 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 {
     /**
      * TopologyDefineApplication constructor.
+	 * @class TopologyDefineApplication
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"applications":{
-	 * 		"applicationA":{
+	 * 	"applications":
+	 * 		"applicationA":
 	 * 			"url":"/../",
 	 * 	
-	 * 			"provided_services":{
-	 * 				"devtools_store": { servers":["Server1"] },
-	 * 				"devtools_panel": { "servers":["Server1"] },
-	 * 				"metrics_http": { "servers":["Server2", "Server3] },
-	 * 			},
+	 * 			"provided_services":
+	 * 				"devtools_store": Object with servers":["Server1"] ,
+	 * 				"devtools_panel": Object wit "servers":["Server1"] ,
+	 * 				"metrics_http": Object wit "servers":["Server2", "Server3]
 	 * 			"used_services":["messages"],
 	 * 			
 	 * 			"used_packages": ["devtools"],
 	 * 			"used_plugins":["foundation6"],
 	 * 			
 	 * 			"license":"APACHE-LICENSE-2.0"
-	 * 		},
-	 * 		"applicationB":{
-	 * 			...
-	 * 		}
-	 * 	}
+	 * 		"applicationB":...
 	 * 
      * @param {string} arg_name - application name.
 	 * @param {object} arg_settings - instance settings map.

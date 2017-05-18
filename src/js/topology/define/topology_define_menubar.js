@@ -21,6 +21,7 @@ export default class TopologyDefineMenubar extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineMenubar instance.
+	 * @class TopologyDefineMenubar
 	 * @extends TopologyDefineItem
 	 * 
 	 * @param {string} arg_name - instance name.

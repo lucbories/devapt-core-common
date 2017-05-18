@@ -17,12 +17,13 @@ if ( is_browser() )
 }
 
 
-let context = 'common/base/context'
+const context = 'common/base/context'
 
 
 
 /**
- * @file Context class: provides contextual mathods (browser/server, locales, i18n).
+ * Runtime context methods (browser/server, locales, i18n).
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -30,13 +31,25 @@ export default class Context
 {
     /**
      * Create a context instance.
+	 * 
      * @param {object} arg_runtime - current runtime.
+	 * 
      * @returns {nothing}
      */
 	constructor(arg_runtime)
 	{
 		assert( T.isObject(arg_runtime) && arg_runtime.is_server_runtime, context + ':bad runtime object')
+		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_context = true
+		
+		/**
+		 * Runtime instance.
+		 * @type {Runtime}
+		 */
 		this.$runtime = arg_runtime
 	}
     

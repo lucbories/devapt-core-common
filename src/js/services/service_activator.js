@@ -63,8 +63,8 @@ export default class ServiceActivator
 		
 		assert( is_server(), context + ':service activation is only available on server')
 		
-		console.log(context + ':activate:app=' + arg_application.get_name())
-		console.log(context + ':activate:server=' + arg_server.get_name())
+		// console.log(context + ':activate:app=' + arg_application.get_name())
+		// console.log(context + ':activate:server=' + arg_server.get_name())
 		
 		arg_provider.server = arg_server
 		arg_provider.application = arg_application
@@ -73,7 +73,7 @@ export default class ServiceActivator
 		// ACTIVATE ON SOCKETIO
 		if (arg_server.serverio)
 		{
-			console.log(context + ':activate:with socketio')
+			// console.log(context + ':activate:with socketio')
 
 			this.activate_on_socketio_server(arg_provider, arg_server.serverio)
 		}
@@ -82,7 +82,7 @@ export default class ServiceActivator
 		if ( T.isObject(arg_provider.exec) && arg_provider.exec.is_executable )
 		{
 			const routes = arg_provider.get_setting_js('routes')
-			console.log(context + ':activate:with routes', routes)
+			// console.log(context + ':activate:with routes', routes)
 
 			if ( T.isNotEmptyArray(routes) )
 			{
@@ -125,10 +125,10 @@ export default class ServiceActivator
 		}
 		
 		const with_credentials_fn = (op_name, socket)=>{
-			console.log(context + ':activate_on_socketio_server:with_credentials_fn:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' enable operation [' + op_name + '] with credentials')
+			// console.log(context + ':activate_on_socketio_server:with_credentials_fn:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' enable operation [' + op_name + '] with credentials')
 			
 			return (arg_request_plain_object) => {
-				console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' requested operation [' + op_name + '] with credentials')
+				// console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' requested operation [' + op_name + '] with credentials')
 
 				const request = new ServiceRequest(arg_request_plain_object)
 				request.set_socket(socket)
@@ -188,6 +188,7 @@ export default class ServiceActivator
 									
 									arg_provider.debug('authorization failure')
 									console.log(context + ':authorization failure')
+
 									error_values.operation = op_name
 									error_values.error = 'security failure:authorization refused'
 									const response = new ServiceResponse(error_values)
@@ -199,6 +200,7 @@ export default class ServiceActivator
 								(reason) => {
 									arg_provider.debug('authorization error:' + reason)
 									console.error(context + ':authorization error:' + reason)
+
 									error_values.operation = op_name
 									error_values.error = 'security failure:authorization exception:' + reason
 									const response = new ServiceResponse(error_values)
@@ -209,6 +211,7 @@ export default class ServiceActivator
 						
 						arg_provider.debug('authentication failure')
 						console.log(context + 'authentication failure')
+
 						error_values.operation = op_name
 						error_values.error = 'security failure:authentication refused'
 						const response = new ServiceResponse(error_values)
@@ -220,6 +223,7 @@ export default class ServiceActivator
 					(reason) => {
 						arg_provider.debug('authentication error:' + reason) // TODO NOT ONLY AUTHORIZ. ERROR
 						console.log(context + 'authentication error:' + reason)
+
 						error_values.operation = op_name
 						error_values.error = 'security failure:authentication exception:' + reason
 						const response = new ServiceResponse(error_values)
@@ -230,11 +234,11 @@ export default class ServiceActivator
 		}
 		
 		const no_credentials_fn = (op_name, socket)=>{
-			console.log(context + ':activate_on_socketio_server:no_credentials_fn:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' enable operation [' + op_name + '] without credentials')
+			// console.log(context + ':activate_on_socketio_server:no_credentials_fn:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' enable operation [' + op_name + '] without credentials')
 
 			return (arg_request_plain_object)=>{
-				console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' requested operation [' + op_name + '] without credentials')
-				console.log(context + ':activate_on_socketio_server:request', arg_request_plain_object)
+				// console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' requested operation [' + op_name + '] without credentials')
+				// console.log(context + ':activate_on_socketio_server:request', arg_request_plain_object)
 				
 				const request = new ServiceRequest(arg_request_plain_object)
 				request.set_socket(socket)
@@ -245,7 +249,7 @@ export default class ServiceActivator
 					error_values.operation = op_name
 					error_values.error = 'bad request object'
 					const response = new ServiceResponse(error_values)
-					socket.emit(op_name, response)
+					socket.emit(op_name, response.get_properties_values())
 					arg_provider.error('bad credentials')
 					console.error(context + ':activate_on_socketio_server:bad request for operation %s of svc %s with data:', op_name, svc_name)
 					return
@@ -254,7 +258,7 @@ export default class ServiceActivator
 				const response_promise = arg_provider.produce(request)
 				response_promise.then(
 					(response)=>{
-						console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' reply to operation [' + op_name + '] without credentials with response', response.get_properties_values())
+						// console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' reply to operation [' + op_name + '] without credentials with response', response.get_properties_values())
 						socket.emit(op_name,  response.get_properties_values())
 					}
 				)

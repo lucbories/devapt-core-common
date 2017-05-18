@@ -29,7 +29,7 @@ const properties = [
 	{
 		name:'operands',
 		type:'array',
-		current:undefined,
+		current:[],
 		private:true,
 		setter:true,
 		getter:true,
@@ -47,6 +47,15 @@ const properties = [
 	{
 		name:'socket',
 		type:'object',
+		current:undefined,
+		private:true,
+		setter:true,
+		getter:true,
+		tester:true
+	},
+	{
+		name:'session_uid',
+		type:'string',
 		current:undefined,
 		private:true,
 		setter:true,

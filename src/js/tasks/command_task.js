@@ -22,6 +22,8 @@ export default class CommandTask extends Task
 {
 	/**
 	 * Create a CommandTask instance.
+	 * @class CommandTask
+	 * @extends Task
 	 * 
 	 * @param {object} arg_settings - task settings.
 	 * 

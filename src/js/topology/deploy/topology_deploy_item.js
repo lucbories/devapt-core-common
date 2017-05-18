@@ -3,20 +3,10 @@ import assert from 'assert'
 
 // COMMON IMPORTS
 import T from '../../utils/types'
-import {is_browser} from '../../utils/is_browser'
-
-let  forge = undefined
-if ( is_browser() )
-{
-	forge = require('forge-browser').forge
-} else {
-	forge = require('node-forge')
-}
 
 // COMMON IMPORTS
 import Collection from '../../base/collection'
 import DistributedInstance from '../../base/distributed_instance'
-import registry from '../registry'
 
 
 let context = 'common/topology/deploy/topology_deploy_item'
@@ -34,6 +24,7 @@ export default class TopologyDeployItem extends DistributedInstance
 {
 	/**
 	 * Create a topology deploy item instance.
+	 * @class TopologyDeployItem
 	 * @extends DistributedInstance
 	 * 
 	 * A deployment item is a runtime dynamic object corresponding to a deployed topology definition item.

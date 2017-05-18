@@ -90,7 +90,8 @@ export default class DataQuery
 	 * 
 	 * @returns {nothing}
 	 */
-	_emit(/*arg_event, arg_datas=undefined*/) // TODO
+	/* eslint no-unused-vars: "off" */
+	_emit(arg_event, arg_datas=undefined) // TODO
 	{
 	}
 

@@ -17,16 +17,13 @@ export default class TopologyDefineDatasource extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineDatasource instance.
+	 * @class TopologyDefineDatasource
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"datasources":{
-	 * 		"datasourceA":{
-	 *			:"...",
-	 * 			:"..."
-	 * 		},
-	 * 		"datasourceB":{
-	 * 		}
+	 * 	"datasources":
+	 * 		"datasourceA":...
+	 * 		"datasourceB":...
 	 * 	}
 	 * 
 	 * @param {string} arg_name - instance name.

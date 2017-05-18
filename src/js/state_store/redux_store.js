@@ -21,6 +21,7 @@ export default class ReduxStore extends StateStore
 {
 	/**
 	 * Create a Redux state Store instance.
+	 * @class ReduxStore
 	 * @extends StateStore
 	 * 
 	 * @param {function} arg_reducer - state reducer.

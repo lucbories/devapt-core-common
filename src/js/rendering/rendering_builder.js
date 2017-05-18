@@ -99,10 +99,10 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 			},
 			settings:{
 				assets_urls_templates:{
-					script:is_server() ? this.get_assets_script_url('{{url}}') : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'script', this._runtime.session_credentials),
-					style: is_server() ? this.get_assets_style_url('{{url}}')  : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'style',  this._runtime.session_credentials),
-					image: is_server() ? this.get_assets_image_url('{{url}}')  : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'image',  this._runtime.session_credentials),
-					html:  is_server() ? this.get_assets_html_url('{{url}}')   : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'html',   this._runtime.session_credentials)
+					script:is_server() ? this.get_assets_script_url('{{url}}') : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'script', this._runtime.get_session_credentials()),
+					style: is_server() ? this.get_assets_style_url('{{url}}')  : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'style',  this._runtime.get_session_credentials()),
+					image: is_server() ? this.get_assets_image_url('{{url}}')  : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'image',  this._runtime.get_session_credentials()),
+					html:  is_server() ? this.get_assets_html_url('{{url}}')   : this._runtime.ui()._ui_rendering.get_asset_url('{{url}}', 'html',   this._runtime.get_session_credentials())
 				}
 			},
 			children:{
@@ -433,6 +433,8 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 	/**
 	 * Get rendering function resolver.
 	 * 
+	 * @param {Credentials} arg_credentials - credentials instance.
+	 * 
 	 * @returns {Function} - rendering function resolver.
 	 */
 	static get_rendering_function_resolver(arg_credentials)
@@ -467,7 +469,7 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 	 * 
 	 * @returns {RenderingResult} - rendering result instance.
 	 */
-	_render_content_on_browser(arg_view_name, arg_menubar_name, arg_credentials)
+	_render_content_on_browser(arg_view, arg_menubar, arg_credentials)
 	{
 		assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':_render_content_on_browser:bad this._runtime instance' )
 		
@@ -484,7 +486,7 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 		// GET DEFAULT MENUBAR
 		const default_menubar_name = state.get('default_menubar', undefined)
 		
-		return this._render_content_common(arg_view_name, arg_menubar_name, arg_credentials, default_view_name, default_menubar_name, rendering_resolver)
+		return this._render_content_common(arg_view, arg_menubar, arg_credentials, default_view_name, default_menubar_name, rendering_resolver)
 	}
 
 
@@ -499,7 +501,7 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 	 * 
 	 * @returns {RenderingResult} - rendering result instance.
 	 */
-	_render_content_on_server(arg_view_name, arg_menubar_name, arg_credentials)
+	_render_content_on_server(arg_view, arg_menubar, arg_credentials)
 	{
 		// GET TOPOLOGY DEFINED APPLICATION
 		const topology_define_app = this.get_topology_defined_application(arg_credentials)
@@ -513,7 +515,7 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 		
 		const resolver = RenderingResolverBuilder.from_topology('server resolver from topology', topology_define_app)
 
-		return this._render_content_common(arg_view_name, arg_menubar_name, arg_credentials, default_view_name, default_menubar_name, resolver)
+		return this._render_content_common(arg_view, arg_menubar, arg_credentials, default_view_name, default_menubar_name, resolver)
 	}
 
 
@@ -531,10 +533,10 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 	 * 
 	 * @returns {RenderingResult} - rendering result instance.
 	 */
-	_render_content_common(arg_view_name, arg_menubar_name, arg_credentials, arg_default_view_name, arg_default_menubar_name, arg_rendering_resolver)
+	_render_content_common(arg_view, arg_menubar, arg_credentials, arg_default_view_name, arg_default_menubar_name, arg_rendering_resolver)
 	{
-		const menubar = (arg_menubar_name ? arg_menubar_name : arg_default_menubar_name)
-		const view    = (arg_view_name    ? arg_view_name    : arg_default_view_name)
+		const menubar = (arg_menubar ? arg_menubar : arg_default_menubar_name)
+		const view    = (arg_view    ? arg_view    : arg_default_view_name)
 		const content = this.get_content_description(view, menubar)
 
 		// DEBUG

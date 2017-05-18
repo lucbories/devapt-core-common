@@ -7,44 +7,38 @@ import T from '../../utils/types'
 import TopologyDeployItem from './topology_deploy_item'
 
 
-let context = 'common/topology/deploy/topology_deploy_local_node'
+const context = 'common/topology/deploy/topology_deploy_local_node'
 
 
 
 /**
- * @file TopologyDeployLocalNode class.
+ * TopologyDeployLocalNode class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		this.deployed_tenants[deployed_tenant_name] = 
+*				name:deployed_tenant_name,		// String
+*				tenant:defined_tenant,			// TopologyDefineTenant instance
+*				services:
+*					svc_name:svc				// TopologyDefinedService instance
+*				applications:
+*					app_name:
+*						name:app_name,				// String
+*						tenant:defined_tenant,		// TopologyDefineTenant instance
+*						appplication:defined_app,	// TopologyDefinedApplication instance
+*						services:
+*							svc_name:svc			// TopologyDefinedService instance
+*						assets:
+*							...						// See TopologyDefinedApplication instance assets
+* 
  */
 export default class TopologyDeployLocalNode extends TopologyDeployItem
 {
 	/**
 	 * Create a TopologyDeployNode instance.
-	 * @extends TopologyDeployItem
-	 * 
-	 * 	API:
-	 * 		this.deployed_tenants[deployed_tenant_name] = {
-	 *				name:deployed_tenant_name,		// String
-	 *				tenant:defined_tenant,			// TopologyDefineTenant instance
-	 *				services:{
-	 *					svc_name:svc				// TopologyDefinedService instance
-	 *				},
-	 *				applications:{
-	 *					app_name:{
-	 *						name:app_name,				// String
-	 *						tenant:defined_tenant,		// TopologyDefineTenant instance
-	 *						appplication:defined_app,	// TopologyDefinedApplication instance
-	 *						services:{
-	 *							svc_name:svc			// TopologyDefinedService instance
-	 *						}
-	 *						assets:{
-	 *							...						// See TopologyDefinedApplication instance assets
-	 *						}
-	 *					}
-	 *				}
-	 *			}
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {TopologyDefineItem} arg_definition_item - topology definition item.
@@ -370,6 +364,7 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 	/**
 	 * Find a deployed service in tenants services.
 	 * 
+	 * @param {string} arg_tenant_name - tenant name.
 	 * @param {string} arg_svc_name - service name.
 	 * 
 	 * @returns {Service} - deployed service instance.

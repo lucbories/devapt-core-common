@@ -2,7 +2,6 @@
 // import assert from 'assert'
 
 // COMMON IMPORTS
-import Collection from '../../base/collection'
 import TopologyDefineItem from './topology_define_item'
 import TopologyDefineServer from './topology_define_server'
 
@@ -22,17 +21,13 @@ export default class TopologyDefineNode extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineNode instance.
+	 * @class TopologyDefineNode
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"nodes":{
-	 * 		"nodeA":{
-	 *			:"...",
-	 * 			:"..."
-	 * 		},
-	 * 		"nodeB":{
-	 * 		}
-	 * 	}
+	 * 	"nodes":
+	 * 		"nodeA":...
+	 * 		"nodeB":...
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

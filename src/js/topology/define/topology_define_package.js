@@ -28,22 +28,19 @@ export default class TopologyDefinePackage extends TopologyDefineItem
 {
 	/**
 	 * Create a package resource instance.
+	 * @class TopologyDefinePackage
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	"packages":{
-	 * 		"packageA":{
+	 * 	"packages":
+	 * 		"packageA":
 	 *			"services":"...",
 	 * 			"datasources":"...",
 	 * 			"models":"...",
 	 * 			"views":"...",
 	 * 			"menus":"...",
 	 * 			"menubars":"..."
-	 * 		},
-	 * 		"packageB":{
-	 * 			...
-	 * 		}
-	 * 	}
+	 * 		"packageB":...
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - instance settings map.

@@ -14,29 +14,29 @@ let context = 'common/topology/define/topology_define_world'
 
 
 /**
- * @file TopologyDefineWorld class.
+ * TopologyDefineWorld class.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
  */
 export default class TopologyDefineWorld extends TopologyDefineItem
 {
 	/**
 	 * Create a TopologyDefineWorld instance.
+	 * @class TopologyDefineWorld
 	 * @extends TopologyDefineItem
 	 * 
 	 * SETTINGS FORMAT:
-	 * 	{
-	 * 		"tenants":{...},
-	 * 		"nodes":{...},
-	 * 		"plugins":{...},
+	 * 	  Object with:
+	 * 		"tenants":...,
+	 * 		"nodes":...,
+	 * 		"plugins":...,
 	 * 
-	 * 		"security":{...},
+	 * 		"security":...,
 	 * 
-	 * 		"loggers":{...},
-	 * 		"traces":{...}
-	 * 	}
+	 * 		"loggers":...,
+	 * 		"traces":...
+	 * 	
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {Immutable.Map|object} arg_settings - instance settings map.
@@ -165,7 +165,7 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 	 * Find a Tenant / Application / service.
 	 * 
 	 * @param {string} arg_tenant_name - tenant name.
-	 * @param {string} arg_env_name - environment name. (TODO)
+	 * //@param {string} arg_env_name - environment name. (TODO)
 	 * @param {string} arg_application_name - application name.
 	 * @param {string} arg_svc_name - service name.
 	 * 

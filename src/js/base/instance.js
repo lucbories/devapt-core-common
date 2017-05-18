@@ -21,7 +21,8 @@ const NOT_STORED_COLLECTIONS = ['defined_topology', 'deployed_topology', 'regist
 
 
 /**
- * @file Devapt base class for resources, servers, Collection items...
+ * Devapt base class for resources, servers, Collection items...
+ * @abstract
  * 
  * @author Luc BORIES
  * 
@@ -31,8 +32,6 @@ export default class Instance extends Stateable
 {
 	/**
 	 * Create an instance.
-	 * @extends Stateable
-	 * @abstract
 	 * 
 	 * @param {string} arg_collection - collection name.
 	 * @param {string} arg_class - class name.
@@ -76,16 +75,45 @@ export default class Instance extends Stateable
 
 
         // CLASS ATTRIBUTES
+
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_instance = true
-		// this.is_weighted = false
         
+
         // INSTANCE ATTRIBUTES
+
+		/**
+		 * Instance is loaded flag.
+		 * @type {boolean}
+		 */
 		this.is_loaded = false
+
+		/**
+		 * Instance id.
+		 * @type {string}
+		 */
 		this.$id = my_uid
+
+		/**
+		 * Instance name.
+		 * @type {string}
+		 */
 		this.$name = arg_name
+
+		/**
+		 * Instance collection name.
+		 * @type {string}
+		 */
 		this.$type = arg_collection
+
+		/**
+		 * Instance class name.
+		 * @type {string}
+		 */
 		this.$class = arg_class
-		// this.$weight = 1
 		
 		// REGISTER INSTANCE IN TOPOLOGY
 		if (is_server())
@@ -126,33 +154,6 @@ export default class Instance extends Stateable
 	{
 		return this.$name
 	}
-	
-	
-
-	/**
-	 * Get instance weight.
-	 * 
-	 * @returns {number}
-	 */
-	// get_weight()
-	// {
-	// 	return this.$weight
-	// }
-	
-
-	
-	/**
-	 * Set instance weight.
-	 * 
-	 * @param {number} arg_weight - instance weight.
-	 * 
-	 * @returns {nothing}
-	 */
-	// set_weight(arg_weight)
-	// {
-	// 	assert( T.isNumber(arg_weight), context + ':bad weight value')
-	// 	this.$weight = arg_weight
-	// }
 	
 
 	

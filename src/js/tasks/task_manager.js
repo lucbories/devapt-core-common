@@ -20,6 +20,8 @@ export default class TaskManager
 {
 	/**
 	 * Create a TaskManager instance.
+	 * @class TaskManager
+	 * @extends Object
 	 * 
 	 * API:
 	 * 		->constructor(arg_settings)

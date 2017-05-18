@@ -7,7 +7,9 @@ let context = 'common/base/errorable'
 
 
 /**
- * @file Base class to deal with errors.
+ * Base class to deal with errors.
+ * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -15,7 +17,6 @@ export default class Errorable extends Loggable
 {
 	/**
 	 * Create an Errorable instance.
-	 * @extends Loggable
 	 * 
 	 * @param {string} arg_log_context - trace context.
 	 * @param {LoggerManager} arg_logger_manager - logger manager object (optional).
@@ -27,8 +28,17 @@ export default class Errorable extends Loggable
 		const my_context = arg_log_context ? arg_log_context : context
 		super(my_context, arg_logger_manager)
 		
-		this.$has_error = false
-		this.$error_msg = null
+		/**
+		 * Has error flag (default false).
+		 * @type {boolean}
+		 */
+		this._has_error = false
+
+		/**
+		 * Error text (default null).
+		 * @type {string}
+		 */
+		this._error_msg = null
 	}
 	
 	
@@ -39,8 +49,8 @@ export default class Errorable extends Loggable
 	 */
 	error(arg_msg)
 	{
-		this.$has_error = true
-		this.$error_msg = arg_msg
+		this._has_error = true
+		this._error_msg = arg_msg
 		super.error(arg_msg)
 	}
 	
@@ -51,7 +61,7 @@ export default class Errorable extends Loggable
 	 */
 	has_error()
 	{
-		return this.$has_error
+		return this._has_error
 	}
 	
 	
@@ -61,7 +71,7 @@ export default class Errorable extends Loggable
 	 */
 	get_error_msg()
 	{
-		return this.$error_msg
+		return this._error_msg
 	}
     
     

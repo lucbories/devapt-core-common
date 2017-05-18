@@ -14,58 +14,59 @@ import CollectionBase from './collection_base'
 
 
 /**
- * @file CollectionVersion class.
+ * Versionned Instance objects collection
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
+* 
+* @example
+* API:
+* 		->set_version_getter(arg_getter):nothing - Set version getter.
+* 		->get_version(arg_item):string - Get instance version.
+* 		->compare_versions(arg_version1, arg_version2):integer - Compare two instance versions: v1 < v2 => -1, v1 = v2 => 0, v1 > v2 => 1.
+* 		
+* 		->get_latest_item(arg_name):Instance|undefined - Get latest version of item by its name.
+* 		->get_latest_items():array - Get latest version of all items.
+* 		->get_item_of_version(arg_name, arg_version):Instance|undefined - Get an item by its name and its version.
+* 		->has_version(arg_item_name, arg_version):boolean -  Test if an item is inside the collection.
+* 
+* @example
+* INHERITED API:
+* 		->set_all(arg_items):nothing - Set all collection items. (INHERITED)
+* 		->get_all(arg_types):array - Get all collection items or filter items with given type. (INHERITED)
+* 		->get_all_names(arg_types):array - Get all items names with or without a filter on items types. (INHERITED)
+* 		->get_all_ids():array - Get all items ids with or without a filter on items types. (INHERITED)
+* 
+* 		->item(arg_name):Instance - Get an item by its name. (INHERITED)
+* 
+* 		->get_count():number - Get all items count. (INHERITED)
+* 		->get_first():object|undefined - Get first item. (INHERITED)
+* 		->get_last():object|undefined - Get last item. (INHERITED)
+* 
+* 		->add(arg_item):nothing - Add an item to the collection. (OVERWRITTEN)
+* 		->add_first(arg_item):nothing - Add an item to the collection at the first position. (INHERITED)
+* 		->remove(arg_item):nothing - Remove an item from the collection.
+* 		->has(arg_item):boolean -  Test if an item is inside the collection.
+* 
+* 		->find_by_name(arg_name):Instance|undefined - Find an item by its name into the collection.
+* 		->find_by_id(arg_id):Instance|undefined - Find an item by its id into the collection.
+* 		->find_by_attr(arg_attr_name, arg_attr_value):Instance|undefined - Find an item by one of its attributes into the collection.
+* 		->find_by_filter(arg_filter_function):Instance|undefined - Find an item by a filter function.
+* 
+* 		->filter_by_attr(arg_attr_name, arg_attr_value):array - Filter items by one of theirs attributes into the collection.
+* 		->filter_by_filter(arg_filter_function):array - Filter items by a filter function.
+* 
+* 		->get_accepted_types():array - Get all collection accepted types.
+* 		->set_accepted_types(arg_types):nothing - Set all collection accepted types.
+* 		->add_accepted_type(arg_type):nothing - Add one collection accepted type.
+* 		->has_accepted_type(arg_type):boolean - Test if collection has given accepted type.
+* 
+* 		->forEach(arg_cb):nothing - forEach wrapper on ordered items.
  */
 export default class CollectionVersion extends CollectionBase
 {
 	/**
 	 * Create a collection of versionned Instance objects.
-	 * 
-	 * API:
-	 * 		->set_version_getter(arg_getter):nothing - Set version getter.
-	 * 		->get_version(arg_item):string - Get instance version.
-	 * 		->compare_versions(arg_version1, arg_version2):integer - Compare two instance versions: v1 < v2 => -1, v1 = v2 => 0, v1 > v2 => 1.
-	 * 		
-	 * 		->get_latest_item(arg_name):Instance|undefined - Get latest version of item by its name.
-	 * 		->get_latest_items():array - Get latest version of all items.
-	 * 		->get_item_of_version(arg_name, arg_version):Instance|undefined - Get an item by its name and its version.
-	 * 		->has_version(arg_item_name, arg_version):boolean -  Test if an item is inside the collection.
-	 * 
-	 * INHERITED API:
-	 * 		->set_all(arg_items):nothing - Set all collection items. (INHERITED)
-	 * 		->get_all(arg_types):array - Get all collection items or filter items with given type. (INHERITED)
-	 * 		->get_all_names(arg_types):array - Get all items names with or without a filter on items types. (INHERITED)
-	 * 		->get_all_ids():array - Get all items ids with or without a filter on items types. (INHERITED)
-	 * 
-	 * 		->item(arg_name):Instance - Get an item by its name. (INHERITED)
-	 * 
-	 * 		->get_count():number - Get all items count. (INHERITED)
-	 * 		->get_first():object|undefined - Get first item. (INHERITED)
-	 * 		->get_last():object|undefined - Get last item. (INHERITED)
-	 * 
-	 * 		->add(arg_item):nothing - Add an item to the collection. (OVERWRITTEN)
-	 * 		->add_first(arg_item):nothing - Add an item to the collection at the first position. (INHERITED)
-	 * 		->remove(arg_item):nothing - Remove an item from the collection.
-	 * 		->has(arg_item):boolean -  Test if an item is inside the collection.
-	 * 
-	 * 		->find_by_name(arg_name):Instance|undefined - Find an item by its name into the collection.
-	 * 		->find_by_id(arg_id):Instance|undefined - Find an item by its id into the collection.
-	 * 		->find_by_attr(arg_attr_name, arg_attr_value):Instance|undefined - Find an item by one of its attributes into the collection.
-	 * 		->find_by_filter(arg_filter_function):Instance|undefined - Find an item by a filter function.
-	 * 
-	 * 		->filter_by_attr(arg_attr_name, arg_attr_value):array - Filter items by one of theirs attributes into the collection.
-	 * 		->filter_by_filter(arg_filter_function):array - Filter items by a filter function.
-	 * 
-	 * 		->get_accepted_types():array - Get all collection accepted types.
-	 * 		->set_accepted_types(arg_types):nothing - Set all collection accepted types.
-	 * 		->add_accepted_type(arg_type):nothing - Add one collection accepted type.
-	 * 		->has_accepted_type(arg_type):boolean - Test if collection has given accepted type.
-	 * 
-	 * 		->forEach(arg_cb):nothing - forEach wrapper on ordered items.
 	 * 
 	 * @param {...Instance} args - variadic list of Instance.
 	 * 
@@ -75,10 +76,28 @@ export default class CollectionVersion extends CollectionBase
 	{
 		super()
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_collection_version  = true
 
-		this.$items_by_name_by_version     = {}
-		this.$items_by_name_latest_version = {}
+		/**
+		 * Items versions names map.
+		 * @type {object}
+		 */
+		this._items_by_name_by_version     = {}
+
+		/**
+		 * Items last version names map.
+		 * @type {object}
+		 */
+		this._items_by_name_latest_version = {}
+
+		/**
+		 * Get version helper.
+		 * @type {function}
+		 */
 		this.$version_getter = (item)=> item && item.get_version ? item.get_version() : undefined
 
 		if ( args.length == 1 && T.isArray(args[0]) )
@@ -155,8 +174,8 @@ export default class CollectionVersion extends CollectionBase
 	 */
 	get_latest_item(arg_name)
 	{
-		// console.log('collection.get_latest_item:latest=' + Object.keys(this.$items_by_name_latest_version).toString())
-		return this.$items_by_name_latest_version ? this.$items_by_name_latest_version[arg_name] : undefined
+		// console.log('collection.get_latest_item:latest=' + Object.keys(this._items_by_name_latest_version).toString())
+		return this._items_by_name_latest_version ? this._items_by_name_latest_version[arg_name] : undefined
 	}
 	
 
@@ -168,7 +187,7 @@ export default class CollectionVersion extends CollectionBase
 	 */
 	get_latest_items()
 	{
-		const items = this.$items_by_name_latest_version ? _.toArray(this.$items_by_name_latest_version) : []
+		const items = this._items_by_name_latest_version ? _.toArray(this._items_by_name_latest_version) : []
 		// console.log(items.length, context + ':get_latest_items:items.length')
 		return items
 	}
@@ -185,7 +204,7 @@ export default class CollectionVersion extends CollectionBase
 	 */
 	get_item_of_version(arg_name, arg_version)
 	{
-		const versions = this.$items_by_name_by_version ? this.$items_by_name_by_version[arg_name] : undefined
+		const versions = this._items_by_name_by_version ? this._items_by_name_by_version[arg_name] : undefined
 		return versions ? versions[arg_version] : undefined
 	}
 	
@@ -201,11 +220,11 @@ export default class CollectionVersion extends CollectionBase
 	 */
 	has_version(arg_item_name, arg_version)
 	{
-		if ( ! this.$items_by_name_by_version[arg_item_name] )
+		if ( ! this._items_by_name_by_version[arg_item_name] )
 		{
 			return false
 		}
-		return arg_version in this.$items_by_name_by_version[arg_item_name]
+		return arg_version in this._items_by_name_by_version[arg_item_name]
 	}
 	
 	
@@ -229,27 +248,27 @@ export default class CollectionVersion extends CollectionBase
 		const id   = arg_item.get_id()
 		const version = this.get_version(arg_item)
 
-		this.$items_array.push(arg_item)
-		this.$items_by_name[name] = arg_item
-		this.$items_by_id[id] = arg_item
+		this._items_array.push(arg_item)
+		this._items_by_name[name] = arg_item
+		this._items_by_id[id] = arg_item
 
-		if (! this.$items_by_name_by_version[name])
+		if (! this._items_by_name_by_version[name])
 		{
-			this.$items_by_name_by_version[name] = {}
-			this.$items_by_name_latest_version[name] = undefined
+			this._items_by_name_by_version[name] = {}
+			this._items_by_name_latest_version[name] = undefined
 		}
 
-		this.$items_by_name_by_version[name][version] = arg_item
-		if ( this.$items_by_name_latest_version[name] )
+		this._items_by_name_by_version[name][version] = arg_item
+		if ( this._items_by_name_latest_version[name] )
 		{
-			const prev_latest = this.get_version(this.$items_by_name_latest_version[name])
+			const prev_latest = this.get_version(this._items_by_name_latest_version[name])
 			const comparison = this.compare_versions(version, prev_latest)
 			if (comparison == 1)
 			{
-				this.$items_by_name_latest_version[name] = arg_item
+				this._items_by_name_latest_version[name] = arg_item
 			}
 		} else {
-			this.$items_by_name_latest_version[name] = arg_item
+			this._items_by_name_latest_version[name] = arg_item
 		}
 	}
 	
@@ -271,8 +290,10 @@ export default class CollectionVersion extends CollectionBase
 		}
 
 		this._add(arg_item)
-		this.$items_array.pop()
-		this.$items_array = [arg_item].concat(this.$items_array)
+
+		const items = this._get_all()
+		items.pop()
+		this._set_all( [arg_item].concat(items) )
 	}
 	
 	
@@ -290,17 +311,17 @@ export default class CollectionVersion extends CollectionBase
 		const name = arg_item.get_name()
 		const id   = arg_item.get_id()
 		const version = this.get_version(arg_item)
-		const index = this.$items_array.indexOf(arg_item)
+		const index = this._items_array.indexOf(arg_item)
 
-		this.$items_array.splice(index, 1)
-		delete this.$items_by_name[name]
-		delete this.$items_by_id[id]
+		this._items_array.splice(index, 1)
+		delete this._items_by_name[name]
+		delete this._items_by_id[id]
 
-		if ( this.$items_by_name_by_version[name] )
+		if ( this._items_by_name_by_version[name] )
 		{
-			delete this.$items_by_name_by_version[name][version]
+			delete this._items_by_name_by_version[name][version]
 		}
-		delete this.$items_by_name_latest_version[name]
+		delete this._items_by_name_latest_version[name]
 	}
 	
 	
@@ -317,6 +338,6 @@ export default class CollectionVersion extends CollectionBase
 	{
 		const name = arg_item.get_name()
 		const version = this.get_version(arg_item)
-		return (name in this.$items_by_name) && this.has_version(name, version)
+		return (name in this._items_by_name) && this.has_version(name, version)
 	}
 }
