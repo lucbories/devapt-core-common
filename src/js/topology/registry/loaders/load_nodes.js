@@ -50,7 +50,7 @@ function load_nodes(logs, arg_nodes_config, arg_base_dir)
 				assert(T.isObject(node_obj.servers), error_msg_bad_node_servers)
 				
 				load_node_servers(logs, node_obj.servers, node_name, node_obj.host, arg_base_dir)
-				console.log(context + ':load_nodes:servers=[%s]', JSON.stringify(node_obj.servers))
+				// console.log(context + ':load_nodes:servers=[%s]', JSON.stringify(node_obj.servers))
 
 				if (node_obj.servers.error)
 				{
@@ -106,7 +106,7 @@ function load_node_servers(logs, arg_servers_config, arg_node_name, arg_host/*, 
 		arg_servers_config = { error: { context:context + ':load servers for node [' + arg_node_name + '] server [' + current_server + ']', exception:e } }
 	}
 	
-	console.log(context + ':load_node_servers:servers=[%s]', JSON.stringify(arg_servers_config))
+	// console.log(context + ':load_node_servers:servers=[%s]', JSON.stringify(arg_servers_config))
 	return arg_servers_config
 }
 

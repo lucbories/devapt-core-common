@@ -101,7 +101,7 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 
 			if (file_path)
 			{
-				console.log(context + ':load_plugin_class:package=%s for plugin=%s at=%s', pkg, this.get_name(), file_path)
+				// console.log(context + ':load_plugin_class:package=%s for plugin=%s at=%s', pkg, this.get_name(), file_path)
 				plugin_class = require(file_path)
 			}
 			else
@@ -116,7 +116,7 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 		else if ( T.isString(this.topology_plugin_file) )
 		{
 			const file_path = self.get_runtime().context.get_absolute_path(this.topology_plugin_file)
-			console.log(context + ':load_plugin_class:file_path=%s for plugin=%s', file_path, this.get_name())
+			// console.log(context + ':load_plugin_class:file_path=%s for plugin=%s', file_path, this.get_name())
 
 			plugin_class = require(file_path)
 		}
@@ -154,7 +154,7 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 
 				this.topology_plugin_instance = plugin
 
-				console.log(context + ':create_plugin:plugin=%s is loaded', this.get_name())
+				// console.log(context + ':create_plugin:plugin=%s is loaded', this.get_name())
 				return plugin
 			}
 			catch(e) {

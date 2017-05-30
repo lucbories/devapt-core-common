@@ -36,6 +36,26 @@ const properties = [
 		tester:true
 	},
 	{
+		name:'socket_id',
+		type:'string',
+		current:undefined,
+		private:true,
+		serializable:true,
+		setter:true,
+		getter:true,
+		tester:true
+	},
+	// {
+	// 	name:'session_uid',
+	// 	type:'string',
+	// 	current:undefined,
+	// 	private:true,
+	// 	serializable:true,
+	// 	setter:true,
+	// 	getter:true,
+	// 	tester:true
+	// },
+	{
 		name:'has_error',
 		type:'boolean',
 		current:false,
@@ -76,11 +96,13 @@ export default class ServiceResponse extends Introspectable
 	constructor(arg_values)
 	{
 		assert( T.isObject(arg_values), context + ':constructor:bad values object')
-		if ( arg_values.is_service_request )
+
+		if ( arg_values.is_service_request && T.isFunction(arg_values.get_service) )
 		{
 			arg_values = {
 				service:arg_values.get_service(),
-				operation:arg_values.get_operation()
+				operation:arg_values.get_operation(),
+				socket_id:arg_values.get_socket_id()
 			}
 		}
 

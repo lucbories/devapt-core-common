@@ -5,7 +5,7 @@ import assert from 'assert'
 import T from '../utils/types'
 
 
-let context = 'common/base/distributed_message'
+const context = 'common/base/distributed_message'
 
 
 
@@ -16,24 +16,38 @@ let context = 'common/base/distributed_message'
  * @license Apache-2.0
  * 
  * @example
-* 	API:
-* 		->get_channel():string - get bus channel name.
-* 		->set_channel(arg_channel):nothing - set bus channel name.
+ * 	API:
+ * 		->get_channel():string - get bus channel name.
+ * 		->set_channel(arg_channel):nothing - set bus channel name.
+ * 		->get_sender():string - Get message sender.
+ * 		->...
  */
 export default class DistributedMessage
 {
     /**
      * Create a DistributedMessage instance.
 	 * 
-	 * @param {string} arg_sender_name - sender name.
+	 * @param {string|object} arg_sender_name - sender name or message plain object (without other args).
 	 * @param {string} arg_target_name - recipient name.
 	 * @param {object} arg_payload - message payload plain object.
 	 * @param {string} arg_channel - channel name.
+	 * @param {array}  arg_buses_path - message buses path (optional default []).
 	 * 
      * @returns {nothing}
      */
-	constructor(arg_sender_name, arg_target_name, arg_payload, arg_channel='default')
+	constructor(arg_sender_name, arg_target_name, arg_payload, arg_channel='default', arg_buses_path=[])
 	{
+		// CASE WITH ONLY ONE ARGUMENT: MESSAGE PLAIN OBJECT
+		if (arguments.length == 1)
+		{
+			const plain_msg = arguments[0]
+			arg_sender_name = plain_msg._sender
+			arg_target_name = plain_msg._target
+			arg_payload     = plain_msg._payload
+			arg_channel     = plain_msg._channel
+			arg_buses_path  = plain_msg._buses_path
+		}
+
 		assert( T.isString(arg_sender_name) , context + ':bad sender string')
 		assert( T.isString(arg_target_name) , context + ':bad target string')
 		assert( T.isObject(arg_payload), context + ':bad payload object')
@@ -67,6 +81,40 @@ export default class DistributedMessage
 		 * @type {string}
 		 */
 		this._channel = arg_channel
+
+		/**
+		 * Message buses path.
+		 * @type {array}
+		 */
+		this._buses_path = T.isArray(arg_buses_path) ? arg_buses_path : []
+	}
+
+
+
+	/**
+	 * Add a step to message buses path.
+	 * 
+	 * @param {string} arg_bus_name - message step bus name.
+	 * 
+	 * @returns {nothing}
+	 */
+	add_buses_step(arg_bus_name)
+	{
+		this._buses_path.push(arg_bus_name)
+	}
+
+
+
+	/**
+	 * Test if message has a step into buses path.
+	 * 
+	 * @param {string} arg_bus_name - message step bus name.
+	 * 
+	 * @returns {nothing}
+	 */
+	has_buses_step(arg_bus_name)
+	{
+		return this._buses_path.indexOf(arg_bus_name) > -1
 	}
 
 

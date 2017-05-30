@@ -1,38 +1,42 @@
 // NPM IMPORTS
 import assert from 'assert'
-import _ from 'lodash'
+// import _ from 'lodash'
 
 // COMMON IMPORTS
 import T               from '../utils/types'
-import Instance        from '../base/instance'
-import Stream          from '../messaging/stream'
+// import Instance        from '../base/instance'
+// import Stream          from '../messaging/stream'
+import StreamsProvider    from '../messaging/streams_provider'
 import ServiceResponse from './service_response'
 
 
-let context = 'common/services/service_provider'
+const context = 'common/services/service_provider'
 
 
 
 /**
  * Service provider base class.
  * @abstract
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* 	API:
+* 		->load():nothing - Load settings.
+* 
+* 		->activate(arg_application, arg_server, arg_app_svc_cfg):nothing - Activate a service feature for an application.
+* 
+* 		->produce():Promise - Produce service datas on request.
+* 
+* 		->get_host():string - Get host name of service server.
+* 		->get_port():number - Get host port of service server.
+* 
  */
-export default class ServiceProvider extends Instance
+export default class ServiceProvider extends StreamsProvider
 {
 	/**
 	 * Create a service provider.
-	 * 
-	 * 	API:
-	 * 		->load():nothing - Load settings.
-	 * 
-	 * 		->activate(arg_application, arg_server, arg_app_svc_cfg):nothing - Activate a service feature for an application.
-	 * 
-	 * 		->produce():Promise - Produce service datas on request.
-	 * 
-	 * 		->get_host():string - Get host name of service server.
-	 * 		->get_port():number - Get host port of service server.
 	 * 
 	 * @param {string} arg_provider_name - consumer name.
 	 * @param {Service} arg_service_instance - service instance.
@@ -56,6 +60,7 @@ export default class ServiceProvider extends Instance
 
 		
 		// CREATE A STREAM WHICH RECEIVE VALUES TO SEND TO SUBSCRIBERS
+		/*
 		this.subscribers_sockets = []
 		this.provided_values_stream = new Stream()
 		if ( T.isFunction(this.init_provided_values_stream) )
@@ -69,6 +74,9 @@ export default class ServiceProvider extends Instance
 			this.post_provided_values_to_subscribers(v)
 		}
 		this.provided_values_stream.subscribe(post_cb)
+		*/
+
+		this.add_stream('default')
 	}
 	
 	
@@ -81,11 +89,6 @@ export default class ServiceProvider extends Instance
 	 */
 	load()
 	{
-		// const provider_operations = this.get_operations_names()
-
-		// this._operations = ['devapt-connect', 'devapt-disconnect',
-		// 	'devapt-subscribe', 'devapt-unsubscribe',
-		// 	'end', 'devapt-ping'].concat(provider_operations)
 	}
 
 
@@ -115,6 +118,8 @@ export default class ServiceProvider extends Instance
 		const operation = arg_request.get_operation()
 		const operands = arg_request.get_operands()
 		const response = new ServiceResponse(arg_request)
+		const opd_1 = operands.length > 0 ? operands[0] : undefined
+		const opd_1_str = T.isNotEmptyString(opd_1) ? opd_1 : 'default'
 
 		// SUBSCRIBE TO PROVIDER STREAM DATAS
 		if (operation == 'devapt-disconnect')
@@ -123,8 +128,9 @@ export default class ServiceProvider extends Instance
 			
 			if (socket)
 			{
-				this.unsubscribe(socket, operands)
+				this.unsubscribe(opd_1_str, socket)
 				socket.disconnect(0)
+
 				response.set_results( ['done'].concat(operands) )
 				return Promise.resolve(response)
 			}
@@ -140,7 +146,8 @@ export default class ServiceProvider extends Instance
 			
 			if (socket)
 			{
-				this.subscribe(socket, operands)
+				this.subscribe(opd_1_str, socket)
+
 				response.set_results( ['done'].concat(operands) )
 				return Promise.resolve(response)
 			}
@@ -156,7 +163,7 @@ export default class ServiceProvider extends Instance
 			
 			if (socket)
 			{
-				this.unsubscribe(socket, operands)
+				this.unsubscribe(opd_1_str, socket)
 				response.set_results( ['done'].concat(operands) )
 				return Promise.resolve(response)
 			}
@@ -205,56 +212,20 @@ export default class ServiceProvider extends Instance
 	
 	
 	/**
-	 * Add a subscriber socket.
+	 * Post streams values to one subscriber.
 	 * 
-	 * @param {object} arg_socket   - subscribing socket.
-	 * @param {any}    arg_operands - service subscription option (optional, unused yet).
-	 * 
-	 * @returns {nothing}
-	 */
-	subscribe(arg_socket/*, arg_operands*/)
-	{
-		// const svc_name = this.service.get_name()
-		// console.info(context + ':subscribe:socket subscribe on /' + svc_name, arg_socket.id)
-		
-		this.subscribers_sockets.push(arg_socket)
-	}
-	
-	
-	
-	/**
-	 * Remove a subscriber socket.
-	 * 
-	 * @param {object} arg_socket   - subscribing socket.
-	 * @param {any}    arg_operands - service subscription option (optional, unused yet).
-	 * 
-	 * @returns {nothing}
-	 */
-	unsubscribe(arg_socket/*, arg_operands*/)
-	{
-		// const svc_name = this.service.get_name()
-
-		_.remove(this.subscribers_sockets, (socket)=>{ socket.id == arg_socket.id } )
-	}
-	
-	
-	
-	/**
-	 * Post a message on the bus.
-	 * 
+	 * @param {object} arg_subscriber - subscriber object.
+	 * @param {string} arg_stream_name - stream name.
 	 * @param {object} arg_datas - response values.
 	 * 
 	 * @returns {nothing}
 	 */
-	post_provided_values_to_subscribers(arg_datas)
+	post_to_subscriber(arg_subscriber, arg_stream_name, arg_datas)
 	{
+		console.log(context + ':post_to_subscriber:stream=[%s] subscriber=', arg_stream_name, arg_subscriber)
+		console.log(context + ':post_to_subscriber:stream=[%s] datas=', arg_stream_name, arg_datas)
+
 		const svc_name = this.service.get_name()
-		// console.log(context + ':post:emit datas for ' + svc_name + ' with subscribers:' + this.subscribers_sockets.length)
-		this.subscribers_sockets.forEach(
-			(socket) => {
-				// console.log(context + ':post:emit datas for ' + svc_name)
-				socket.emit('devapt-subscription', { service:svc_name, operation:'devapt-subscription', result:'done', datas:arg_datas })
-			}
-		)
+		arg_subscriber.emit('devapt-subscription', { service:svc_name, operation:'devapt-subscription', results:['done', arg_datas] })
 	}
 }

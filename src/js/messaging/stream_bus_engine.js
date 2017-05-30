@@ -7,28 +7,31 @@ import BusEngine from './bus_engine'
 import Stream   from './stream'
 
 
-let context = 'common/messaging/stream_bus_engine'
+const context = 'common/messaging/stream_bus_engine'
 
 
 
 /**
- * @file Base class for message bus client or server.
+ * Stream based bus engine class for message bus client or server.
  * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+* API:
+*   ->constructor(arg_name,arg_settings,arg_log_context,arg_logger_manager).
+* 
+*	->channel_list():array                           - List engine channels.
+*   ->channel_add(arg_channel):nothing               - Add a channel.
+*   ->channel_send(arg_channel, arg_payload):nothing - Send a message into a channel.
+*   ->channel_on(arg_channel, arg_handler):nothing   - Subscribe on channel inputs.
+*   ->channel_transform(arg_in_channel, arg_out_channel, arg_xform_handler):nothing - Transform payload of input channel to output channel.
+* 
  */
 export default class StreamBusEngine extends BusEngine
 {
 	/**
 	 * Create a bus.
-	 * 
-	 * API:
-	 *   ->constructor(arg_name, arg_settings, arg_log_context).
-	 * 
-	 *   ->channel_add(arg_channel)
-	 *   ->channel_send(arg_channel, arg_payload)
-	 *   ->channel_on(arg_channel, arg_handler)
-	 *   ->channel_transform(arg_in_channel, arg_out_channel, arg_xform_handler).
 	 * 
 	 * @param {string} arg_name - instance name.
 	 * @param {object} arg_settings - settings.
@@ -44,7 +47,8 @@ export default class StreamBusEngine extends BusEngine
 		this.is_stream_bus_engine = true
 		
 		this._channels = {}
-		this._channels['default'] = new Stream()
+		// this._channels['default'] = new Stream()
+		// this.channel_add('default')
 	}
 	
 
@@ -82,7 +86,7 @@ export default class StreamBusEngine extends BusEngine
 	 * @param {string} arg_channel - channel name string.
 	 * @param {object} arg_payload - payload data object.
 	 * 
-	 * @returns {Stream} - input bus stream
+	 * @returns {nothing}
 	 */
 	channel_send(arg_channel, arg_payload)
 	{
@@ -101,7 +105,7 @@ export default class StreamBusEngine extends BusEngine
 	 * @param {function} arg_handler - f(payload):nothing
 	 * @param {function} arg_predicate - p(payload):boolean
 	 * 
-	 * @returns {Stream} - input bus stream
+	 * @returns {nothing}
 	 */
 	channel_on(arg_channel, arg_handler, arg_predicate=undefined)
 	{
@@ -113,36 +117,18 @@ export default class StreamBusEngine extends BusEngine
 				// console.log(context + ':subscribe:bus[' + this.get_name() + '] channel [' + arg_channel + '] received value', value)
 				
 				// FILTER BY PREDICATE
-				if ( T.isFunction(arg_predicate) && arg_predicate(value) )
+				if ( T.isFunction(arg_predicate) )
 				{
-					arg_handler(value)
-					return
+					if ( arg_predicate(value) )
+					{
+						arg_handler(value)
+						return
+					}
 				}
 				
 				// NO VALID PREDICATE
 				arg_handler(value)
 			}
 		)
-	}
-
-
-
-	/**
-	 * Transform payload of input channel to output channel.
-	 * 
-	 * @param {string} arg_in_channel - input channel name.
-	 * @param {string} arg_out_channel - output channel name.
-	 * @param {function} arg_handler - payload tranform function. 
-	 */
-	channel_transform(arg_in_channel, arg_out_channel, arg_handler)
-	{
-		assert( T.isString(arg_in_channel), this.get_context() + ':channel_transform:bad input channel name')
-		assert( T.isString(arg_out_channel), this.get_context() + ':channel_transform:bad output channel name')
-		assert( T.isFunction(arg_handler), this.get_context() + ':channel_transform:bad transform function')
-		const handler = (payload)=>{
-			const xform_payload = arg_handler(payload)
-			this.channel_send(arg_out_channel, xform_payload)
-		}
-		this.channel_on(arg_in_channel, handler)
 	}
 }

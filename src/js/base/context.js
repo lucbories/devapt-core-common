@@ -26,6 +26,51 @@ const context = 'common/base/context'
  * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+ * 	API:
+ * 		->constructor(arg_runtime):nothing - constructor.
+ * 
+ *  PATHS API:
+ * 		->get_base_dir():string - Get project base directory, the root directory of the project.
+ * 		->get_world_dir():string - Get topology  world resources directory, by default: the root directory of the project.
+ * 
+ * 		->get_absolute_path(arg_relative_path1, arg_relative_path2, arg_relative_path3):string - Get absolute path of given relative path.
+ * 				Search strategy:
+ * 				1-Joining given ordered paths
+ * 				2-Joining base directory and given ordered paths
+ * 				3-Joining world resources directory and given ordered paths
+ * 
+ * 		->get_absolute_plugin_path(arg_relative_plugin, arg_relative_path1, arg_relative_path2):string - Get absolute path of given relative plugin name.
+ * 				Call get_absolute_path(arg_relative_plugin, arg_relative_path1, arg_relative_path2)
+ * 
+ * 		->get_absolute_package_path(arg_relative_pkg, arg_relative_path1, arg_relative_path2):string - Get absolute path of given relative package name.
+ * 				Call get_absolute_path(arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+ * 				Call get_absolute_path( path.join('../../../node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
+ * 				Call get_absolute_path( path.join('../../node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
+ * 				Call get_absolute_path( path.join('../node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
+ * 				Call get_absolute_path( path.join('node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
+ * 
+ * 		->get_absolute_public_path(arg_relative_public, arg_relative_path1, arg_relative_path2):string - Get absolute path of given relative public path.
+ * 				Call get_absolute_path(arg_relative_public, arg_relative_path1, arg_relative_path2)
+ * 				If not found, search with prefixes [base_public, world_public, 'public', '..', '../public', '../..', '../../public', '../../..', '../../../public']
+ * 				Call get_absolute_path( join(prefix, arg_relative_public), arg_relative_path1, arg_relative_path2)
+ * 
+ * 		->get_absolute_resources_path(arg_relative_resource, arg_relative_path1, arg_relative_path2):string - Get absolute path of given relative resource file.
+ * 				Call get_absolute_path( path.join('resources', arg_relative_resource), arg_relative_path1, arg_relative_path2)
+ * 
+ * 	CREDENTIALS API:
+ * 		->get_credentials(arg_request):object - Get credentials.
+ * 		->get_credentials_string(arg_credentials):string - Get credentials string as 'username=...&password=...&token=...'.
+ * 		->get_url_with_credentials(arg_url, arg_request):string - Get given url augmented with credentials string.
+ * 
+ * 		->render_credentials_template(arg_html, arg_request_or_credentials):string - Render credentials template.
+ * 				Call  mustache.render(arg_html, credentials_datas)
+ * 				with const credentials_datas = credentials_obj.get_credentials_for_template()
+ * 					credentials_datas.credentials_str = credentials_str
+ * 					credentials_datas.credentials_url = credentials_url
+ * 					credentials_datas.credentials_basic_base64 = base64_encoded
+ * 					credentials_datas.url = '{{url}}'
  */
 export default class Context
 {
@@ -223,28 +268,28 @@ export default class Context
 		}
 		// debugger
 		
-		let p = this.get_absolute_path('../../../node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		let p = this.get_absolute_path( path.join('../../../node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
 		// console.log('get_absolute_package_path:../../../node_modules:', p)
 		if (p)
 		{
 			return p
 		}
 		
-		p = this.get_absolute_path('../../node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		p = this.get_absolute_path( path.join('../../node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
 		// console.log('get_absolute_package_path:../../../node_modules:', p)
 		if (p)
 		{
 			return p
 		}
 		
-		p = this.get_absolute_path('../node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		p = this.get_absolute_path( path.join('../node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
 		// console.log('get_absolute_package_path:../../../node_modules:', p)
 		if (p)
 		{
 			return p
 		}
 
-		return this.get_absolute_path('node_modules', arg_relative_pkg, arg_relative_path1, arg_relative_path2)
+		return this.get_absolute_path( path.join('node_modules', arg_relative_pkg), arg_relative_path1, arg_relative_path2)
 	}
 	
 	
@@ -280,7 +325,7 @@ export default class Context
 		while( ! p && index < searchs.length )
 		{
 			prefix = searchs[index]
-			p = this.get_absolute_path(prefix, arg_relative_public, arg_relative_path1, arg_relative_path2)
+			p = this.get_absolute_path( path.join(prefix, arg_relative_public), arg_relative_path1, arg_relative_path2)
 			// console.log('get_absolute_public_path:prefix=%s:', prefix, p)
 			++index
 		}
@@ -302,7 +347,7 @@ export default class Context
 	get_absolute_resources_path(arg_relative_resource, arg_relative_path1, arg_relative_path2)
 	{
 		assert( T.isString(arg_relative_resource), context + 'get_absolute_resources_path: bad resource file string')
-		return this.get_absolute_path('resources', arg_relative_resource, arg_relative_path1, arg_relative_path2)
+		return this.get_absolute_path( path.join('resources', arg_relative_resource), arg_relative_path1, arg_relative_path2)
 	}
 	
 	
@@ -359,7 +404,7 @@ export default class Context
 	
 	
     /**
-     * Get an url to server the given image asset.
+     * Get given url augmented with credentials string.
 	 * 
      * @param {string} arg_url - image asset relative url.
      * @param {object} arg_request - request object.

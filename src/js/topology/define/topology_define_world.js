@@ -93,7 +93,9 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 		const traces_settings = this.get_setting_js('traces', {})
 		
 		loggers_settings.traces = traces_settings
-		this._runtime.get_logger_manager().load(loggers_settings)
+		const logger_manager = this._runtime.get_logger_manager()
+		logger_manager.load(loggers_settings)
+		logger_manager.enable_trace()
 
 		this.info('load_loggers:async is resolved with success')
 		return Promise.resolve(true)

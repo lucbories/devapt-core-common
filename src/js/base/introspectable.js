@@ -133,6 +133,7 @@ export default class Introspectable
 		const getter   = T.isBoolean(arg_record.getter) ? arg_record.getter : true
 		const setter   = T.isBoolean(arg_record.setter) ? arg_record.setter : true
 		const tester   = T.isBoolean(arg_record.tester) ? arg_record.tester : true
+		const serializable= T.isBoolean(arg_record.serializable) ? arg_record.serializable : true
 		
 		assert( T.isString(arg_record.name), context + ':add_property:bad property record.name string')
 
@@ -146,6 +147,7 @@ export default class Introspectable
 			type:type,
 			value:value,
 			private:is_priv,
+			serializable:serializable,
 			getter:getter,
 			setter:setter,
 			tester:tester
@@ -294,7 +296,10 @@ export default class Introspectable
 		const values ={}
 		this._properties_names.forEach(
 			(name)=>{
-				values[name] = this.get_property_value(name)
+				if ( this._properties[name].serializable )
+				{
+					values[name] = this.get_property_value(name)
+				}
 			}
 		)
 		return values

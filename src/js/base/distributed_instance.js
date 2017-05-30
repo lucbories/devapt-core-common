@@ -122,7 +122,8 @@ export default class DistributedInstance extends Instance
 			this._logs_bus    = this.get_runtime().node.get_logs_bus()
 		}
 
-		console.log(context + ':load:name=%s this._metrics_bus', this.get_name(), this._metrics_bus.get_name())
+		// DEBUG
+		// console.log(context + ':load:name=%s this._metrics_bus', this.get_name(), this._metrics_bus.get_name())
 	}
 
 

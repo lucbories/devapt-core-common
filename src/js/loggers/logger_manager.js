@@ -37,13 +37,15 @@ export default class LoggerManager
 	
 	/**
 	 * Load settings.
-	 * @param {object} arg_settings - loggers settings
+	 * 
+	 * @param {object} arg_settings - loggers settings.
+	 * 
 	 * @returns {nothing}
 	 */
 	load(arg_settings)
 	{
+		// DEBUG
 		// console.log(arg_settings, context + ':arg_settings')
-		
 		
 		if (this.loggers.length > 0)
 		{

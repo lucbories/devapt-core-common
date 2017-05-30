@@ -13,6 +13,7 @@ const properties = [
 		type:'string',
 		current:undefined,
 		private:true,
+		serializable:true,
 		setter:true,
 		getter:true,
 		tester:true
@@ -22,6 +23,7 @@ const properties = [
 		type:'string',
 		current:undefined,
 		private:true,
+		serializable:true,
 		setter:true,
 		getter:true,
 		tester:true
@@ -31,6 +33,7 @@ const properties = [
 		type:'array',
 		current:[],
 		private:true,
+		serializable:true,
 		setter:true,
 		getter:true,
 		tester:true
@@ -40,6 +43,7 @@ const properties = [
 		type:'object',
 		current:undefined,
 		private:true,
+		serializable:true,
 		setter:true,
 		getter:true,
 		tester:true
@@ -49,6 +53,17 @@ const properties = [
 		type:'object',
 		current:undefined,
 		private:true,
+		serializable:false,
+		setter:true,
+		getter:true,
+		tester:true
+	},
+	{
+		name:'socket_id',
+		type:'string',
+		current:undefined,
+		private:true,
+		serializable:true,
 		setter:true,
 		getter:true,
 		tester:true
@@ -58,6 +73,7 @@ const properties = [
 		type:'string',
 		current:undefined,
 		private:true,
+		serializable:true,
 		setter:true,
 		getter:true,
 		tester:true

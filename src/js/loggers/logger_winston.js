@@ -117,15 +117,21 @@ export default class LoggerWinston extends Logger
 		const default_transport_cfg = {
 			level:'debug',
 			
-			timestamp: function()
-			{
-				return Date.now()
-			},
+			timestamp: false,
 			
 			formatter: function(options)
 			{
-				return options.timestamp().toString().substr(-6) +' '+ process.pid +' '+ options.level.toUpperCase() +' '+ (undefined !== options.message ? options.message : '') +
-					(options.meta && Object.keys(options.meta).length ? '\n\t'+ JSON.stringify(options.meta) : '' )
+				const msg = undefined !== options.message ? options.message : ''
+				const meta = options.meta && Object.keys(options.meta).length ? options.meta : undefined
+				// const payload = meta ? '\n\t' + JSON.stringify(meta) : '' 
+				return /*options.timestamp().toString().substr(-6) +*/' pid='+ process.pid + ' '+ winston.config.colorize( options.level, options.level.toUpperCase() )
+					+ msg
+					+ '\n\t' + meta[0] // TS
+					+ ' : ' + meta[1] // CONTEXT
+					+ ' : ' + meta[2] // NAME
+					+ ' : ' + meta[4] // ACTION
+					+ ' : ' + meta[3] // ?
+					+ '\n\t text = ' + meta[5] // TEXT
 			},
 			
 			colorize:true

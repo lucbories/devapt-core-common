@@ -11,7 +11,7 @@ let context = 'common/messaging/stream'
 
 
 /**
- * @file Stream class for BaconJS stream wrapping.
+ * Stream class for BaconJS stream wrapping.
  * 
  * @author Luc BORIES
  * @license Apache-2.0
@@ -20,6 +20,7 @@ export default class Stream
 {
 	/**
 	 * Create a stream.
+	 * 
 	 * @returns {nothing}
 	 */
 	constructor(arg_stream=undefined)

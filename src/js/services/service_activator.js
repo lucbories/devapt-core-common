@@ -272,15 +272,17 @@ export default class ServiceActivator
 				const ops = arg_provider.get_operations_names()
 				_.forEach(ops, 
 					(op_name) => {
+						// socket.join(socket.id)
+
 						if ( no_credentials_ops.indexOf(op_name) > -1 )
 						{
-							console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' enable operation [' + op_name + '] without credentials')
+							console.log(context + ':activate_on_socketio_server:svc=[%s] serverio.name=[%s] socket.id=[%s] enable operation=[%s] without credentials', svc_name, serverio_svc.name, socket.id, op_name)
 
 							socket.on(op_name, no_credentials_fn(op_name, socket))
 							return
 						}
 
-						console.log(context + ':activate_on_socketio_server:svc=' + svc_name + ':socket.id=' + serverio_svc.name + ' enable operation [' + op_name + '] with credentials')
+						console.log(context + ':activate_on_socketio_server:svc=[%s] serverio.name=[%s] socket.id=[%s] enable operation=[%s] with credentials', svc_name, serverio_svc.name, socket.id, op_name)
 						
 						socket.on(op_name, with_credentials_fn(op_name, socket))
 					}

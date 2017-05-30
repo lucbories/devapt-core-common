@@ -21,20 +21,35 @@ export default class DistributedMetrics extends DistributedMessage
     /**
      * Create a DistributedMetrics instance.
 	 * 
-	 * @param {string} arg_sender_name - sender name.
+	 * @param {string|object} arg_sender_name - sender name or message plain object (without other args).
 	 * @param {string} arg_target_name - recipient name.
 	 * @param {string} arg_type - metrics type string.
 	 * @param {array} arg_values - metrics values array.
 	 * @param {string} arg_channel - channel name.
+	 * @param {array}  arg_buses_path - message buses path (optional default []).
 	 * 
      * @returns {nothing}
      */
-	constructor(arg_sender_name, arg_target_name, arg_type, arg_values, arg_channel='metrics')
+	constructor(arg_sender_name, arg_target_name, arg_type, arg_values, arg_channel='metrics', arg_buses_path=[])
 	{
+		// CASE WITH ONLY ONE ARGUMENT: MESSAGE PLAIN OBJECT
+		if (arguments.length == 1)
+		{
+			const plain_msg = arguments[0]
+			arg_sender_name = plain_msg._sender
+			arg_target_name = plain_msg._target
+			arg_type        = plain_msg._payload.metric
+			arg_values      = plain_msg._payload.metrics
+			arg_channel     = plain_msg._channel
+			arg_buses_path  = plain_msg._buses_path
+		}
+
 		assert( T.isString(arg_type) , context + ':bad metric type string')
 		assert( T.isArray(arg_values), context + ':bad metrics values array')
 
-		super(arg_sender_name, arg_target_name, { metric:arg_type, metrics:arg_values }, arg_channel)
+		const payload = { metric:arg_type, metrics:arg_values }
+		
+		super(arg_sender_name, arg_target_name, payload, arg_channel, arg_buses_path)
 
 		/**
 		 * Class type flag.

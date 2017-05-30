@@ -49,6 +49,12 @@ export default class BusEngine extends Instance
 		 * @type {boolean}
 		 */
 		this.is_bus_engine = true
+
+		this._engine_type      = this.get_setting_js('type', 'Client')
+		this._engine_protocole = this.get_setting_js('protocole', 'https')
+		this._engine_host      = this.get_setting_js('host', 'localhost')
+		this._engine_port      = this.get_setting_js('port', '9999')
+		this._engine_url       = this._engine_protocole + '://' + this._engine_host + ':' + this._engine_port
 	}
 	
 
@@ -130,6 +136,10 @@ export default class BusEngine extends Instance
 		assert( T.isString(arg_in_channel), this.get_context() + ':channel_transform:bad input channel name')
 		assert( T.isString(arg_out_channel), this.get_context() + ':channel_transform:bad output channel name')
 		assert( T.isFunction(arg_handler), this.get_context() + ':channel_transform:bad transform function')
-		throw new Error('channel_transform:Not yet implemented')
+		const handler = (payload)=>{
+			const xform_payload = arg_handler(payload)
+			this.channel_send(arg_out_channel, xform_payload)
+		}
+		this.channel_on(arg_in_channel, handler)
 	}
 }

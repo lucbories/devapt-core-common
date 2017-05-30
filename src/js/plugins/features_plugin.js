@@ -152,11 +152,14 @@ export default class FeaturesPlugin extends Plugin
 	{
 		assert( T.isString(arg_path), context + ':bad path string')
 		
-		console.log(context + ':load_feature_class:load package')
+		// console.log(context + ':load_feature_class:load package')
+
 		try
 		{
 			const file_path_name = this._runtime.context.get_absolute_package_path(arg_path)
-			console.log(context + ':load_feature_class:load package [' + arg_path + '] file=', file_path_name)
+
+			// console.log(context + ':load_feature_class:load package [' + arg_path + '] file=', file_path_name)
+
 			const required = require(file_path_name)
 			if (required)
 			{

@@ -86,7 +86,8 @@ export default class Loggable
 			this._logger_manager = arg_logger_manager
 		}
 		else {
-			console.warn(this.get_class() + ':' + this.get_name() + ':no logger manager')
+			// DEBUG
+			// console.warn(this.get_class() + ':' + this.get_name() + ':no logger manager')
 			// debugger
 		}
 		
@@ -220,7 +221,7 @@ export default class Loggable
 		
 		let should_trace = false
 		
-		// TRACES MODULE ?
+		// TRACES COLLECTION ?
 		if ( T.isObject(arg_traces_cfg) && (arg_collection_name in arg_traces_cfg) )
 		{
 			const collection = arg_traces_cfg[arg_collection_name]
@@ -257,7 +258,7 @@ export default class Loggable
 						{
 							// console.log(context + ':should_trace_collection_item: good pattern=%s this.attribute=%s', arg_item_pattern, attribute)
 
-							// NPORMALIZE PATTERN
+							// NORMALIZE PATTERN
 							arg_item_pattern = arg_item_pattern == '*' ? '.*' : arg_item_pattern
 							// console.log(context + ':should_trace_collection_item: noarmalized pattern=%s', arg_item_pattern)
 
@@ -290,8 +291,9 @@ export default class Loggable
 	{
 		if (!this._logger_manager)
 		{
-			console.log(this.get_class() + ':' + this.get_name(), 'bad logger manager')
-			debugger
+			// DEBUG
+			console.warn(this.get_class() + ':' + this.get_name(), 'bad logger manager')
+			// debugger
 		}
 		assert( T.isObject(this._logger_manager) && this._logger_manager.is_logger_manager, context + ':get_logger_manager:bad logger manager object')
 		return this._logger_manager
@@ -331,7 +333,7 @@ export default class Loggable
 	enable_trace()
 	{
 		this.is_trace_enabled = true
-		this.get_logger_manager().enable_trace()
+		// this.get_logger_manager().enable_trace()
 	}
 	
 	
@@ -343,7 +345,7 @@ export default class Loggable
 	disable_trace()
 	{
 		this.is_trace_enabled = false
-		this.get_logger_manager().disable_trace()
+		// this.get_logger_manager().disable_trace()
 	}
 	
 	

@@ -7,7 +7,7 @@ import JsonProvider from './json_provider'
 import { SOURCE_MASTER } from './json_provider_sources'
 
 
-const context = 'common/json_provider/file_json_provider'
+const context = 'common/json_provider/master_json_provider'
 
 
 
@@ -45,9 +45,9 @@ export default class MasterJsonProvider extends JsonProvider
 	provide_json_self(resolve/*, reject*/)
 	{
 		assert( this.source == SOURCE_MASTER, context + ':provide_json_self:bad source')
-		assert( T.isString(this.$settings.relative_path), context + ':provide_json_self:bad settings.relative_path string')
+		// assert( T.isString(this.$settings.relative_path), context + ':provide_json_self:bad settings.relative_path string')
 		
-		const node = this.$settings.node
+		const node = this.$settings.runtime.node
 		assert( T.isObject(node) && node.is_node, context + ':provide_json_self:bad node object')
 
 		const master_name = node.master_name

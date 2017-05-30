@@ -21,22 +21,38 @@ export default class DistributedLogs extends DistributedMessage
     /**
      * Create a DistributedLogs instance.
 	 * 
-	 * @param {string} arg_sender_name - sender name.
+	 * @param {string|object} arg_sender_name - sender name or message plain object (without other args).
 	 * @param {string} arg_target_name - recipient name.
 	 * @param {string} arg_timestamp - logs timestamp string.
 	 * @param {string} arg_level - logs level string.
 	 * @param {array}  arg_values - logs values array.
 	 * @param {string} arg_channel - channel name.
+	 * @param {array}  arg_buses_path - message buses path (optional default []).
 	 * 
      * @returns {nothing}
      */
-	constructor(arg_sender_name, arg_target_name, arg_timestamp, arg_level, arg_values, arg_channel='logs')
+	constructor(arg_sender_name, arg_target_name, arg_timestamp, arg_level, arg_values, arg_channel='logs', arg_buses_path=[])
 	{
+		// CASE WITH ONLY ONE ARGUMENT: MESSAGE PLAIN OBJECT
+		if (arguments.length == 1)
+		{
+			const plain_msg = arguments[0]
+			arg_sender_name = plain_msg._sender
+			arg_target_name = plain_msg._target
+			arg_timestamp   = plain_msg._payload.ts
+			arg_level       = plain_msg._payload.level
+			arg_values      = plain_msg._payload.logs
+			arg_channel     = plain_msg._channel
+			arg_buses_path  = plain_msg._buses_path
+		}
+
 		assert( T.isString(arg_timestamp) , context + ':bad log timestamp string')
 		assert( T.isString(arg_level) , context + ':bad log level string')
 		assert( T.isArray(arg_values), context + ':bad logs values array')
 
-		super(arg_sender_name, arg_target_name, { ts:arg_timestamp, level:arg_level, source:'SERVER', logs:arg_values }, arg_channel)
+		const payload = { ts:arg_timestamp, level:arg_level, source:'SERVER', logs:arg_values }
+
+		super(arg_sender_name, arg_target_name, payload, arg_channel, arg_buses_path)
 
 		/**
 		 * Class type flag.
