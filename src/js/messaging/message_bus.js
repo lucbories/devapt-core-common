@@ -292,16 +292,17 @@ export default class MessageBus extends Instance
 	 * 
 	 * @param {DistributedInstance} arg_distributed_instance - distributed recipient instance.
 	 * @param {string} arg_channel - channel name string.
-	 * @param {string} arg_method - message handler method name string.
+	 * @param {string} arg_method  - message handler method name string.
+	 * @param {string} arg_alias   - instance alias name string (optional, default undefined).
 	 * 
 	 * @returns {function} - unsubscribe function.
 	 */
-	msg_register(arg_distributed_instance, arg_channel, arg_method='receive_msg')
+	msg_register(arg_distributed_instance, arg_channel, arg_method='receive_msg', arg_alias=undefined)
 	{
 		assert( T.isObject(arg_distributed_instance) && arg_distributed_instance.is_distributed_instance, this.get_context() + ':msg_register:bad distributed instance.')
 		assert( T.isString(arg_method) && (arg_method in arg_distributed_instance), this.get_context() + ':msg_register:bad method name [' + arg_method + '].')
 		
-		const name = arg_distributed_instance.get_name()
+		const name = T.isNotEmptyString(arg_alias) ? arg_alias : arg_distributed_instance.get_name()
 		const handler = arg_distributed_instance[arg_method].bind(arg_distributed_instance)
 
 		// DEBUG

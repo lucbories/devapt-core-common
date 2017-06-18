@@ -7,19 +7,19 @@ import T                     from '../utils/types'
 import RenderingPlugin       from '../plugins/rendering_plugin'
 import * as DefaultRendering from '../rendering/index'
 
-const plugin_name = 'default_plugin'
+const plugin_name = 'DefaultRendering'
 const context = 'common/' + plugin_name + '/rendering_default_plugin'
 
 
 
 /**
- * Plugin class for default rendering_plugin.
+ * Plugin class for default rendering plugin.
  * 
  * @author Luc BORIES
  * 
  * @license Apache-2.0
  */
-export default class DefaultPlugin extends RenderingPlugin
+export default class DefaultDefaultRendering extends RenderingPlugin
 {
 	constructor(arg_runtime, arg_manager)
 	{
@@ -28,15 +28,11 @@ export default class DefaultPlugin extends RenderingPlugin
 
 		super(arg_runtime, arg_manager, 'DefaultRendering', '1.0.0')
 
-		const assets_dir = '../../public/'
-		this.add_public_asset('css', '/' + plugin_name + '/normalize.css',    path.join(__dirname, assets_dir, 'css/normalize.css') )
-		
-		this.add_public_asset('img', '/' + plugin_name + '/favico.png',       path.join(__dirname, assets_dir, 'img/favico.png') )
-
-		this.add_public_asset('js', '/' + plugin_name + '/browser.min.js',    path.join(__dirname, assets_dir, 'js/vendor/browser.min.js') )
-
-		this.add_public_asset('js', '/' + plugin_name + '/devapt-browser.js',   path.join(__dirname, assets_dir, 'js/build/devapt-browser.js') )
-		this.add_public_asset('js', '/' + plugin_name + '/devapt-bootstrap.js', path.join(__dirname, assets_dir, 'js/devapt-bootstrap.js') )
+		const assets_dir = '../../../public/'
+		this.add_public_asset('css', '/' + plugin_name + '/normalize.css',       path.join(__dirname, assets_dir, 'css/normalize.css') )
+		this.add_public_asset('img', '/' + plugin_name + '/favico.png',          path.join(__dirname, assets_dir, 'img/favico.png') )
+		this.add_public_asset('js',  '/' + plugin_name + '/browser.min.js',      path.join(__dirname, assets_dir, 'js/vendor/browser.min.js') )
+		this.add_public_asset('js',  '/' + plugin_name + '/devapt-bootstrap.js', path.join(__dirname, assets_dir, 'js/devapt-bootstrap.js') )
 	}
 
 

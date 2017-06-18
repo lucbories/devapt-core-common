@@ -364,12 +364,11 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 	/**
 	 * Find a deployed service in tenants services.
 	 * 
-	 * @param {string} arg_tenant_name - tenant name.
 	 * @param {string} arg_svc_name - service name.
 	 * 
 	 * @returns {Service} - deployed service instance.
 	 */
-	find_deployed_service(arg_tenant_name, arg_svc_name)
+	find_deployed_service(arg_svc_name)
 	{
 		this.enter_group('find_deployed_service')
 
@@ -377,7 +376,7 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 
 		// LOOP ON TENANTS
 		const tenants_names = this.get_deployed_tenants_names()
-		for(const tenant_name in tenants_names)
+		for(const tenant_name of tenants_names)
 		{
 			const svc = this.get_deployed_service(tenant_name, arg_svc_name)
 			if (svc && svc.is_service)
@@ -413,7 +412,7 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 		const defined_node = this.get_topology_definition_item()
 		const defined_world = defined_node.get_topology_owner()
 		const defined_tenant = defined_world.tenant(arg_tenant_name)
-		assert( T.isObject(defined_tenant) && defined_tenant.is_topology_define_tenant, context + ':get_deployed_service:bad tenant object for ' + arg_tenant_name)
+		assert( T.isObject(defined_tenant) && defined_tenant.is_topology_define_tenant, context + ':get_deployed_service:bad tenant object for [' + arg_tenant_name + ']')
 
 		// GET TENANT DEPLOYMENT
 		if (! T.isObject(this.deployed_tenants[arg_tenant_name]) )
@@ -433,26 +432,35 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 			this.leave_group('get_deployed_service (already deployed)')
 			return deployed_tenant.services[arg_svc_name]
 		}
-		// CREATE SERVICE
+
+		// GET SERVICE DEFINITION
 		const defined_service = defined_tenant.get_service(arg_svc_name)
-		let service = undefined
-		if (defined_service)
+		this.debug('get_deployed_service:defined_service', defined_service)
+		if (! defined_service)
 		{
-			const settings = defined_service.get_settings()
-			service = this.deployed_factory.create('service', arg_svc_name, settings)
-		}
-		if (service)
-		{
-			service.enable()
-			this.debug('get_deployed_service:service is enabled')
-		}
-		else
-		{
-			console.error(context + ':get_deployed_service:bad service [' + arg_svc_name + '] for tenant ' + arg_tenant_name)
+			this.error(context + ':get_deployed_service:definition not found for service [' + arg_svc_name + '] for tenant [' + arg_tenant_name + ']')
+			
 			this.leave_group('get_deployed_service (error)')
 			return undefined
 		}
+		this.debug('get_deployed_service:defined service found [' + arg_svc_name + ']')
 
+		// CREATE SERVICE
+		let service = undefined
+		const settings = defined_service.get_settings()
+		service = this.deployed_factory.create('service', arg_svc_name, settings)
+		if (! service)
+		{
+			this.error(context + ':get_deployed_service:creation failed for service [' + arg_svc_name + '] for tenant [' + arg_tenant_name + ']')
+			
+			this.leave_group('get_deployed_service (error)')
+			return undefined
+		}
+		this.debug('get_deployed_service:service instance created [' + arg_svc_name + '] for tenant [' + arg_tenant_name + ']')
+		
+		// ENABLE SERVICE
+		service.enable()
+		this.debug('get_deployed_service:service is enabled')
 		this.deployed_tenants[arg_tenant_name].services[arg_svc_name] = service
 
 		this.leave_group('get_deployed_service')
@@ -533,11 +541,18 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 								// const deployed_app_svc = deployed_app_services[deployed_svc_name]
 								const service = this.get_deployed_service(deployed_tenant_name, deployed_svc_name)
 
+								if (! service || ! service.is_service)
+								{
+									this.error('deploy:services:service not found [' + deployed_svc_name + '] for tenant [' + deployed_tenant_name + ']')
+									return
+								}
+
 								// LOOP ON DEPLOYED APPLICATION SERVICE SERVERS
 								service.activate(defined_app, deployed_app_svc)
 								service.enable()
 
 								deployed_app_topology.services[deployed_svc_name] = service
+								this.deployed_tenants[deployed_tenant_name].services[deployed_svc_name] = service
 							}
 						)
 						
@@ -574,8 +589,14 @@ export default class TopologyDeployLocalNode extends TopologyDeployItem
 						this.deployed_tenants[deployed_tenant_name].applications[deployed_app_name] = deployed_app_topology
 
 						// REGISTER ASSETS ON DEPLOYED SERVICES
-						_.forEach(this.deployed_services,
-							(service)=>{
+						_.forEach(deployed_app_services,
+							(service_cfg, svc_name)=>{
+								const service = this.deployed_tenants[deployed_tenant_name].services[svc_name]
+								if (! service || ! service.is_service)
+								{
+									this.error('deploy:assets:service not found [' + svc_name + '] for tenant [' + deployed_tenant_name + ']')
+									return
+								}
 								service.topology_deploy_assets = deployed_assets
 							}
 						)

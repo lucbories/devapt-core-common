@@ -81,18 +81,25 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 			let file_path_stats = file_path ? fs.statSync(file_path) : undefined
 			if ( ! file_path_stats || ! file_path_stats.isDirectory())
 			{
+				this.debug('plugin=%s not found in [%s]', this.get_name(), './node_modules/')
+
 				file_path = self.get_runtime().context.get_absolute_path('../node_modules/', pkg)
 				file_path_stats = file_path ? fs.statSync(file_path) : undefined
 				if ( ! file_path_stats || ! file_path_stats.isDirectory())
 				{
+					this.debug('plugin=%s not found in [%s]', this.get_name(), '../node_modules/')
+
 					file_path = self.get_runtime().context.get_absolute_path('../../node_modules/', pkg)
 					file_path_stats = file_path ? fs.statSync(file_path) : undefined
 					if ( ! file_path_stats || ! file_path_stats.isDirectory())
 					{
+						this.debug('plugin=%s not found in [%s]', this.get_name(), '../../node_modules/')
+
 						file_path = self.get_runtime().context.get_absolute_path('../../../node_modules/', pkg)
 						file_path_stats = file_path ? fs.statSync(file_path) : undefined
 						if ( ! file_path_stats || ! file_path_stats.isDirectory())
 						{
+							this.debug('plugin=%s not found in [%s]', this.get_name(), '../../../node_modules/')
 							file_path = undefined
 						}
 					}
@@ -102,6 +109,7 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 			if (file_path)
 			{
 				// console.log(context + ':load_plugin_class:package=%s for plugin=%s at=%s', pkg, this.get_name(), file_path)
+				this.debug('plugin=%s found for path [%s]', this.get_name(), file_path)
 				plugin_class = require(file_path)
 			}
 			else
@@ -186,18 +194,24 @@ export default class TopologyDefinePlugin extends TopologyDefineItem
 		const plugin_class = this.load_plugin_class()
 		const plugin = this.create_plugin(arg_runtime, plugin_class, plugins_mgr)
 		
-		plugin.find_rendering_function = (type)=>{
-			if ( T.isFunction(plugin.$plugin_class.find_rendering_function) )
-			{
-				// console.log('plugin.$plugin_class.find_rendering_function FOUND')
-				return plugin.$plugin_class.find_rendering_function(type)
+		if (plugin && plugin.is_rendering_plugin)
+		{
+			plugin.find_rendering_function = (type)=>{
+				if ( T.isFunction(plugin.$plugin_class.find_rendering_function) )
+				{
+					// console.log('plugin.$plugin_class.find_rendering_function FOUND')
+					return plugin.$plugin_class.find_rendering_function(type)
+				}
+				// console.log('plugin.$plugin_class.find_rendering_function NOT FOUND')
+				return undefined
 			}
-			// console.log('plugin.$plugin_class.find_rendering_function NOT FOUND')
-			return undefined
+
+			self.leave_group('load_rendering_plugin')
+			return Promise.resolve(plugin)
 		}
-			
-		self.leave_group('load_rendering_plugin')
-		return Promise.resolve(plugin)
+
+		self.leave_group('load_rendering_plugin:not found')
+		return Promise.resolve(undefined)
 	}
 
 

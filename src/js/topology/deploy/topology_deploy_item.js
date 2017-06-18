@@ -105,8 +105,12 @@ export default class TopologyDeployItem extends DistributedInstance
 		
 		const promises = []
 		const children_names = Object.keys(this.topology_children)
+		this.debug('load:children_names [' + children_names.toString() + ']')
+		
 		children_names.forEach(
 			(child_name)=>{
+				this.debug('loop on child [' + child_name + ']')
+
 				const child_collection = this.topology_children[child_name]
 				const child_promise = this.load_collection(child_collection.plural, child_collection, child_collection.item_class, child_collection.item_init)
 				promises.push(child_promise)
@@ -254,7 +258,7 @@ export default class TopologyDeployItem extends DistributedInstance
 			const all_map = collection_settings.toMap()
 			all_map.forEach(
 				(settings, name) => {
-					this.info('Processing ' + arg_collection_name + ' item creation of:' + name)
+					this.info('load_collection:Processing collection [' + arg_collection_name + '] item creation of [' + name + ']')
 					// console.log(settings, 'settings')
 					// console.log(name, 'name')
 					if (! settings.has('tenant'))

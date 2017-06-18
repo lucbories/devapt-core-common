@@ -59,6 +59,8 @@ export default class LoggerWinston extends Logger
 					(transport_name) => {
 						const transport_cfg = arg_settings.transports[transport_name]
 						
+						transport_cfg.name = transport_name
+
 						if ( ! T.isString(transport_cfg.type) )
 						{
 							return
@@ -115,7 +117,7 @@ export default class LoggerWinston extends Logger
 
 		// DEFAULT CONFIGURATION
 		const default_transport_cfg = {
-			level:'debug',
+			level: 'debug',
 			
 			timestamp: false,
 			

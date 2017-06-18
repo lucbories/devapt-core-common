@@ -149,7 +149,8 @@ export default class Stateable extends Settingsable
 		// console.log(context + ':state', this._state_store.get_state().getIn(path))
 		// console.log(context + ':state js', this._state_store.get_state().getIn(path).toJS())
 		
-		return this._state_store.get_state().getIn(path)
+		const current_state = this._state_store.get_state().getIn(path)
+		return current_state ? current_state : this._initial_state
 	}
 	
 	

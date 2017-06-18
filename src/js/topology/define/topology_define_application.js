@@ -245,6 +245,8 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 	 */
 	find_rendering_function(arg_type)
 	{
+		this.debug('find_rendering_function:type=[' + arg_type + ']')
+
 		if ( (! T.isString(arg_type) ) || arg_type.length == 0)
 		{
 			this.error(context + ':find_rendering_function:bad type:', arg_type, typeof arg_type)
@@ -254,8 +256,8 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 		const tenant = this.get_topology_owner()
 		if (! tenant)
 		{
-			this.error(context + ':find_rendering_function:no owner tenant found for this application')
-			console.error(context + ':find_rendering_function:no owner tenant found for this application')
+			this.error(context + ':find_rendering_function:type=[' + arg_type + ']:no owner tenant found for this application')
+			console.error(context + ':find_rendering_function:type=[' + arg_type + ']:no owner tenant found for this application')
 			return undefined
 		}
 
@@ -267,20 +269,28 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 		{
 			const plugin_name = used_plugins_array[plugin_index]
 			const plugin = tenant.get_topology_owner().plugin(plugin_name)
+			
+			// CHECK PLUGIN INSTANCE
 			if ( ! plugin )
 			{
-				console.error(context + ':find_rendering_function:plugin not found for [' + plugin_name + ']')
-			} else {
-				if ( T.isFunction(plugin.find_rendering_function) )
-				{
-					const rendering_fn = plugin.find_rendering_function(arg_type)
-					// console.log(rendering_fn, context + ':find_rendering_function:type=' + arg_type + ' in plugin ' + plugin_name + (rendering_fn ? ' found' : ' not found'))
-				
-					if (rendering_fn)
-					{
-						return rendering_fn
-					}
-				}
+				console.error(context + ':find_rendering_function:type=[' + arg_type + ']:plugin not found for [' + plugin_name + ']')
+				continue
+			}
+
+			// TEST PLUGIN
+			if ( plugin.topology_plugin_type != 'rendering' || ! T.isFunction(plugin.find_rendering_function) )
+			{
+				console.log(context + ':find_rendering_function:type=[' + arg_type + ']:skip plugin [' + plugin_name + ']')
+				continue
+			}
+
+			// LOOKUP RENDERING FUNCTION
+			const rendering_fn = plugin.find_rendering_function(arg_type)
+			// console.log(rendering_fn, context + ':find_rendering_function:type=' + arg_type + ' in plugin ' + plugin_name + (rendering_fn ? ' found' : ' not found'))
+		
+			if (rendering_fn)
+			{
+				return rendering_fn
 			}
 		}
 

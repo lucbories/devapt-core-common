@@ -247,6 +247,10 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 	 */
 	render_page(arg_title, arg_view, arg_menubar, arg_credentials, arg_assets_services=undefined)
 	{
+		// DEBUG
+		debugger
+		console.log(context + ':render_page:credentials', arg_credentials)
+
 		assert( T.isObject(arg_credentials) && arg_credentials.is_credentials, context + ':render_page:bad credentials object')
 		
 		// ONLY FOR SERVER SIDE

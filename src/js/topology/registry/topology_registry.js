@@ -10,33 +10,33 @@ const context = 'common/topology/registry/topology_registry'
 
 
 
-const TRACE = false // TODO configure from runtime settings
-
 /**
- * @file TopologyRegistryStore class, a RegistryStore loading topology.
+ * TopologyRegistryStore class, a RegistryStore loading topology.
  * 
  * @author Luc BORIES
- * 
  * @license Apache-2.0
  */
 export default class TopologyRegistry extends RegistryStore
 {
 	/**
 	 * Create a TopologyRegistry instance.
-	 * @class TopologyRegistry
-	 * @extends RegistryStore
 	 * 
 	 * @param {LoggerManager} arg_logger_manager - logger manager object.
+	 * @param {boolean} arg_trace - load config trace flag
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_logger_manager)
+	constructor(arg_logger_manager, arg_trace=false)
 	{
-		const default_config = load_config({}, undefined, undefined, TRACE)
+		// DEBUG
+		console.log(context + ':constructor:trace=[%s]', arg_trace ? 'Yes': 'No')
+
+		const default_config = load_config({}, undefined, undefined, arg_trace)
 		super(default_config.config, context, arg_logger_manager)
 
 		this.error = undefined
 		this.initial_config = undefined
+		this._trace = arg_trace
 	}
 	
 
@@ -55,7 +55,7 @@ export default class TopologyRegistry extends RegistryStore
 		this.initial_config = arg_config
 
 		// LOAD AND CHECK CONFIG
-		let checked_config = load_config({}, arg_config, arg_base_dir, arg_topology_dir, TRACE)
+		let checked_config = load_config({}, arg_config, arg_base_dir, arg_topology_dir, this._trace)
 		if (checked_config.config.error)
 		{
 			this.error = checked_config.config.error

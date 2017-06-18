@@ -126,39 +126,45 @@ export default class TopologyDefineWorld extends TopologyDefineItem
 	/**
 	 * Load rendering plugins.
 	 * 
+	 * @param {TopologyDefinePlugin} arg_plugin - plugin definition instance.
+	 * 
 	 * @returns {Promise} - Promise of Plugin instance.
 	 */
 	load_plugin(arg_plugin)
 	{
 		this.enter_group('load_plugin')
-		// this.debug('plugin', arg_plugin)
+
+		assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin: bad plugin definition instance²')
+		const name = arg_plugin.get_name()
+		this.debug('plugin name', name)
+		this.debug('plugin type', arg_plugin.topology_plugin_type)
 
 		let promise = undefined
 		switch(arg_plugin.topology_plugin_type){
 			case 'rendering': {
-				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin:bad plugin object')
-				assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':load_plugin:bad runtime instance' )
+				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin:bad plugin object for [' + name + ']')
+				assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':load_plugin:bad runtime instance for [' + name + ']' )
 				
 				promise = arg_plugin.load_rendering_plugin(this._runtime)
-				this.leave_group('load_plugin:rendering:async')
+				this.leave_group('load_plugin:rendering:async for [' + name + ']')
 				return promise
 			}
 			case 'services': {
-				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin:bad plugin object')
-				assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':load_plugin:bad runtime instance' )
+				assert( T.isObject(arg_plugin) && arg_plugin.is_topology_define_plugin, context + ':load_plugin:bad plugin object for [' + name + ']')
+				assert( T.isObject(this._runtime) && this._runtime.is_base_runtime, context + ':load_plugin:bad runtime instance for [' + name + ']' )
 				
 				promise = arg_plugin.load_services_plugin(this._runtime)
-				this.leave_group('load_plugin:services:async')
+				this.leave_group('load_plugin:services:async for [' + name + ']')
 				return promise
 			}
 			case '...':{
-				this.leave_group('load_plugin:unknow:async')
+				this.leave_group('load_plugin:unknow:async for [' + name + ']')
 				return Promise.resolve(false)
 			}
 		}
 
-		this.leave_group('load_plugin')
-		return Promise.reject('bad plugin type [' + arg_plugin.topology_plugin_type + ']')
+		this.leave_group('load_plugin:bad plugin type [' + arg_plugin.topology_plugin_type + '] for [' + name + ']')
+		return Promise.reject('world.load_plugin:bad plugin type [' + arg_plugin.topology_plugin_type + '] for [' + name + ']')
 	}
 
 

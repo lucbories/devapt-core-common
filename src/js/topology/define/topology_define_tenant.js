@@ -69,14 +69,21 @@ export default class TopologyDefineTenant extends TopologyDefineItem
 		const packages = this.packages().get_latest_items()
 		let i = 0
 		let count = packages.length
+		this.debug('get_service:svc [' + arg_svc_name + '] with packages count [' + count + ']')
+		
 		for( ; i < count ; ++i)
 		{
 			const pkg = packages[i]
+			this.debug('get_service:svc [' + arg_svc_name + '] loop on package [' + pkg.get_name() + ']')
+
 			const svc = pkg.service(arg_svc_name)
 			if (svc)
 			{
+				this.debug('get_service:svc found [' + arg_svc_name + '] on package [' + pkg.get_name() + ']')
 				return svc
 			}
+			
+			this.debug('get_service:svc not found [' + arg_svc_name + '] on package [' + pkg.get_name() + ']')
 		}
 		return undefined
 	}

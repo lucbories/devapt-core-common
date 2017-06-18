@@ -24,7 +24,8 @@ const context = 'common/topology/registry/loaders/load_config'
  */
 function load_config(arg_state, arg_initial_config, arg_base_dir, arg_world_dir, arg_trace)
 {
-	const logs = new LoggerConsole(arg_trace ? arg_trace : false)
+	const logs = new LoggerConsole(arg_trace)
+	let should_toggle_trace = false
 	
 	logs.info(context, 'loading config')
 	
@@ -91,6 +92,13 @@ function load_config(arg_state, arg_initial_config, arg_base_dir, arg_world_dir,
 		assert(T.isObject(config.loggers), 'load_config:loggers should be a plain object')
 		assert(T.isObject(config.traces), 'load_config:traces should be a plain object')
 		
+		config.traces.loading = T.isBoolean(config.traces.loading) ? config.traces.loading : false
+		if (arg_trace != config.traces.loading)
+		{
+			should_toggle_trace = true
+			logs.toggle_trace()
+		}
+
 		// LOAD CONFIG PARTS
 		logs.info(context, 'loading config parts')
 		arg_state.config = {}
@@ -249,6 +257,11 @@ function load_config(arg_state, arg_initial_config, arg_base_dir, arg_world_dir,
 	}
 	
     // console.log( Object.keys(arg_state.config.resources.by_name), 'resources' )
+	
+	if (should_toggle_trace)
+	{
+		logs.toggle_trace()
+	}
 	
 	logs.info(context, 'loading config is finished, returns state')
 	return arg_state

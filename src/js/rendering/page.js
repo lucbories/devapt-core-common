@@ -100,8 +100,8 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 	}
 
 
-	// BUILD SCRIPTS TAGS
-	const script = (item)=>{
+	// BUILD HEAD SCRIPTS TAGS
+	const head_script_tag = (item)=>{
 		if ( T.isObject(item) && T.isString(item.id) && item.id.length > 0 && T.isString(item.content) && item.content.length > 0 )
 		{
 			const type = T.isString(item.type)  && item.type.length  > 0 ? item.type  : 'text/javascript'
@@ -110,6 +110,23 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 		}
 	}
 
+	// BUILD BODY SCRIPTS TAGS
+	const body_script_tag = (item)=>{
+		if ( T.isObject(item) && T.isString(item.id) && item.id.length > 0 && T.isString(item.content) && item.content.length > 0 )
+		{
+			const type = T.isString(item.type)  && item.type.length  > 0 ? item.type  : 'text/javascript'
+
+			const content = `
+				window.devapt_bootstrap_promise.then(
+					function()
+					{
+						${item.content}
+					}
+				)
+			`
+			return h('script', { id:item.id, type:type }, content)
+		}
+	}
 
 	// BUILD STYLES TAGS
 	const style = (item)=>{
@@ -138,7 +155,7 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 	}
 
 
-	// BUILD HEAD SCRIPTS URLS
+	// BUILD SCRIPTS URLS
 	const script_url = (item)=>{
 		if ( T.isObject(item) && T.isString(item.src) && item.src.length > 0 && T.isString(item.id) && item.id.length > 0 )
 		{
@@ -148,6 +165,161 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 		}
 	}
 
+	const body_script_url = (item)=>{
+		if ( T.isObject(item) && T.isString(item.src) && item.src.length > 0 && T.isString(item.id) && item.id.length > 0 )
+		{
+			const type = T.isString(item.type)  && item.type.length  > 0 ? item.type  : 'text/javascript'
+
+			const url = get_url(settings.assets_urls_templates.script, item.src, item.absolute)
+			switch(item.id){
+				case 'js-socketio':
+				case 'js-browser':
+				case 'js-initial-state':
+				case 'js-initial-content':
+					return h('script', { id:item.id, src:url, type:type })
+				
+				case 'js-devapt-core-browser': {
+					const content = `
+						var required_element = document.getElementById("js-browser")
+						var required_loaded = window.babel ? true : false
+
+						var core_browser_promise_cb = function(resolve, reject) {
+							console.log("page loading:loading of [${item.id}] begins")
+
+							try{
+								var load_cb = function() {
+									// CREATE CORE BROWSER SCRIPT ELEMENT
+									var js_element = document.createElement("script")
+									js_element.setAttribute("id", "${item.id}")
+									js_element.src = "${url}"
+									document.body.appendChild(js_element)
+									
+									var js_load_cb = function() {
+										console.log("page loading:loading of [${item.id}] ends")
+										resolve()
+									}
+
+									js_element.addEventListener ("load", js_load_cb, false)
+								}
+
+								if (! required_loaded)
+								{
+									required_element.addEventListener ("load", load_cb, false)
+								} else {
+									load_cb()
+								}
+
+								console.log("page loading:loading of [${item.id}] waits dependancies")
+							}
+							catch(e) {
+								console.error("page loading:loading [${item.id}]:error=" + e.toString())
+							}
+						}
+
+						window.devapt_core_browser_promise = new Promise(core_browser_promise_cb)
+					`
+					return h('script', { id:item.id + '-load', type:type }, content)
+				}
+
+				case 'js-devapt-bootstrap': {
+					const content = `
+						var bootstrap_promise_cb = function(resolve, reject) {
+							console.log("page loading:loading of [${item.id}] begins")
+
+							window.devapt_core_browser_promise.then(
+								function()
+								{
+									console.log("page loading:loading of [${item.id}] dependancies resolved")
+
+									try{
+										// CREATE BOOTSTRAP SCRIPT ELEMENT
+										var js_element = document.createElement("script")
+										js_element.setAttribute("id", "${item.id}")
+										js_element.src = "${url}"
+										document.body.appendChild(js_element)
+
+										console.log("page loading:loading of [${item.id}] element", js_element)
+
+										var js_load_cb = function() {
+											window.devapt().register_asset_loading("script", "${item.id}", "${url}")
+											console.log("page loading:loading of [${item.id}] ends")
+											resolve()
+										}
+
+										js_element.addEventListener ("load", js_load_cb, false)
+										
+									}
+									catch(e) {
+										reject("page loading:loading [${item.id}]:error=" + e.toString())
+									}
+								}
+							)
+							console.log("page loading:loading of [${item.id}] waits dependancies")
+						}
+
+						window.devapt_bootstrap_promise = new Promise(bootstrap_promise_cb)
+					`
+					return h('script', { id:item.id + '-load', type:type }, content)
+				}
+			}
+			
+			let options = undefined
+			if ( T.isNotEmptyArray(item.required) )
+			{
+				options = { required:item.required }
+			}
+			const options_str = JSON.stringify(options)
+
+			const content = `
+				window.devapt_bootstrap_promise.then(
+					function()
+					{
+						window.devapt().script_promise("${item.id}", "${url}", ${options_str})
+					}
+				)
+			`
+			return h('script', { id:item.id, type:type }, content)
+		}
+	}
+
+	const do_body_scripts_urls = (items)=>{
+		let socketio_item = undefined
+		let browser_item = undefined
+		let core_browser_item = undefined
+		let bootstrap_item = undefined
+		const ordered_items = []
+		_.forEach(items,
+			(item)=>{
+				if (item && item.id && item.id == 'js-socketio')
+				{
+					socketio_item = item
+					return
+				}
+				if (item && item.id && item.id == 'js-browser')
+				{
+					browser_item = item
+					return
+				}
+				if (item && item.id && item.id == 'js-devapt-core-browser')
+				{
+					core_browser_item = item
+					return
+				}
+				if (item && item.id && item.id == 'js-devapt-bootstrap')
+				{
+					bootstrap_item = item
+					return
+				}
+				ordered_items.push(item)
+			}
+		)
+		return [socketio_item, browser_item, core_browser_item, bootstrap_item].concat(ordered_items).map(body_script_url)
+	}
+
+	// BUILD BODY SCRIPTS ELEMENTS
+	const do_body_scripts_tags = (items)=>{
+		return items.map(body_script_tag)
+	}
 
 	// BUILD TITLE TAG
 	const title = h('title', undefined, title_value)
@@ -179,8 +351,8 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 
 	const body_styles_tags  = ( T.isArray(state.body_styles_tags)  ? _.concat(rendering_result.body_styles_tags,  state.body_styles_tags)  : rendering_result.body_styles_tags ).map(style)
 	const body_styles_urls  = ( T.isArray(state.body_styles_urls)  ? _.concat(rendering_result.body_styles_urls,  state.body_styles_urls)  : rendering_result.body_styles_urls ).map(link)
-	const body_scripts_tags = ( T.isArray(state.body_scripts_tags) ? _.concat(rendering_result.body_scripts_tags, state.body_scripts_tags) : rendering_result.body_scripts_tags).map(script)
-	const body_scripts_urls = ( T.isArray(state.body_scripts_urls) ? _.concat(rendering_result.body_scripts_urls, state.body_scripts_urls) : rendering_result.body_scripts_urls).map(script_url)
+	const body_scripts_tags = do_body_scripts_tags( T.isArray(state.body_scripts_tags) ? _.concat(rendering_result.body_scripts_tags, state.body_scripts_tags) : rendering_result.body_scripts_tags )
+	const body_scripts_urls = do_body_scripts_urls( T.isArray(state.body_scripts_urls) ? _.concat(rendering_result.body_scripts_urls, state.body_scripts_urls) : rendering_result.body_scripts_urls )
 
 	const body_children = [headers, contents, footers, body_styles_urls, body_styles_tags, body_scripts_urls, body_scripts_tags]
 	const body_props = { class:body_class_value }
@@ -191,7 +363,7 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 	const head_styles_urls  = ( T.isArray(state.head_styles_urls)  ? _.concat(rendering_result.head_styles_urls,  state.head_styles_urls) : rendering_result.head_styles_urls  ).map(link)
 	const head_links_urls   = ( T.isArray(state.head_links_urls)   ? _.concat(rendering_result.head_links_urls,   state.head_links_urls)  : rendering_result.head_links_urls   ).map(link)
 	const head_scripts_urls = ( T.isArray(state.head_scripts_urls) ? _.concat(rendering_result.head_scripts_urls, state.head_scripts_urls): rendering_result.head_scripts_urls ).map(script_url)
-	const head_scripts_tags = ( T.isArray(state.head_scripts_tags) ? _.concat(rendering_result.head_scripts_tags, state.head_scripts_tags): rendering_result.head_scripts_tags ).map(script)
+	const head_scripts_tags = ( T.isArray(state.head_scripts_tags) ? _.concat(rendering_result.head_scripts_tags, state.head_scripts_tags): rendering_result.head_scripts_tags ).map(head_script_tag)
 	const head_styles_tags  = ( T.isArray(state.head_styles_tags)  ? _.concat(rendering_result.head_styles_tags,  state.head_styles_tags) : rendering_result.head_styles_tag   ).map(style)
 
 

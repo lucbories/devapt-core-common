@@ -110,7 +110,12 @@ export default class Settingsable extends Errorable
 	 */
 	get_settings_js()
 	{
-		return this.$settings.toJS()
+		const settings = this.$settings.toJS()
+
+		delete settings.runtime
+		delete settings.logger_manager
+
+		return settings
 	}
 
 	

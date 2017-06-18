@@ -135,6 +135,12 @@ export default class TopologyDefineItem extends Instance
 			}
 		)
 		
+		if (promises.length == 0)
+		{
+			this.leave_group('load:async is resolved without item children with success')
+			return Promise.resolve(true)
+		}
+		
 		this.leave_group('load:async wait')
 		return Promise.all(promises).then(
 			(result)=>{
@@ -356,7 +362,9 @@ export default class TopologyDefineItem extends Instance
 	 */
 	export_settings()
 	{
-		return this.get_settings_js()
+		const settings = this.get_settings_js()
+
+		return settings
 	}
 
 

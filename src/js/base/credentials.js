@@ -15,7 +15,7 @@ const context = 'common/base/credentials'
 
 
 const default_credentials = {
-	tenant:undefined,		// Tenant name (mandatory)
+	tenant:'default',		// Tenant name (mandatory)
 	env:undefined,			// Environment code: dev, test, int, rec, pro (mandatory)
 	application:undefined,	// Application name (mandatory)
 

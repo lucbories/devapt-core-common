@@ -181,7 +181,7 @@ private_devapt.render_page_content = function(arg_operand)
 	var json_result = arg_operand ? arg_operand : window.__INITIAL_CONTENT__ 
 	// console.log(json_result, 'js-devapt-init-content')
 	
-	if (json_result && json_result.rendering_result)
+	if (json_result && json_result.is_rendering_result)
 	{
 		const cmd_settings = {
 			name:'devapt-bootstrap:render_page_content',
@@ -305,20 +305,35 @@ private_devapt.monitor_asset_loading = function(arg_tag, arg_id, arg_url, arg_el
 	}
 	var promise_cb = function(resolve, reject)
 	{
-		arg_elem.onload = function(){
+		var load_cb = function(){
 			console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 			resolve('ASSET loaded tag=' + arg_tag + ', id=' + arg_id + ', url=' + arg_url)
 		}
+		arg_elem.addEventListener ("load", load_cb, false)
 
-		arg_elem.onerror = function(){
+		var error_cb = function(){
 			console.error('ASSET loading error tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 			reject('ASSET loading error tag=' + arg_tag + ', id=' + arg_id + ', url=' + arg_url)
 		}
+		arg_elem.addEventListener ("error", error_cb, false)
 	}
 	private_asset_promises[arg_id] = new Promise(promise_cb)
 	console.info('ASSET init event for tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 	return private_asset_promises[arg_id]
 }
+
+private_devapt.register_asset_loading = function(arg_tag, arg_id, arg_url, arg_promise)
+{
+	if (arg_id in private_asset_promises)
+	{
+		return private_asset_promises[arg_id]
+	}
+
+	console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+	private_asset_promises[arg_id] = arg_promise && arg_promise.then ? arg_promise : Promise.resolve()
+	return private_asset_promises[arg_id]
+}
+
 // ASSET PROMISE GETTER
 private_devapt.asset_promise = function(arg_asset_id)
 {
@@ -328,22 +343,23 @@ private_devapt.asset_promise = function(arg_asset_id)
 	}
 	return Promise.reject('asset promise not found for [' + arg_asset_id + ']')
 }
-// INIT SCRIPTS ASSETS MONITORING
-private_devapt.init_scripts_load_events = function()
-{
-	console.info('devapt-bootstrap:init_scripts_load_events')
 
-	var scripts = document.getElementsByTagName('script')
-	var i = 0
-	for( ; i < scripts.length ; i++)
-	{
-		var e = scripts[i]
-		var tag = e.tagName
-		var id = e.getAttribute('id')
-		var url = e.getAttribute('src')
-		private_devapt.monitor_asset_loading(tag, id, url, e)
-	}
-}
+// INIT SCRIPTS ASSETS MONITORING
+// private_devapt.init_scripts_load_events = function()
+// {
+// 	console.info('devapt-bootstrap:init_scripts_load_events')
+
+// 	var scripts = document.getElementsByTagName('script')
+// 	var i = 0
+// 	for( ; i < scripts.length ; i++)
+// 	{
+// 		var e = scripts[i]
+// 		var tag = e.tagName
+// 		var id = e.getAttribute('id')
+// 		var url = e.getAttribute('src')
+// 		private_devapt.monitor_asset_loading(tag, id, url, e)
+// 	}
+// }
 
 
 
@@ -352,29 +368,92 @@ private_devapt.init_scripts_load_events = function()
 private_devapt.ajax = function() { return private_devapt.private_ajax }
 private_devapt.private_ajax = {}
 
-private_devapt.private_ajax.get_html = function (arg_url, arg_callback)
+private_devapt.private_ajax.get_html = function (arg_url, arg_callback, arg_options)
 {
-	console.log('devapt-bootstrap:ajax_get')
+	console.log('devapt-bootstrap:get_html')
 
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', arg_url);
-	xhr.send(null);
+	var xhr = new XMLHttpRequest()
+
+	xhr.open('GET', arg_url)
+
+	if (arg_options && arg_options.content_type)
+	{
+		xhr.setRequestHeader("Content-Type", arg_options.content_type)
+	}
+
+	xhr.send(null)
 
 	xhr.onreadystatechange = function ()
 	{
-		var DONE = 4;
-		var OK   = 200;
+		var DONE = 4
+		var OK   = 200
 		if (xhr.readyState === DONE)
 		{
 			if (xhr.status === OK) 
 			{
-				console.log(xhr.responseText);
-				arg_callback(xhr.responseText);
+				// console.log('devapt-bootstrap:get_html', xhr.responseText)
+				arg_callback(xhr.responseText)
 			} else {
-				console.error('Error: ' + xhr.status);
+				console.error('devapt-bootstrap:get_html:error: ' + xhr.status)
 			}
 		}
 	}
+}
+
+
+
+private_devapt.script_promise = function (arg_id, arg_url, arg_options)
+{
+	console.log('devapt-bootstrap:get_script_promise for [' + arg_id + ']')
+
+	if (arg_id in private_asset_promises)
+	{
+		return private_asset_promises[arg_id]
+	}
+
+	arg_options = arg_options ? arg_options : {}
+	arg_options.content_type = 'text/javascript'
+
+	var promise_cb = function(resolve, reject)
+	{
+		var eval_cb = function(response) {
+			try{
+				if (response)
+				{
+					eval(response + '')
+
+					console.info('ASSET loaded tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
+					resolve('ASSET loaded tag=' + 'script' + ', id=' + arg_id + ', url=' + arg_url)
+					return
+				}
+				console.error('ASSET loading error (no script content) tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
+				reject('ASSET loading error (no script content) tag=' + 'script' + ', id=' + arg_id + ', url=' + arg_url)
+			}
+			catch(e) {
+				console.error('ASSET loading error (' + e + ') tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
+				reject('ASSET loading error (' + e + ') tag=' + 'script' + ', id=' + arg_id + ', url=' + arg_url)
+			}
+		}
+		
+		private_devapt.private_ajax.get_html(arg_url, eval_cb, arg_options)
+	}
+
+	let asset_promise = new Promise(promise_cb)
+	if ( Array.isArray(arg_options.required) && arg_options.required.length > 0 )
+	{
+		var required_promises = arg_options.required.map( function(id) { return window.devapt().asset_promise(id) } )
+		
+		asset_promise = Promise.all(required_promises).then(
+			function()
+			{
+				return new Promise(promise_cb)
+			}
+		)
+	}
+	private_asset_promises[arg_id] = asset_promise
+
+	console.info('ASSET init event for tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
+	return private_asset_promises[arg_id]
 }
 
 private_devapt.private_ajax.get_json = private_devapt.private_ajax.get_html
@@ -520,7 +599,7 @@ private_devapt.request_service = function(arg_svc_promise, arg_operation, arg_op
 
 // *********************************************************************************
 // STARTING DEVAPT
-window.devapt().init_scripts_load_events()
+// window.devapt().init_scripts_load_events()
 window.devapt().on_dom_loaded( window.devapt().create_runtime )
 
 window.devapt().on_content_rendered(

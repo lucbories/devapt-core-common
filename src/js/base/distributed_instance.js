@@ -189,13 +189,14 @@ export default class DistributedInstance extends Instance
 	 * @param {MessageBus} arg_bus - message bus.
 	 * @param {string} arg_channel - channel name string (default='default').
 	 * @param {string} arg_method  - receiveing method name string (default='receive_msg').
+	 * @param {string} arg_alias   - instance alias name string (optional, default undefined).
 	 * 
 	 * @returns {nothing}
 	 */
-	enable_on_bus(arg_bus, arg_channel='default', arg_method='receive_msg')
+	enable_on_bus(arg_bus, arg_channel='default', arg_method='receive_msg', arg_alias=undefined)
 	{
 		const bus_name = arg_bus.get_name() + ':' + arg_channel
-		this._bus_unsubscribes[bus_name] = arg_bus.msg_register(this, arg_channel, arg_method)
+		this._bus_unsubscribes[bus_name] = arg_bus.msg_register(this, arg_channel, arg_method, arg_alias)
 	}
 
 
