@@ -69,6 +69,8 @@ export default class TopologyDefineService extends TopologyDefineItem
 		this.topology_service_type         = this.get_setting_js('type', undefined)
 		this.topology_service_routes       = this.get_setting_js('routes', undefined)
 		this.topology_service_action       = this.get_setting_js('action', undefined)
+		this.topology_service_app_base_dir = this.get_setting_js('app_base_dir', undefined)
+		this.topology_service_pkg_base_dir = this.get_setting_js('pkg_base_dir', undefined)
 		this.topology_service_directory    = this.get_setting_js('directory', undefined)
 		this.topology_service_default_file = this.get_setting_js('default_file', undefined)
 		this.topology_service_page_view    = this.get_setting_js('page_view', undefined)

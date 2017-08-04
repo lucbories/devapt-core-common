@@ -144,6 +144,7 @@ export default class Context
 		// console.log(this.get_world_dir(), 'world_dir')
 		// console.log('get_absolute_path:with ', arg_relative_path1, arg_relative_path2, arg_relative_path3)
 
+		const default_extension = '.js'
 		let ext = undefined
 		let p0 = undefined
 		let p1 = undefined
@@ -177,6 +178,7 @@ export default class Context
 
 		if ( path.isAbsolute(p0) )
 		{
+			// WITHOUT DEFAULT EXTENSION
 			try
 			{
 				const fs_stat = fs.statSync(p0)
@@ -187,10 +189,23 @@ export default class Context
 				}
 			}
 			catch(e) {}
+
+			// WITH DEFAULT EXTENSION
+			try
+			{
+				const fs_stat = fs.statSync(p0 + default_extension)
+				if ( fs_stat.isFile() || fs_stat.isDirectory() )
+				{
+					// console.log(context + ':get_absolute_path:path found [%s] for [%s, %s, %s]', p0, arg_relative_path1, arg_relative_path2, arg_relative_path3)
+					return p0 + default_extension
+				}
+			}
+			catch(e) {}
 		}
 
 		if ( path.isAbsolute(p1) )
 		{
+			// WITHOUT DEFAULT EXTENSION
 			try
 			{
 				const fs_stat = fs.statSync(p1)
@@ -201,10 +216,23 @@ export default class Context
 				}
 			}
 			catch(e) {}
+
+			// WITH DEFAULT EXTENSION
+			try
+			{
+				const fs_stat = fs.statSync(p1 + default_extension)
+				if ( fs_stat.isFile() || fs_stat.isDirectory() )
+				{
+					// console.log(context + ':get_absolute_path:path found [%s] for [%s, %s, %s] with .js', p1, arg_relative_path1, arg_relative_path2, arg_relative_path3)
+					return p1 + default_extension
+				}
+			}
+			catch(e) {}
 		}
 
 		if ( path.isAbsolute(p2) )
 		{
+			// WITHOUT DEFAULT EXTENSION
 			try
 			{
 				const fs_stat = fs.statSync(p2)
@@ -215,15 +243,36 @@ export default class Context
 				}
 			}
 			catch(e) {}
+
+			// WITH DEFAULT EXTENSION
+			try
+			{
+				const fs_stat = fs.statSync(p2 + default_extension)
+				if ( fs_stat.isFile() || fs_stat.isDirectory() )
+				{
+					// console.log(context + ':get_absolute_path:path found [%s] for [%s, %s, %s] with .js', p2, arg_relative_path1, arg_relative_path2, arg_relative_path3)
+					return p2 + default_extension
+				}
+			}
+			catch(e) {}
 		}
 
 		
-		if (! ext)
-		{
-			return this.get_absolute_path((arg_relative_path1 && ! arg_relative_path2) ? arg_relative_path1 + '.js' : arg_relative_path1, (arg_relative_path2 && ! arg_relative_path3) ? arg_relative_path2 + '.js' : arg_relative_path2, arg_relative_path3 ? arg_relative_path3 + '.js' : undefined)
-		}
+		// if (ext == '')
+		// {
+		// 	const path_1_is_directory = path.dirname(arg_relative_path1) == arg_relative_path1
+		// 	const path_2_is_directory = path.dirname(arg_relative_path2) == arg_relative_path2
+		// 	const path_3_is_directory = path.dirname(arg_relative_path3) == arg_relative_path3
 
-		console.error(context + ':get_absolute_path:path not found [%s, %s, %s] for [%s, %s, %s]', p0, p1, p2, arg_relative_path1, arg_relative_path2, arg_relative_path3)
+		// 	const part_1 = (! path_1_is_directory && arg_relative_path1 && ! arg_relative_path2) ? arg_relative_path1 + '.js' : arg_relative_path1
+		// 	const part_2 = (! path_2_is_directory && arg_relative_path2 && ! arg_relative_path3) ? arg_relative_path2 + '.js' : arg_relative_path2
+		// 	const part_3 = arg_relative_path3 ? arg_relative_path3 + (! path_3_is_directory ? '.js' : '') : undefined
+
+		// 	const absolute_path = this.get_absolute_path(part_1, part_2, part_3)
+		// 	return absolute_path
+		// }
+
+		console.error(context + ':get_absolute_path:path not found [\n%s, \n%s, \n%s\n] for [\n%s, \n%s, \n%s\n]', p0, p1, p2, arg_relative_path1, arg_relative_path2, arg_relative_path3)
 		return undefined
 	}
 	
@@ -407,25 +456,28 @@ export default class Context
      * Get given url augmented with credentials string.
 	 * 
      * @param {string} arg_url - image asset relative url.
-     * @param {object} arg_request - request object.
+     * @param {object|Credentials} arg_request_or_credentials - request object or Credentials instance.
 	 * 
-     * @returns {string} absolute image asset url.
+     * @returns {string} absolute url.
      */
-	get_url_with_credentials(arg_url, arg_request)
+	get_url_with_credentials(arg_url, arg_request_or_credentials)
 	{
 		// logs.debug('get_url_with_credentials')
 		
 		
 		// TODO ARGS = REQUEST OR CRENDETIALS ??
 
-
-		if ( ! arg_request )
+		// NO CREDENTIALS, NO REQUEST
+		if ( ! arg_request_or_credentials )
 		{
 			return arg_url + '?{{credentials_url}}'
 		}
+	
+		// GET CREDENTIALS
+		const credentials = arg_request_or_credentials.is_credentials ? arg_request_or_credentials : (arg_request_or_credentials.credentials ? arg_request_or_credentials.credentials : undefined)
 		
-		const credentials_str = this.get_credentials_string(arg_request ? arg_request.credentials : undefined)
-		
+		// GET CREDENTIALS STRING
+		const credentials_str = this.get_credentials_string(credentials)
 		if (credentials_str)
 		{
 			return arg_url + '?' + credentials_str

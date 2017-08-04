@@ -178,6 +178,10 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 			const svc = arg_package_config.services[svc_name]
 			assert(T.isObject(svc), error_msg_bad_service)
 			logs.info(context, 'loading world...packages.' + arg_package_name + '.services.' + svc_name + ' is registered')
+			
+			// REGISTER BASE DIRECTORIES
+			svc.app_base_dir = arg_base_dir
+			svc.pkg_base_dir = arg_package_config.base_dir
 
 			arg_package_config.resources_by_name[svc_name] = svc
 			arg_package_config.resources_by_type['services'][svc_name] = svc
