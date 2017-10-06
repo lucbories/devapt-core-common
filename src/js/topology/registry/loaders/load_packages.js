@@ -40,6 +40,46 @@ function load_packages(logs, arg_packages_config, arg_base_dir)
 		
 		// LOOP ON PACKAGES
 		let files = {}
+		const load_one_package_fn = (package_name, package_obj, package_dir)=>{
+			// BAD FORMAT
+			if ( ! T.isObject(package_obj) )
+			{
+				throw 'error in packages.' + package_name + ':bad format, not a file name nor an object'
+			}
+
+			arg_packages_config[package_name] = load_package(logs, package_name, package_obj, package_dir, files)
+			// console.log(package_obj, 'package_obj')
+
+			// PROCESS ERRORS
+			if (package_obj.commands && package_obj.commands.error)
+			{
+				throw 'error in packages.' + package_name + '.commands:' + package_obj.commands.error
+			}
+			if (package_obj.services && package_obj.services.error)
+			{
+				throw 'error in packages.' + package_name + '.services:' + package_obj.services.error 
+			}
+			if (package_obj.datasources && package_obj.datasources.error)
+			{
+				throw 'error in packages.' + package_name + '.datasources:' + package_obj.datasources.error 
+			}
+			if (package_obj.models && package_obj.models.error)
+			{
+				throw 'error in packages.' + package_name + '.models:' + package_obj.models.error 
+			}
+			if (package_obj.views && package_obj.views.error)
+			{
+				throw 'error in packages.' + package_name + '.views:' + package_obj.views.error
+			}
+			if (package_obj.menus && package_obj.menus.error)
+			{
+				throw 'error in packages.' + package_name + '.menus:' + package_obj.menus.error
+			}
+			if (package_obj.menubars && package_obj.menubars.error)
+			{
+				throw 'error in packages.' + package_name + '.menubars:' + package_obj.menubars.error
+			}
+		}
 		Object.keys(arg_packages_config).forEach(
 			function(arg_package_name)
 			{
@@ -51,38 +91,37 @@ function load_packages(logs, arg_packages_config, arg_base_dir)
 				logs.info(context, 'loading world...packages.' + arg_package_name)
 				
 				let package_obj = arg_packages_config[arg_package_name]
-				arg_packages_config[arg_package_name] = load_package(logs, arg_package_name, package_obj, arg_base_dir, files)
-				// console.log(package_obj, 'package_obj')
 
-				// PROCESS ERRORS
-				if (package_obj.commands && package_obj.commands.error)
+				// LOAD A FILE NAME
+				if ( T.isString(package_obj) )
 				{
-					throw 'error in packages.' + arg_package_name + '.commands:' + e 
+					const pkg_name = package_obj
+					const file_path_name = path.join(arg_base_dir, pkg_name)
+					
+					package_obj = require(file_path_name).packages
+
+					const pkg_dir = path.dirname(file_path_name)
+
+					// DEBUG
+					logs.info(context + ':file=[%s] package_obj:', file_path_name, package_obj)
+
+					Object.keys(package_obj).forEach(
+						function(arg_sub_name)
+						{
+							const sub_pkg = package_obj[arg_sub_name]
+							load_one_package_fn(arg_sub_name, sub_pkg, pkg_dir)
+						}
+					)
+					return
 				}
-				if (package_obj.services && package_obj.services.error)
+
+				// BAD FORMAT
+				if ( ! T.isObject(package_obj) )
 				{
-					throw 'error in packages.' + arg_package_name + '.services:' + e 
+					throw 'error in packages.' + arg_package_name + ':bad format, not a file name nor an object'
 				}
-				if (package_obj.datasources && package_obj.datasources.error)
-				{
-					throw 'error in packages.' + arg_package_name + '.datasources:' + e 
-				}
-				if (package_obj.models && package_obj.models.error)
-				{
-					throw 'error in packages.' + arg_package_name + '.models:' + e 
-				}
-				if (package_obj.views && package_obj.views.error)
-				{
-					throw 'error in packages.' + arg_package_name + '.views:' + e 
-				}
-				if (package_obj.menus && package_obj.menus.error)
-				{
-					throw 'error in packages.' + arg_package_name + '.menus:' + e 
-				}
-				if (package_obj.menubars && package_obj.menubars.error)
-				{
-					throw 'error in packages.' + arg_package_name + '.menubars:' + e 
-				}
+
+				load_one_package_fn(arg_package_name, package_obj, arg_base_dir)
 			}
 		)
 		
@@ -204,9 +243,18 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 	const templates = arg_package_config.templates
 	templates.forEach(
 		(template_file) => {
+			logs.info(context, 'loading world...packages.' + arg_package_name + ' arg_base_dir:' + arg_base_dir)
 			logs.info(context, 'loading world...packages.' + arg_package_name + ' templates file:' + template_file)
+			logs.info(context, 'loading world...packages.' + arg_package_name + ' arg_package_config.base_dir:' + arg_package_config.base_dir)
 			
-			let relative_path_name = path.join(arg_package_config.base_dir, template_file)
+			if ( ! T.isNotEmptyString(template_file) )
+			{
+				return
+			}
+			
+			let relative_path_name = T.isNotEmptyString(arg_package_config.base_dir) ? path.join(arg_package_config.base_dir, template_file) : template_file
+			logs.info(context, 'loading world...packages.' + arg_package_name + ' relative_path_name:' + relative_path_name)
+
 			let absolute_path_name = path.join(arg_base_dir , relative_path_name)
 			
 			let config = parser.read(absolute_path_name, 'utf8')
@@ -285,15 +333,23 @@ function load_package_children(logs, arg_package_name, arg_package_config, arg_c
 			logs.debug(context, 'loading world...packages.' + arg_package_name + ' resource children for ' + res_name)
 			
 			let res_obj = arg_children[res_name]
+			
+			// DEBUG
+			// console.log('load_package_children:res_obj=', JSON.stringify(res_obj) )
 
 			// TEMPLATE
 			if ( T.isNotEmptyString(res_obj.template) )
 			{
+				// console.log('load_package_children:res_obj=', JSON.stringify(res_obj) )
+
 				const template_name = res_obj.template
 				const template_resource = arg_package_config.templates[template_name]
 				assert(T.isObject(template_resource), error_msg_bad_resource_config + ' for ' + res_name + ' with template ' + template_name)
-				const clone = _.clone(template_resource)
-				res_obj = _.merge(res_obj, clone)
+
+				const template_clone = _.clone(template_resource)
+				const res_clone = _.clone(res_obj)
+
+				res_obj = _.merge(template_clone, res_clone)
 				const xform_fn = (v)=>{
 					if ( T.isNotEmptyString(v) )
 					{
@@ -304,7 +360,21 @@ function load_package_children(logs, arg_package_name, arg_package_config, arg_c
 				res_obj = attr_iter(res_obj, xform_fn)
 				arg_children[res_name] = res_obj
 
-				// console.log(context + ':loading world...packages.' + arg_package_name + ' resource [%s] of collection [%s] from template [%s]:', res_name, type_name, template_name, res_obj)
+				// DEBUG
+				// console.log(context + ':load_package_children:' + arg_package_name + ' resource [%s] of collection [%s] from template [%s]:', res_name, type_name, template_name, res_obj)
+				// if (res_obj && res_obj.state && res_obj.state.space)
+				// {
+				// 	console.log(context + ':load_package_children:' + arg_package_name + ' resource [%s] of collection [%s] from template [%s]', res_name, type_name, template_name)
+					
+				// 	console.log(context + ':load_package_children:' + arg_package_name + ':source=')
+				// 	console.log(res_clone.state.space)
+					
+				// 	console.log(context + ':load_package_children:' + arg_package_name + ':template=')
+				// 	console.log(template_clone.state.space)
+					
+				// 	console.log(context + ':load_package_children:' + arg_package_name + ':merge=')
+				// 	console.log(res_obj.state.space)
+				// }
 			}
 			
 			// GET RESOURCE TYPE
@@ -339,6 +409,44 @@ function load_package_template(logs, arg_package_name, arg_package_config, arg_c
 			
 			let res_obj = arg_children[res_name]
 			
+			// DEBUG
+			// console.log('load_package_template:res_obj=', JSON.stringify(res_obj.state) )
+			
+			// TEMPLATE
+			if ( T.isNotEmptyString(res_obj.template) )
+			{
+				const template_name = res_obj.template
+				let template_resource = arg_package_config.templates[template_name]
+				if (! template_resource)
+				{
+					template_resource = arg_children[template_name]
+				}
+				if (! template_resource)
+				{
+					console.error(context + ':load_package_template:package=[' + arg_package_name + '] resource=[' + res_name + ']: template not found for [' + template_name + ']')
+				}
+				assert(T.isObject(template_resource), error_msg_bad_resource_config + ' for ' + res_name + ' with template ' + template_name)
+				const template_clone = _.clone(template_resource)
+				const res_clone = _.clone(res_obj)
+				res_obj = _.merge(template_clone, res_clone)
+
+				// DEBUG
+				// console.log(context + ':load_package_template world...packages.' + arg_package_name + ' resource [%s] of collection [%s] from template [%s] src[%o] template[%o] merg[%o]:', res_name, type_name, template_name, tmp, clone, res_obj)
+				// if (res_obj && res_obj.state && res_obj.state.space)
+				// {
+				// 	console.log(context + ':load_package_template world...packages.' + arg_package_name + ' resource [%s] of collection [%s] from template [%s]', res_name, type_name, template_name)
+					
+				// 	console.log(context + ':load_package_template world...packages.' + arg_package_name + ':source=')
+				// 	console.log(res_clone.state.space)
+					
+				// 	console.log(context + ':load_package_template world...packages.' + arg_package_name + ':template=')
+				// 	console.log(template_clone.state.space)
+					
+				// 	console.log(context + ':load_package_template world...packages.' + arg_package_name + ':merge=')
+				// 	console.log(res_obj.state.space)
+				// }
+			}
+
 			if (type_name !== 'menus' && type_name !== 'models')
 			{
 				res_obj.class_name = res_obj.class_name ? res_obj.class_name : res_obj.type

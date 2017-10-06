@@ -2,6 +2,7 @@
 // NPM IMPORTS
 import assert from 'assert'
 import lowdb from 'lowdb'
+import FileAsync from 'lowdb/adapters/FileSync'
 
 // COMMON IMPORTS
 import T              from '../../utils/types'
@@ -51,10 +52,10 @@ export default class JsonFileRecordProvider extends RecordProvider
 
 			// OPEN DATABASE
 			const db_settings = {
-				autosave:true,
-				async:true
+				autosave:true
 			}
-			this.file_db = lowdb(json_full_path, db_settings)
+			this.file_adapter = new FileAsync(json_full_path, db_settings)
+			this.file_db = lowdb(this.file_adapter)
 
 			this.is_ready = T.isFunction(this.file_db)
 		}

@@ -1,7 +1,7 @@
 {
   "name": "devapt-core-common",
-  "version": "2.0.0",
-  "description": "Developpers Application Toolkit - build application (backend, frontend, RESTfull, API, distributed nodes, reactive...) from configuration",
+  "version": "2.0.1",
+  "description": "Developpers Application Toolkit - common features - build application (backend, frontend, RESTfull, API, distributed nodes, reactive...) from configuration",
   "author": {
     "name": "Luc BORIES",
     "email": "luc.bories@gmail.com",
@@ -57,7 +57,8 @@
     "reactive",
     "declarative",
     "distributed",
-    "responsive"
+    "responsive",
+    "browser"
   ],
   "dependencies": {
     "acl": ">=0.4.9",
@@ -83,7 +84,7 @@
     "immutable": ">=3.7.5",
     "jade": ">=1.11.0",
     "lodash": ">=4.16.4",
-    "lowdb": ">=0.12.5",
+    "lowdb": ">=1.0.0",
     "moment": ">=2.13.0",
     "mustache": ">=2.2.1",
     "node-cache": ">=3.2.1",

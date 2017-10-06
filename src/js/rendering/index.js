@@ -9,6 +9,7 @@ import component       from './component'
 import container       from './container'
 import input_field     from './input_field'
 import button          from './button'
+import canvas          from './canvas'
 import table           from './table'
 import anchor          from './anchor'
 import list            from './list'
@@ -34,6 +35,7 @@ export {
 	container,
 	input_field,
 	button,
+	canvas,
 	table,
 	anchor,
 	list,

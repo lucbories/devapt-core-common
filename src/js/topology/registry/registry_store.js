@@ -21,8 +21,6 @@ export default class RegistryStore extends MapStore
 {
 	/**
 	 * Create RegistryStore instance.
-	 * @class RegistryStore
-	 * @extends MapStore
 	 * 
 	 * @param {object} arg_initial_state - initial state to populate registry.
 	 * @param {string} arg_log_context - trace context.

@@ -82,6 +82,7 @@ export default class DefaultDefaultRendering extends RenderingPlugin
 			case 'component':
 			case 'container':
 			case 'button':
+			case 'canvas':
 			case 'label':
 			case 'anchor':
 			case 'image':
@@ -146,6 +147,9 @@ export default class DefaultDefaultRendering extends RenderingPlugin
 
 			case 'button':
 				return DefaultRendering.button
+
+			case 'canvas':
+				return DefaultRendering.canvas
 			
 			case 'label':
 				return DefaultRendering.label

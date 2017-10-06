@@ -238,6 +238,7 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 
 	/**
 	 * Find a rendering function.
+	 * @ TODO add a watchdog counter through all calls to prevent from recursive loops.
 	 * 
 	 * @param {string} arg_type - rendering item type.
 	 * 
@@ -257,7 +258,7 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 		if (! tenant)
 		{
 			this.error(context + ':find_rendering_function:type=[' + arg_type + ']:no owner tenant found for this application')
-			console.error(context + ':find_rendering_function:type=[' + arg_type + ']:no owner tenant found for this application')
+			// console.error(context + ':find_rendering_function:type=[' + arg_type + ']:no owner tenant found for this application')
 			return undefined
 		}
 
@@ -273,6 +274,7 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 			// CHECK PLUGIN INSTANCE
 			if ( ! plugin )
 			{
+				this.error('find_rendering_function:type=[' + arg_type + ']:plugin not found for [' + plugin_name + ']')
 				console.error(context + ':find_rendering_function:type=[' + arg_type + ']:plugin not found for [' + plugin_name + ']')
 				continue
 			}
@@ -280,13 +282,13 @@ export default class TopologyDefineApplication extends TopologyDefineItem
 			// TEST PLUGIN
 			if ( plugin.topology_plugin_type != 'rendering' || ! T.isFunction(plugin.find_rendering_function) )
 			{
-				console.log(context + ':find_rendering_function:type=[' + arg_type + ']:skip plugin [' + plugin_name + ']')
+				this.debug('find_rendering_function:type=[' + arg_type + ']:skip plugin [' + plugin_name + ']')
 				continue
 			}
 
 			// LOOKUP RENDERING FUNCTION
 			const rendering_fn = plugin.find_rendering_function(arg_type)
-			// console.log(rendering_fn, context + ':find_rendering_function:type=' + arg_type + ' in plugin ' + plugin_name + (rendering_fn ? ' found' : ' not found'))
+			this.debug('find_rendering_function:type=' + arg_type + ' in plugin ' + plugin_name + (rendering_fn ? ' found' : ' not found'))
 		
 			if (rendering_fn)
 			{

@@ -184,7 +184,10 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 						var required_loaded = window.babel ? true : false
 
 						var core_browser_promise_cb = function(resolve, reject) {
-							console.log("page loading:loading of [${item.id}] begins")
+							if (window.DEVAPT.TRACE_RUNTIME)
+							{
+								console.log("page loading:loading of [${item.id}] begins")
+							}
 
 							try{
 								var load_cb = function() {
@@ -195,7 +198,10 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 									document.body.appendChild(js_element)
 									
 									var js_load_cb = function() {
-										console.log("page loading:loading of [${item.id}] ends")
+										if (window.DEVAPT.TRACE_RUNTIME)
+										{
+											console.log("page loading:loading of [${item.id}] ends")
+										}
 										resolve()
 									}
 
@@ -209,7 +215,10 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 									load_cb()
 								}
 
-								console.log("page loading:loading of [${item.id}] waits dependancies")
+								if (window.DEVAPT.TRACE_RUNTIME)
+								{
+									console.log("page loading:loading of [${item.id}] waits dependancies")
+								}
 							}
 							catch(e) {
 								console.error("page loading:loading [${item.id}]:error=" + e.toString())
@@ -224,12 +233,15 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 				case 'js-devapt-bootstrap': {
 					const content = `
 						var bootstrap_promise_cb = function(resolve, reject) {
-							console.log("page loading:loading of [${item.id}] begins")
+							window.DEVAPT.TRACE_RUNTIME && console.log("page loading:loading of [${item.id}] begins")
 
 							window.devapt_core_browser_promise.then(
 								function()
 								{
-									console.log("page loading:loading of [${item.id}] dependancies resolved")
+									if (window.DEVAPT.TRACE_RUNTIME)
+									{
+										console.log("page loading:loading of [${item.id}] dependancies resolved")
+									}
 
 									try{
 										// CREATE BOOTSTRAP SCRIPT ELEMENT
@@ -238,11 +250,14 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 										js_element.src = "${url}"
 										document.body.appendChild(js_element)
 
-										console.log("page loading:loading of [${item.id}] element", js_element)
+										if (window.DEVAPT.TRACE_RUNTIME)
+										{
+											console.log("page loading:loading of [${item.id}] element", js_element)
+										}
 
 										var js_load_cb = function() {
 											window.devapt().register_asset_loading("script", "${item.id}", "${url}")
-											console.log("page loading:loading of [${item.id}] ends")
+											window.DEVAPT.TRACE_RUNTIME && console.log("page loading:loading of [${item.id}] ends")
 											resolve()
 										}
 
@@ -254,7 +269,10 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 									}
 								}
 							)
-							console.log("page loading:loading of [${item.id}] waits dependancies")
+							if (window.DEVAPT.TRACE_RUNTIME)
+							{
+								console.log("page loading:loading of [${item.id}] waits dependancies")
+							}
 						}
 
 						window.devapt_bootstrap_promise = new Promise(bootstrap_promise_cb)

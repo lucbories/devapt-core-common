@@ -1,6 +1,7 @@
 // NPM IMPORTS
 import assert from 'assert'
 import path from 'path'
+import _ from 'lodash'
 
 // COMMON IMPORTS
 import T                 from '../../../utils/types'
@@ -77,25 +78,48 @@ function load_tenant(logs, arg_tenant_name, arg_tenant_config, arg_plugins, arg_
 	assert(T.isObject(arg_tenant_config), error_msg_bad_config)
 
 	// LOAD PACKAGES
-	if ( T.isString(arg_tenant_config.packages) )
-	{
-		const file_path_name = path.join(arg_base_dir, arg_tenant_config.packages)
-		arg_tenant_config.packages = require(file_path_name).packages
-	}
-	if ( T.isObject(arg_tenant_config.packages) )
-	{
-		logs.info(context, 'loading world.tenants.' + arg_tenant_name + '.packages')
-		arg_tenant_config.packages = load_packages(logs, arg_tenant_config.packages, arg_base_dir)
-
-		// PROCESS ERROR
-		if (arg_tenant_config.packages.error)
-		{
-			arg_tenant_config = {
-				error:arg_tenant_config.packages.error
+	const packages_array = T.isArray(arg_tenant_config.packages) ? arg_tenant_config.packages : [arg_tenant_config.packages]
+	const loaded_packages = { packages:{} }
+	let loaded_errors = undefined
+	let loaded_basedir = arg_base_dir
+	packages_array.forEach(
+		(pkg_item)=>{
+			if ( T.isString(pkg_item) )
+			{
+				const file_path_name = path.join(loaded_basedir, pkg_item)
+				logs.info(context, 'loading world.tenants.' + arg_tenant_name + '.packages: loading file with file_path_name=' + file_path_name)
+				pkg_item = {}
+				pkg_item.packages = require(file_path_name).packages
+				loaded_basedir = path.dirname(file_path_name)
+				logs.info(context, 'loading world.tenants.' + arg_tenant_name + '.packages: loading file with base dir=' + loaded_basedir)
 			}
-			return arg_tenant_config
+			if ( T.isObject(pkg_item.packages) )
+			{
+				logs.info(context, 'loading world.tenants.' + arg_tenant_name + '.packages with base dir=' + loaded_basedir)
+				const pkgs = load_packages(logs, pkg_item.packages, loaded_basedir)
+				_.forEach(pkgs,
+					(pkg, pkg_name)=>{
+						loaded_packages.packages[pkg_name] = pkg
+					}
+				)
+				
+				// PROCESS ERROR
+				if (loaded_packages.packages.error)
+				{
+					loaded_errors = {
+						error:loaded_packages.packages.error
+					}
+					return
+				}
+			}
 		}
+	)
+	// PROCESS ERROR
+	if (loaded_errors)
+	{
+		return loaded_errors
 	}
+	arg_tenant_config.packages = loaded_packages.packages
 	
 	// CONSOLID SERVICES
 	let services = {}

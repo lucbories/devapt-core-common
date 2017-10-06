@@ -15,16 +15,25 @@ var private_devapt = {
 window.devapt = function() { return private_devapt }
 
 
+// DEBUG OPTIONS
+window.devapt.TRACE_ASSETS    = false
+window.devapt.TRACE_DOM       = false
+window.devapt.TRACE_RUNTIME   = false
+window.devapt.TRACE_RENDERING = false
+window.devapt.TRACE_COMMANDS  = false
+window.devapt.TRACE_HELPERS   = false
+
+
 
 // *********************************************************************************
 // ON DOM LOADED HANDLER
 function dom_loaded_listener(arg_callback, arg_operand)
 {
-	// console.log('devapt-bootstrap:dom_loaded_listener')
+	window.devapt.TRACE_DOM && console.log('devapt-bootstrap:dom_loaded_listener')
 
 	var cb = function()
 	{
-		// console.info('devapt-bootstrap:dom_loaded_listener:cb')
+		window.devapt.TRACE_DOM && console.info('devapt-bootstrap:dom_loaded_listener:cb')
 
 		document.removeEventListener("DOMContentLoaded", cb, false);
 
@@ -42,15 +51,15 @@ function dom_loaded_listener(arg_callback, arg_operand)
 
 private_devapt.on_dom_loaded = function(arg_callback, arg_operand)
 {
-	// console.log('devapt-bootstrap:on_dom_loaded')
+	window.devapt.TRACE_DOM && console.log('devapt-bootstrap:on_dom_loaded')
 
 	document.onreadystatechange = function ()
 	{
-		console.info('devapt-bootstrap:on_dom_loaded:state changes:' + document.readyState)
+		window.devapt.TRACE_DOM &&console.info('devapt-bootstrap:on_dom_loaded:state changes:' + document.readyState)
 
 		if (document.readyState == 'complete')
 		{
-			console.info('devapt-bootstrap:on_dom_loaded:dom is loaded')
+			window.devapt.TRACE_DOM &&console.info('devapt-bootstrap:on_dom_loaded:dom is loaded')
 			arg_callback(arg_operand)
 		}
 	}
@@ -73,7 +82,7 @@ private_devapt.on_dom_loaded = function(arg_callback, arg_operand)
 // CREATE RUNTIME
 private_devapt.create_runtime = function()
 {
-	console.info('devapt-bootstrap:create_runtime')
+	window.devapt.TRACE_RUNTIME && console.info('devapt-bootstrap:create_runtime')
 	
 	function reducers(prev_state/*, action*/)
 	{
@@ -152,7 +161,7 @@ private_devapt.create_runtime = function()
 
 private_devapt.on_runtime_created = function(arg_callback, arg_operand)
 {
-	// console.log('devapt-bootstrap:on_runtime_created')
+	window.devapt.TRACE_RUNTIME && console.log('devapt-bootstrap:on_runtime_created')
 
 	private_devapt.runtime_created_listeners.push( { callback:arg_callback, operands:arg_operand})
 }
@@ -160,7 +169,7 @@ private_devapt.on_runtime_created = function(arg_callback, arg_operand)
 
 private_devapt.runtime_created = function()
 {
-	console.info('devapt-bootstrap:runtime_created')
+	window.devapt.TRACE_RUNTIME && console.info('devapt-bootstrap:runtime_created')
 
 	private_devapt.runtime_created_listeners.forEach(
 		function(cb_record)
@@ -176,10 +185,10 @@ private_devapt.runtime_created = function()
 // RENDER PAGE CONTENTT
 private_devapt.render_page_content = function(arg_operand)
 {
-	console.info('devapt-bootstrap:render_page_content')
+	window.devapt.TRACE_RENDERING && console.info('devapt-bootstrap:render_page_content')
 	
 	var json_result = arg_operand ? arg_operand : window.__INITIAL_CONTENT__ 
-	// console.log(json_result, 'js-devapt-init-content')
+	window.devapt.TRACE_RENDERING && console.log(json_result, 'js-devapt-init-content')
 	
 	if (json_result && json_result.is_rendering_result)
 	{
@@ -201,7 +210,8 @@ private_devapt.render_page_content = function(arg_operand)
 private_devapt.on_content_rendered = function(arg_callback, arg_operand, arg_persistent)
 {
 	arg_persistent = arg_persistent ? arg_persistent : false
-	// console.log('devapt-bootstrap:on_content_rendered')
+
+	window.devapt.TRACE_RENDERING && console.log('devapt-bootstrap:on_content_rendered')
 
 	if (arg_persistent)
 	{
@@ -216,7 +226,7 @@ private_devapt.on_content_rendered = function(arg_callback, arg_operand, arg_per
 // ON RUNTIME CREATED HANDLER
 private_devapt.content_rendered = function()
 {
-	console.info('devapt-bootstrap:content_rendered')
+	window.devapt.TRACE_RENDERING && console.info('devapt-bootstrap:content_rendered')
 
 	private_devapt.content_rendered_listeners.forEach(
 		function(cb_record)
@@ -241,7 +251,7 @@ private_devapt.content_rendered = function()
 // UPDATE ANCHORS WITH COMMANDS ATTRIBUTES
 private_devapt.init_anchors_commands = function()
 {
-	console.info('devapt-bootstrap:init_anchors_commands')
+	window.devapt.TRACE_COMMANDS && console.info('devapt-bootstrap:init_anchors_commands')
 
 	var label = undefined
 	var href = undefined
@@ -280,7 +290,7 @@ private_devapt.init_anchors_commands = function()
 // UPDATE ANCHORS WITH COMMANDS ATTRIBUTES
 private_devapt.init_app_state_save = function()
 {
-	console.info('devapt-bootstrap:init_app_state_save')
+	window.devapt.TRACE_RUNTIME && console.info('devapt-bootstrap:init_app_state_save')
 
 	var runtime = private_devapt.runtime()
 	if (! runtime)
@@ -303,22 +313,26 @@ private_devapt.monitor_asset_loading = function(arg_tag, arg_id, arg_url, arg_el
 	{
 		return private_asset_promises[arg_id]
 	}
+
 	var promise_cb = function(resolve, reject)
 	{
 		var load_cb = function(){
-			console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+			window.devapt.TRACE_ASSETS && console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 			resolve('ASSET loaded tag=' + arg_tag + ', id=' + arg_id + ', url=' + arg_url)
 		}
 		arg_elem.addEventListener ("load", load_cb, false)
 
 		var error_cb = function(){
-			console.error('ASSET loading error tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+			window.devapt.TRACE_ASSETS && console.error('ASSET loading error tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 			reject('ASSET loading error tag=' + arg_tag + ', id=' + arg_id + ', url=' + arg_url)
 		}
 		arg_elem.addEventListener ("error", error_cb, false)
 	}
+
 	private_asset_promises[arg_id] = new Promise(promise_cb)
-	console.info('ASSET init event for tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+	
+	window.devapt.TRACE_ASSETS && console.info('ASSET init event for tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+	
 	return private_asset_promises[arg_id]
 }
 
@@ -329,7 +343,8 @@ private_devapt.register_asset_loading = function(arg_tag, arg_id, arg_url, arg_p
 		return private_asset_promises[arg_id]
 	}
 
-	console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+	window.devapt.TRACE_ASSETS && console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
+	
 	private_asset_promises[arg_id] = arg_promise && arg_promise.then ? arg_promise : Promise.resolve()
 	return private_asset_promises[arg_id]
 }
@@ -370,7 +385,7 @@ private_devapt.private_ajax = {}
 
 private_devapt.private_ajax.get_html = function (arg_url, arg_callback, arg_options)
 {
-	console.log('devapt-bootstrap:get_html')
+	window.devapt.TRACE_HELPERS && console.log('devapt-bootstrap:get_html')
 
 	var xhr = new XMLHttpRequest()
 
@@ -391,7 +406,7 @@ private_devapt.private_ajax.get_html = function (arg_url, arg_callback, arg_opti
 		{
 			if (xhr.status === OK) 
 			{
-				// console.log('devapt-bootstrap:get_html', xhr.responseText)
+				window.devapt.TRACE_HELPERS && console.log('devapt-bootstrap:get_html', xhr.responseText)
 				arg_callback(xhr.responseText)
 			} else {
 				console.error('devapt-bootstrap:get_html:error: ' + xhr.status)
@@ -404,7 +419,7 @@ private_devapt.private_ajax.get_html = function (arg_url, arg_callback, arg_opti
 
 private_devapt.script_promise = function (arg_id, arg_url, arg_options)
 {
-	console.log('devapt-bootstrap:get_script_promise for [' + arg_id + ']')
+	window.devapt.TRACE_HELPERS && console.log('devapt-bootstrap:get_script_promise for [' + arg_id + ']')
 
 	if (arg_id in private_asset_promises)
 	{
@@ -422,7 +437,7 @@ private_devapt.script_promise = function (arg_id, arg_url, arg_options)
 				{
 					eval(response + '')
 
-					console.info('ASSET loaded tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
+					window.devapt.TRACE_ASSETS && console.info('ASSET loaded tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
 					resolve('ASSET loaded tag=' + 'script' + ', id=' + arg_id + ', url=' + arg_url)
 					return
 				}
@@ -452,7 +467,7 @@ private_devapt.script_promise = function (arg_id, arg_url, arg_options)
 	}
 	private_asset_promises[arg_id] = asset_promise
 
-	console.info('ASSET init event for tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
+	window.devapt.TRACE_ASSETS && console.info('ASSET init event for tag=%s, id=%s, url=%s', 'script', arg_id, arg_url)
 	return private_asset_promises[arg_id]
 }
 
@@ -471,7 +486,7 @@ private_devapt.get_service = function(arg_svc_name, arg_svc_cfg)
 	return svc_promise.then(
 		function(svc)
 		{
-			console.log('service [' + arg_svc_name + '] is ready')
+			window.devapt.TRACE_HELPERS && console.log('service [' + arg_svc_name + '] is ready')
 			return svc
 		}
 	)
@@ -498,7 +513,7 @@ private_devapt.subscribe_service = function(arg_svc_promise, arg_operands=undefi
 			var subscribe_unsubscribe = subscribe_stream.subscribe(
 				function(response)
 				{
-					console.log('service [' + svc.get_name() + '] receive method [' + subscribe_method + '] response', response)
+					window.devapt.TRACE_HELPERS && console.log('service [' + svc.get_name() + '] receive method [' + subscribe_method + '] response', response)
 
 					subscribe_unsubscribe()
 					
@@ -514,7 +529,7 @@ private_devapt.subscribe_service = function(arg_svc_promise, arg_operands=undefi
 					var unsubscribe = subscription_stream.subscribe(
 						function(response)
 						{
-							console.log('service [' + svc.get_name() + '] receive method [' + subscription_method + '] response', response)
+							window.devapt.TRACE_HELPERS && console.log('service [' + svc.get_name() + '] receive method [' + subscription_method + '] response', response)
 							
 							if (arg_callback)
 							{
@@ -532,7 +547,7 @@ private_devapt.subscribe_service = function(arg_svc_promise, arg_operands=undefi
 				}
 			)
 
-			// console.log('[' + request_method + '] subscribed for service [' + svc.get_name() + ']')
+			window.devapt.TRACE_HELPERS && console.log('[' + request_method + '] subscribed for service [' + svc.get_name() + ']')
 		}
 	)
 }
@@ -572,7 +587,7 @@ private_devapt.request_service = function(arg_svc_promise, arg_operation, arg_op
 			var unsubscribe = result_stream.subscribe(
 				function(response)
 				{
-					console.log('devapt_request_service:service [' + svc.get_name() + '] receive method [' + arg_operation + '] response', response)
+					window.devapt.TRACE_HELPERS && console.log('devapt_request_service:service [' + svc.get_name() + '] receive method [' + arg_operation + '] response', response)
 					
 					if (arg_callback)
 					{
