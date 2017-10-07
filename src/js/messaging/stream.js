@@ -1,7 +1,6 @@
 // NPM IMPORTS
 import assert from 'assert'
 import Baconjs from 'baconjs'
-// import sizeof from 'object-sizeof'
 
 // COMMON IMPORTS
 import T from '../utils/types'
@@ -180,7 +179,6 @@ export default class Stream
 	push(arg_value)
 	{
 		this.counters.msg_count += 1
-		// this.counters.msg_size += sizeof(arg_value)// TODO circular error
 		
 		// console.log(arg_value,  context + ':push:value')
 		this._source_stream.push(arg_value)
