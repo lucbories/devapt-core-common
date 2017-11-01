@@ -9,6 +9,10 @@ import DistributedMetrics      from '../base/distributed_metrics'
 import DistributedLogs         from '../base/distributed_logs'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/distributed_instance'
 
 

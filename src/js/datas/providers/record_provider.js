@@ -6,6 +6,10 @@ import assert from 'assert'
 import T from '../../utils/types'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/datas/providers/record_provider'
 
 
@@ -24,6 +28,10 @@ export default class RecordProvider
 	constructor(arg_settings)
 	{
 		assert( T.isObject(arg_settings), context + ':bad settings object')
+		/**
+		 * Record provider settings.
+		 * @type {object}
+		 */
 		this.$settings = T.isFunction(arg_settings.toJS) ? arg_settings.toJS() : arg_settings
 	}
     

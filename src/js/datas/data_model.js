@@ -6,6 +6,10 @@ import T from '../utils/types'
 import DataRecord from './data_record'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/data/data_model'
 
 

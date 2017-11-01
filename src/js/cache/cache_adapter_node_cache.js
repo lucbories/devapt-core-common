@@ -7,6 +7,10 @@ import T from '../utils/types'
 import CacheAdapter from './cache_adapter'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 // let context = 'common/cache/cache_adapter_node_cache'
 
 

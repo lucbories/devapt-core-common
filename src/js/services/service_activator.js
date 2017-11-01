@@ -10,6 +10,11 @@ import ServiceRequest  from './service_request'
 import ServiceResponse from './service_response'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 let context = 'common/services/service_activator'
 
 

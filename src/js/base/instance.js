@@ -12,10 +12,18 @@ import runtime from './runtime'
 import topology_registry from '../topology/registry/index'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/instance'
 
 
 
+/**
+ * Collections list.
+ * @private
+ */
 const NOT_STORED_COLLECTIONS = ['defined_topology', 'deployed_topology', 'registered_services', 'components', 'svc_providers', 'svc_consumers', 'buses', 'remote_bus_gateways']
 
 

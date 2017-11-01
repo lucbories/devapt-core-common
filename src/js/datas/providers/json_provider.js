@@ -6,24 +6,69 @@ import T                       from '../../utils/types'
 import {is_browser, is_server} from '../../utils/is_browser'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/datas/providers/provider'
 
 
 
+/**
+ * Local file source.
+ * @private
+ */
 export const SOURCE_LOCAL_FILE = 'local_file'
+
+/**
+ * master node source.
+ * @private
+ */
 export const SOURCE_MASTER = 'master'
+
+/**
+ * Message bus source.
+ * @private
+ */
 export const SOURCE_MSG_BUS = 'message_bus'
+
+/**
+ * Remote url source.
+ * @private
+ */
 export const SOURCE_REMOTE_URL = 'remote_url'
+
+/**
+ * Sql database source.
+ * @private
+ */
 export const SOURCE_SQL_DATABASE = 'sql_database'
+
+/**
+ * NoSql database source.
+ * @private
+ */
 export const SOURCE_NOSQL_DATABASE = 'nosql_database'
 
+/**
+ * All sources.
+ * @private
+ */
 const SOURCES = [SOURCE_LOCAL_FILE, SOURCE_MASTER, SOURCE_MSG_BUS, SOURCE_REMOTE_URL, SOURCE_SQL_DATABASE, SOURCE_NOSQL_DATABASE]
 
 
 
 // GET RUNTIME
+/**
+ * Runtime source file on server.
+ * @private
+ */
 const server_runtime_file = '../../base/runtime'
 
+/**
+ * Runtime instance.
+ * @private
+ */
 let runtime = undefined
 
 if (is_server())
@@ -58,10 +103,18 @@ export default class JsonProvider
     {
 		// CHECK SETTINGS
 		assert( T.isObject(arg_settings), context + ':bad settings object')
+		/**
+		 * Json provider settings.
+		 * @type {object}
+		 */
 		this.$settings = arg_settings.toJS()
 
 		// GET PROVIDER SOURCE
 		assert( T.isString(this.$settings.source), context + ':bad settings.source string')
+		/**
+		 * Json provider source.
+		 * @type {string}
+		 */
 		this.source = this.$settings.source
 		assert( SOURCES.indexOf(this.source) > -1, context + ':bad source string, should be part of [' + SOURCES + ']')
 	}

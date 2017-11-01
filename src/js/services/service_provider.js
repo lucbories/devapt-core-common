@@ -1,15 +1,17 @@
 // NPM IMPORTS
 import assert from 'assert'
-// import _ from 'lodash'
 
 // COMMON IMPORTS
 import T               from '../utils/types'
-// import Instance        from '../base/instance'
-// import Stream          from '../messaging/stream'
 import StreamsProvider    from '../messaging/streams_provider'
 import ServiceResponse from './service_response'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'common/services/service_provider'
 
 
@@ -214,7 +216,7 @@ export default class ServiceProvider extends StreamsProvider
 	/**
 	 * Post streams values to one subscriber.
 	 * 
-	 * @param {object} arg_subscriber - subscriber object.
+	 * @param {object} arg_subscriber - subscriber object (Socket...).
 	 * @param {string} arg_stream_name - stream name.
 	 * @param {object} arg_datas - response values.
 	 * 
@@ -222,8 +224,9 @@ export default class ServiceProvider extends StreamsProvider
 	 */
 	post_to_subscriber(arg_subscriber, arg_stream_name, arg_datas)
 	{
-		console.log(context + ':post_to_subscriber:stream=[%s] subscriber=', arg_stream_name, arg_subscriber)
-		console.log(context + ':post_to_subscriber:stream=[%s] datas=', arg_stream_name, arg_datas)
+		// DEBUG
+		// console.log(context + ':post_to_subscriber:stream=[%s] subscriber=', arg_stream_name, arg_subscriber)
+		// console.log(context + ':post_to_subscriber:stream=[%s] datas=', arg_stream_name, arg_datas)
 
 		const svc_name = this.service.get_name()
 		arg_subscriber.emit('devapt-subscription', { service:svc_name, operation:'devapt-subscription', results:['done', arg_datas] })

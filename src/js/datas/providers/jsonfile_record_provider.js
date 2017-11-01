@@ -10,7 +10,10 @@ import RecordProvider from './record_provider'
 import runtime        from '../../base/runtime'
 
 
-
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/datas/providers/jsonfile_record_provider'
 
 
@@ -31,19 +34,43 @@ export default class JsonFileRecordProvider extends RecordProvider
 
 		// GET FILE NAME
 		assert( T.isString(arg_settings.filename), context + ':bad settings.filename object')
+		/**
+		 * Json file provider file name.
+		 * @type {string}
+		 */
 		this.filename = arg_settings.filename
 
 		// GET MODEL NAME
 		assert( T.isString(arg_settings.modelname), context + ':bad settings.modelname object')
+		/**
+		 * Json file provider model name.
+		 * @type {string}
+		 */
 		this.modelname = arg_settings.modelname
 
 		// GET PRIMARY KEY NAME
 		assert( T.isString(arg_settings.pkname), context + ':bad settings.pkname object')
+		/**
+		 * Json file provider primary key name.
+		 * @type {string}
+		 */
 		this.pkname = arg_settings.pkname
 
+
 		// LOAD FILE DB
+
+		/**
+		 * Json file provider low db instance.
+		 * @type {object}
+		 */
 		this.file_db = null
+
+		/**
+		 * Json file provider is ready flag.
+		 * @type {boolean}
+		 */
 		this.is_ready = false
+
 		if ( T.isString(this.filename) )
 		{
 			assert(runtime, context + ':bad runtime instance')

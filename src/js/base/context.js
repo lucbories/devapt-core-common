@@ -8,6 +8,10 @@ import mustache from 'mustache'
 import T            from '../utils/types'
 import {is_browser} from '../utils/is_browser'
 
+/**
+ * Cryptography library.
+ * @private
+ */
 let  forge = undefined
 if ( is_browser() )
 {
@@ -17,6 +21,10 @@ if ( is_browser() )
 }
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/context'
 
 

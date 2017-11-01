@@ -7,10 +7,15 @@ import T from '../utils/types'
 import CacheAdapter from './cache_adapter'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/cache/cache_adapter_cache_manager'
 
 
 /*
+TODO:
 node-cache-manager-redis
 
 node-cache-manager-mongodb

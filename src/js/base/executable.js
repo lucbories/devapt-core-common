@@ -2,6 +2,10 @@
 import Errorable from './errorable'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/base/executable'
 
 

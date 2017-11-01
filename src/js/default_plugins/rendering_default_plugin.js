@@ -7,7 +7,18 @@ import T                     from '../utils/types'
 import RenderingPlugin       from '../plugins/rendering_plugin'
 import * as DefaultRendering from '../rendering/index'
 
+/**
+ * Plugin file name.
+ * @private
+ * @type {string}
+ */
 const plugin_name = 'DefaultRendering'
+
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'common/' + plugin_name + '/rendering_default_plugin'
 
 

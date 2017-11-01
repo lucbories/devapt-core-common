@@ -6,7 +6,19 @@ import T              from '../utils/types'
 import Introspectable from '../base/introspectable'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'common/services/service_response'
+
+
+/**
+ * Request properties array.
+ * @private
+ * @type {array}
+ */
 const properties = [
 	{
 		name:'service',
@@ -74,6 +86,13 @@ const properties = [
 		tester:true
 	}
 ]
+
+
+/**
+ * Response methods array.
+ * @private
+ * @type {array}
+ */
 const methods =[]
 
 
@@ -108,6 +127,10 @@ export default class ServiceResponse extends Introspectable
 
 		super(properties, methods, arg_values)
 
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_service_response = true
 	}
 }

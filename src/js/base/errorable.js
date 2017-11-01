@@ -2,6 +2,10 @@
 import Loggable from './loggable'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/base/errorable'
 
 

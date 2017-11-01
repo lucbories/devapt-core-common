@@ -8,6 +8,10 @@ import DataCollection from './data_collection'
 import DataRecord from './data_record'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/data/data_adapter'
 
 
@@ -80,18 +84,55 @@ export default class DataAdapter extends Loggable
 		 * @type {boolean}
 		 */
 		this.is_data_adapter = true
-
+		
+		/**
+		 * CacheManager instance.
+		 * @type {CacheManager}
+		 */
 		this._cache_manager = arg_cache_manager
 
+
 		// TOPOLOGY ITEMS
+		
+		/**
+		 * Topology database instance.
+		 * @type {TopologyRuntimeDatabase}
+		 */
 		this._topology_database = undefined
+		
+		/**
+		 * Topology models array.
+		 * @type {array}
+		 */
 		this._topology_models_array = []
+		
+		/**
+		 * Topology models map.
+		 * @type {object}
+		 */
 		this._topology_models_map = {}
 		
+		
 		// ADAPTER ATTRIBUTES
+		
+		/**
+		 * Adapter collections map.
+		 * @type {object}
+		 */
 		this._collections = {}
+
+		/**
+		 * Adapter roles map.
+		 * @type {object}
+		 */
 		this._roles = {}
+		
+		/**
+		 * Adapter includes map.
+		 * @type {object}
+		 */
 		this._includes = {}
+
 
 		// LOAD DATABASE AND MODEL
 		/**

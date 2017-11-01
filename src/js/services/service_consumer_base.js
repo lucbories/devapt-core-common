@@ -7,6 +7,11 @@ import Instance from '../base/instance'
 import { is_browser, is_server } from '../utils/is_browser'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 let context = 'common/services/service_consumer_base'
 
 

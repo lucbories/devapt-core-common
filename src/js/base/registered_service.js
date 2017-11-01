@@ -7,6 +7,10 @@ import Instance from './instance'
 
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/base/registered_service'
 
 

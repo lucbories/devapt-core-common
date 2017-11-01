@@ -6,6 +6,10 @@ import assert from 'assert'
 import T from '../utils/types'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/loggable'
 
 

@@ -7,6 +7,10 @@ import Settingsable           from './settingsable'
 import LoggerManager          from '../loggers/logger_manager'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'browser/runtime'
 
 

@@ -7,6 +7,10 @@ import {Map} from 'immutable'
 import T from '../utils/types'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/data/data_record'
 
 
@@ -68,20 +72,59 @@ export default class DataRecord
 		 */
 		this.is_data_record = true
 
+		/**
+		 * Datas collection instance.
+		 * @type {DataCollection}
+		 */
 		this._collection = arg_data_collection
 
+		/**
+		 * Record is a new created record flag.
+		 * @type {boolean}
+		 */
 		this._is_new = false
+
+		/**
+		 * Record unique identifier.
+		 * @type {string}
+		 */
 		this._id = arg_id
+		
+		/**
+		 * Record identifier field name.
+		 * @type {string}
+		 */
 		this._id_field_name = this._collection.get_schema().get_id_field_name()
+
+		/**
+		 * Record attributes map.
+		 * @type {object}
+		 */
 		this._attributes = new Map()
+
 		this.set_attributes(arg_attributes)
 		if (this._id)
 		{
 			this.set(this._id_field_name, this._id)
 		}
 
+
+		/**
+		 * Record has dirty attributes values flag.
+		 * @type {boolean}
+		 */
 		this._has_dirty_attributes = false
+
+		/**
+		 * Record dirty attributes names.
+		 * @type {array}
+		 */
 		this._dirty_attributes = []
+		
+		/**
+		 * Record dirty attributes map.
+		 * @type {Map}
+		 */
 		this._previous_attributes = this._attributes
 	}
 

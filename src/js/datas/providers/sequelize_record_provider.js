@@ -9,7 +9,10 @@ import RecordProvider from './record_provider'
 // import runtime from '../../base/runtime'
 
 
-
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/datas/providers/sequelize_record_provider'
 
 
@@ -29,8 +32,16 @@ export default class SequelizeRecordProvider extends RecordProvider
 		super(arg_settings)
 
 		assert( T.isObject(arg_settings.model), context + ':bad settings.model object')
+		/**
+		 * Sequelize record provider model instance.
+		 * @type {object}
+		 */
 		this.sequelize_model = arg_settings.model
 
+		/**
+		 * Sequelize record provider fields array.
+		 * @type {array}
+		 */
 		this.fields_list = undefined
 		if ( T.isArray(arg_settings.fields_list) )
 		{

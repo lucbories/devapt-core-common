@@ -4,6 +4,11 @@
 import ServiceConsumerByUrl from './service_consumer_by_url'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 let context = 'common/services/service_consumer'
 
 

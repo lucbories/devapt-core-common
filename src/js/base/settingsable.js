@@ -7,6 +7,10 @@ import T from '../utils/types'
 import Errorable from './errorable'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/settingsable'
 
 

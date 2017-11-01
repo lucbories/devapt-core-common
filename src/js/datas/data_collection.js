@@ -6,6 +6,10 @@ import T from '../utils/types'
 import Loggable from '../base/loggable'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 let context = 'common/data/data_collection'
 
 
@@ -82,11 +86,35 @@ export default class DataCollection extends Loggable
 		 * @type {boolean}
 		 */
 		this.is_data_collection = true
-
+		
+		/**
+		 * CacheManager instance.
+		 * @type {CacheManager}
+		 */
 		this._cache_manager = arg_cache_manager
+		
+		/**
+		 * Datas adapter instance.
+		 * @type {DataAdapter}
+		 */
 		this._adapter = arg_data_adapter
+		
+		/**
+		 * Topology model schema instance.
+		 * @type {array}
+		 */
 		this._schema = arg_model_schema
+		
+		/**
+		 * Datas collection prefix.
+		 * @type {string}
+		 */
 		this._cache_prefix = model_plural_name
+		
+		/**
+		 * Datas collection name.
+		 * @type {string}
+		 */
 		this._name = model_plural_name
 	}
 

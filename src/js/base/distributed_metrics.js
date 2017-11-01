@@ -6,6 +6,10 @@ import T from '../utils/types'
 import DistributedMessage from './distributed_message'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/distributed_metrics'
 
 

@@ -10,10 +10,18 @@ import EncodeDecode   from '../utils/encode_decode'
 import EncryptDecrypt from '../utils/encrypt_decrypt'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/credentials'
 
 
 
+/**
+ * Default credentials record.
+ * @private
+ */
 const default_credentials = {
 	tenant:'default',		// Tenant name (mandatory)
 	env:undefined,			// Environment code: dev, test, int, rec, pro (mandatory)

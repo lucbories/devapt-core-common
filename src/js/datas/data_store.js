@@ -6,6 +6,10 @@ import T from '../utils/types'
 import Loggable from '../base/loggable'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/data/data_store'
 
 /*
@@ -111,10 +115,23 @@ export default class DataStore extends Loggable
 		 * @type {boolean}
 		 */
 		this.is_data_store = true
-
+		
+		/**
+		 * CacheManager instance.
+		 * @type {CacheManager}
+		 */
 		this._cache_manager = arg_cache_manager
+		
+		/**
+		 * Datas adapters array.
+		 * @type {array}
+		 */
 		this._adapters = arg_data_adapters
-
+		
+		/**
+		 * Adapter collections map.
+		 * @type {object}
+		 */
 		this._collections = {}
 	}
 

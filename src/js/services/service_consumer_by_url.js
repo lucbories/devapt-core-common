@@ -7,6 +7,11 @@ import { is_remote, is_locale } from '../utils/is_remote'
 import ServiceConsumerBase from './service_consumer_base'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 let context = 'common/services/service_consumer_by_url'
 
 

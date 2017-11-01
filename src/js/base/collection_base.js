@@ -8,6 +8,10 @@ import Errorable from './errorable'
 import Instance  from './instance'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/base/collection_base'
 
 

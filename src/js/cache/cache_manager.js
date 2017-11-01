@@ -4,6 +4,11 @@ import assert from 'assert'
 // COMMON IMPORTS
 import T from '../utils/types'
 
+
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
 const context = 'common/cache/cache_manager'
 
 
