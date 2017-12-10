@@ -32,6 +32,14 @@ const context = 'common/' + plugin_name + '/rendering_default_plugin'
  */
 export default class DefaultDefaultRendering extends RenderingPlugin
 {
+	/**
+	 * Create a DefaultDefaultRendering instance.
+	 * 
+	 * @param {RuntimeBase} arg_runtime - runtime instance.
+	 * @param {PlugindManager} arg_manager - plugins manager instance.
+	 * 
+	 * @returns {nothing}
+	 */
 	constructor(arg_runtime, arg_manager)
 	{
 		assert( T.isObject(arg_runtime) && arg_runtime.is_base_runtime, context + ':constructor:bad runtime instance' )
@@ -43,7 +51,12 @@ export default class DefaultDefaultRendering extends RenderingPlugin
 		this.add_public_asset('css', '/' + plugin_name + '/normalize.css',       path.join(__dirname, assets_dir, 'css/normalize.css') )
 		this.add_public_asset('img', '/' + plugin_name + '/favico.png',          path.join(__dirname, assets_dir, 'img/favico.png') )
 		this.add_public_asset('js',  '/' + plugin_name + '/browser.min.js',      path.join(__dirname, assets_dir, 'js/vendor/browser.min.js') )
+		this.add_public_asset('js',  '/' + plugin_name + '/jquery.min.js',       path.join(__dirname, assets_dir, 'js/vendor/jquery.min.js') )
+		this.add_public_asset('js',  '/' + plugin_name + '/jquery.min.map',      path.join(__dirname, assets_dir, 'js/vendor/jquery.min.map') )
 		this.add_public_asset('js',  '/' + plugin_name + '/devapt-bootstrap.js', path.join(__dirname, assets_dir, 'js/devapt-bootstrap.js') )
+
+		const browser_assets_dir = '../../../../devapt-core-browser/public'
+		this.add_public_asset('js',  '/' + plugin_name + '/devapt-core-browser.js', path.join(__dirname, browser_assets_dir, 'js/build/devapt-core-browser.js') )
 	}
 
 
@@ -76,7 +89,14 @@ export default class DefaultDefaultRendering extends RenderingPlugin
 	}
 
 	
-	
+
+	/**
+     * test if plugin has a feature class.
+	 * 
+     * @param {string} arg_class_name - feature class name.
+     * 
+	 * @returns {boolean}
+     */
 	has(arg_class_name)
 	{
 		assert( T.isString(arg_class_name), context + ':has:bad class string')

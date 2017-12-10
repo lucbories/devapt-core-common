@@ -21,6 +21,7 @@ let error_msg_bad_templates = context + ':package.templates should be an array'
 let error_msg_bad_includes = context + ':package.includes should be an array'
 
 let error_msg_bad_service = context + ':package.services.* should be an object'
+let error_msg_bad_command = context + ':package.commands.*. should be an object'
 let error_msg_bad_resource = context + ':package.resources.* should be a string'
 let error_msg_bad_template = context + ':package.templates.* should be a string'
 let error_msg_bad_include = context + ':package.includes.* should be a string'
@@ -231,7 +232,7 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 	Object.keys(arg_package_config.commands).forEach(
 		(cmd_name) => {
 			const cmd = arg_package_config.commands[cmd_name]
-			assert(T.isObject(cmd), error_msg_bad_service)
+			assert(T.isObject(cmd), error_msg_bad_command)
 			logs.info(context, 'loading world...packages.' + arg_package_name + '.commands.' + cmd_name + ' is registered')
 
 			arg_package_config.resources_by_name[cmd_name] = cmd

@@ -16,7 +16,7 @@ window.devapt = function() { return private_devapt }
 
 
 // DEBUG OPTIONS
-window.devapt.TRACE_ASSETS    = false
+window.devapt.TRACE_ASSETS    = true
 window.devapt.TRACE_DOM       = false
 window.devapt.TRACE_RUNTIME   = false
 window.devapt.TRACE_RENDERING = false
@@ -307,10 +307,17 @@ private_devapt.init_app_state_save = function()
 // *********************************************************************************
 // MONITOR ASSET LOADING WITH A PROMSE FOR ASSETS DEPENDENCIES
 var private_asset_promises = {}
-private_devapt.monitor_asset_loading = function(arg_tag, arg_id, arg_url, arg_elem)
+private_devapt.monitor_asset_loading = function(arg_tag, arg_id, arg_url, arg_elem, arg_is_loaded)
 {
 	if (arg_id in private_asset_promises)
 	{
+		return private_asset_promises[arg_id]
+	}
+
+	if (arg_is_loaded == true)
+	{
+		private_asset_promises[arg_id] = Promise.resolve('ASSET loaded tag=' + arg_tag + ', id=' + arg_id + ', url=' + arg_url)
+		window.devapt.TRACE_ASSETS && console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 		return private_asset_promises[arg_id]
 	}
 
@@ -345,7 +352,7 @@ private_devapt.register_asset_loading = function(arg_tag, arg_id, arg_url, arg_p
 
 	window.devapt.TRACE_ASSETS && console.info('ASSET loaded tag=%s, id=%s, url=%s', arg_tag, arg_id, arg_url)
 	
-	private_asset_promises[arg_id] = arg_promise && arg_promise.then ? arg_promise : Promise.resolve()
+	private_asset_promises[arg_id] = (arg_promise && arg_promise.then) ? arg_promise : Promise.resolve()
 	return private_asset_promises[arg_id]
 }
 

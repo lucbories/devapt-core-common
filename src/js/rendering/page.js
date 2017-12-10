@@ -7,11 +7,88 @@ import T                   from '../utils/types'
 import rendering_normalize from './rendering_normalize'
 
 
-let context = 'common/rendering/page'
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
+const context = 'common/rendering/page'
 
 
+/**
+ * Loading script to insert into the page header.
+ * @type {string}
+ */
+const head_script_load_depds = `
+function devapt_page_load(arg_required_promise, arg_required_dom_id, arg_load_id, arg_load_url, arg_load_promise_name)
+{
+	arg_required_promise = arg_required_promise ? arg_required_promise : Promise.resolve(undefined)
+	var required_element = arg_required_dom_id ? document.getElementById(arg_required_dom_id) : undefined
+	var required_loaded = window.babel ? true : false
 
-// DEFAULT STATE
+	var dom_promise_cb = function(resolve, reject) {
+		
+		const TRACE_RUNTIME = window.devapt ? window.devapt.TRACE_RUNTIME : false
+		
+		if (TRACE_RUNTIME)
+		{
+			console.log("page loading:loading of [" + arg_load_id + "] begins")
+		}
+
+		arg_required_promise.then(
+			function()
+			{
+				try{
+					var load_cb = function() {
+						// CREATE SCRIPT ELEMENT
+						var js_element = document.createElement("script")
+						js_element.setAttribute("id", arg_load_id)
+						js_element.src = arg_load_url
+						document.body.appendChild(js_element)
+						
+						var js_load_cb = function() {
+							if (TRACE_RUNTIME)
+							{
+								console.log("page loading:loading of [" + arg_load_id + "] ends")
+							}
+							resolve()
+						}
+
+						js_element.addEventListener ("load", js_load_cb, false)
+					}
+
+					if (! required_loaded)
+					{
+						if (required_element)
+						{
+							required_element.addEventListener ("load", load_cb, false)
+						} else {
+							load_cb()
+						}
+					} else {
+						load_cb()
+					}
+				}
+				catch(e) {
+					console.error("page loading:loading [" + arg_load_id + "]:error=" + e.toString())
+				}
+			}
+		)
+
+		if (TRACE_RUNTIME)
+		{
+			console.log("page loading:loading of [" + arg_load_id + "] waits dependancies")
+		}
+	}
+
+	return new Promise(dom_promise_cb)
+}
+`
+
+
+/**
+ * Default page component state.
+ * @type {object}
+ */
 const default_state = {
 	title:undefined,
 	metas:undefined, 	 // array of head tags
@@ -23,7 +100,7 @@ const default_state = {
 	head_styles_tags:[],
 	head_styles_urls:[],
 	
-	head_scripts_tags:[],
+	head_scripts_tags:[ { id:'js_head_script_load_depds', content:head_script_load_depds } ],
 	head_scripts_urls:[],
 
 	body_styles_tags:[],
@@ -33,7 +110,10 @@ const default_state = {
 	body_scripts_urls:[]
 }
 
-// DEFAULT SETTINGS
+/**
+ * Default page component settings.
+ * @type {object}
+ */
 const default_settings = {
 	html_lang:undefined,
 	html_class:undefined,
@@ -54,7 +134,16 @@ const default_settings = {
 	}
 }
 
-
+/**
+ * Get asset url function.
+ * @type {function}
+ * 
+ * @param {string}  arg_template
+ * @param {string}  arg_url
+ * @param {boolean} arg_absolute
+ * 
+ * @returns {string} - application asset url.
+ */
 const get_url = (arg_template, arg_url, arg_absolute)=>arg_absolute ? arg_url : arg_template.replace('{{url}}', arg_url)
 
 
@@ -172,60 +261,16 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 
 			const url = get_url(settings.assets_urls_templates.script, item.src, item.absolute)
 			switch(item.id){
-				case 'js-socketio':
-				case 'js-browser':
-				case 'js-initial-state':
-				case 'js-initial-content':
-					return h('script', { id:item.id, src:url, type:type })
+				case 'js-app': {
+					const content = `
+					window.app_js_promise = devapt_page_load(window.devapt_bootstrap_promise, null, "${item.id}", "${url}")
+					`
+					return h('script', { id:item.id + '-load', type:type }, content)
+				}
 				
 				case 'js-devapt-core-browser': {
 					const content = `
-						var required_element = document.getElementById("js-browser")
-						var required_loaded = window.babel ? true : false
-
-						var core_browser_promise_cb = function(resolve, reject) {
-							if (window.DEVAPT.TRACE_RUNTIME)
-							{
-								console.log("page loading:loading of [${item.id}] begins")
-							}
-
-							try{
-								var load_cb = function() {
-									// CREATE CORE BROWSER SCRIPT ELEMENT
-									var js_element = document.createElement("script")
-									js_element.setAttribute("id", "${item.id}")
-									js_element.src = "${url}"
-									document.body.appendChild(js_element)
-									
-									var js_load_cb = function() {
-										if (window.DEVAPT.TRACE_RUNTIME)
-										{
-											console.log("page loading:loading of [${item.id}] ends")
-										}
-										resolve()
-									}
-
-									js_element.addEventListener ("load", js_load_cb, false)
-								}
-
-								if (! required_loaded)
-								{
-									required_element.addEventListener ("load", load_cb, false)
-								} else {
-									load_cb()
-								}
-
-								if (window.DEVAPT.TRACE_RUNTIME)
-								{
-									console.log("page loading:loading of [${item.id}] waits dependancies")
-								}
-							}
-							catch(e) {
-								console.error("page loading:loading [${item.id}]:error=" + e.toString())
-							}
-						}
-
-						window.devapt_core_browser_promise = new Promise(core_browser_promise_cb)
+					window.devapt_core_browser_promise = devapt_page_load(null, "js-devapt-bootstrap", "${item.id}", "${url}")
 					`
 					return h('script', { id:item.id + '-load', type:type }, content)
 				}
@@ -233,12 +278,14 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 				case 'js-devapt-bootstrap': {
 					const content = `
 						var bootstrap_promise_cb = function(resolve, reject) {
-							window.DEVAPT.TRACE_RUNTIME && console.log("page loading:loading of [${item.id}] begins")
+							const TRACE_RUNTIME = window.devapt ? window.devapt.TRACE_RUNTIME : false
+
+							if (TRACE_RUNTIME) console.log("page loading:loading of [${item.id}] begins")
 
 							window.devapt_core_browser_promise.then(
 								function()
 								{
-									if (window.DEVAPT.TRACE_RUNTIME)
+									if (TRACE_RUNTIME)
 									{
 										console.log("page loading:loading of [${item.id}] dependancies resolved")
 									}
@@ -250,14 +297,14 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 										js_element.src = "${url}"
 										document.body.appendChild(js_element)
 
-										if (window.DEVAPT.TRACE_RUNTIME)
+										if (TRACE_RUNTIME)
 										{
 											console.log("page loading:loading of [${item.id}] element", js_element)
 										}
 
 										var js_load_cb = function() {
 											window.devapt().register_asset_loading("script", "${item.id}", "${url}")
-											window.DEVAPT.TRACE_RUNTIME && console.log("page loading:loading of [${item.id}] ends")
+											if (TRACE_RUNTIME) console.log("page loading:loading of [${item.id}] ends")
 											resolve()
 										}
 
@@ -269,7 +316,7 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 									}
 								}
 							)
-							if (window.DEVAPT.TRACE_RUNTIME)
+							if (TRACE_RUNTIME)
 							{
 								console.log("page loading:loading of [${item.id}] waits dependancies")
 							}
@@ -278,6 +325,16 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 						window.devapt_bootstrap_promise = new Promise(bootstrap_promise_cb)
 					`
 					return h('script', { id:item.id + '-load', type:type }, content)
+				}
+
+				default: {
+				// case 'js-socketio':
+				// case 'js-browser':
+				// case 'js-jquery':
+				// case 'js-jquery-map':
+				// case 'js-initial-state':
+				// case 'js-initial-content':
+					return h('script', { id:item.id, src:url, type:type })
 				}
 			}
 			
