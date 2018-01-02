@@ -110,6 +110,7 @@ function load_config(arg_state, arg_initial_config, arg_base_dir, arg_world_dir,
 		arg_state.config.resources.by_type = {}
 		arg_state.config.resources.by_type.commands = {} // Resource names (map name:name)
 		arg_state.config.resources.by_type.services = {} // Resource names (map name:name)
+		arg_state.config.resources.by_type.features = {} // Resource names (map name:name)
 		arg_state.config.resources.by_type.views = {} // Resource names (map name:name)
 		arg_state.config.resources.by_type.models = {} // Resource names (map name:name)
 		arg_state.config.resources.by_type.menubars = {} // Resource names (map name:name)

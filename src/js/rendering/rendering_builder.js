@@ -152,6 +152,7 @@ export default class RenderingBuilder extends RenderingBuilderAssets
 		initial_state.app_url    = this._application ? this._application.app_url : null
 		initial_state.app_assets = this._application ? this._application.app_assets : null
 		initial_state.commands   = this._application ? this._application.get_resources_settings('commands') : {}
+		initial_state.features   = this._application ? this._application.get_resources_settings('features') : {}
 		initial_state.views      = this._application ? this._application.get_resources_settings('views') : {}
 		initial_state.menubars   = this._application ? this._application.get_resources_settings('menubars') : {}
 		initial_state.menus      = this._application ? this._application.get_resources_settings('menus') : {}

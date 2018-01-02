@@ -10,6 +10,7 @@ import TopologyDefineView from './topology_define_view'
 import TopologyDefineMenu from './topology_define_menu'
 import TopologyDefineMenubar from './topology_define_menubar'
 import TopologyDefineService from './topology_define_service'
+import TopologyDefineFeature from './topology_define_feature'
 import TopologyDefineCommand from './topology_define_command'
 
 
@@ -61,6 +62,7 @@ export default class TopologyDefinePackage extends TopologyDefineItem
 
 		this.declare_collection('commands',    'command',     TopologyDefineCommand)
 		this.declare_collection('services',    'service',     TopologyDefineService)
+		this.declare_collection('features',    'feature',     TopologyDefineFeature)
 		this.declare_collection('datasources', 'datasource',  TopologyDefineDatasource)
 		this.declare_collection('models',      'model',       TopologyDefineModel)
 		this.declare_collection('views',       'view',        TopologyDefineView)
@@ -94,6 +96,9 @@ export default class TopologyDefinePackage extends TopologyDefineItem
 				case 'service':
 				case 'services':    return this.service(arg_name)
 
+				case 'feature':
+				case 'features':    return this.feature(arg_name)
+
 				case 'datasource':
 				case 'datasources': return this.datasource(arg_name)
 
@@ -120,6 +125,7 @@ export default class TopologyDefinePackage extends TopologyDefineItem
 		}
 
 		return this.service(arg_name)
+			|| this.feature(arg_name)
 			|| this.datasource(arg_name)
 			|| this.model(arg_name)
 			|| this.view(arg_name)
@@ -148,6 +154,9 @@ export default class TopologyDefinePackage extends TopologyDefineItem
 				
 				case 'service':
 				case 'services':    return this.services().get_all_names()
+				
+				case 'feature':
+				case 'features':    return this.features().get_all_names()
 
 				case 'datasource':
 				case 'datasources': return this.datasources().get_all_names()
@@ -167,7 +176,7 @@ export default class TopologyDefinePackage extends TopologyDefineItem
 			return []
 		}
 
-		const types = ['commands', 'services', 'datasources', 'models', 'views', 'menus', 'menubars']
+		const types = ['commands', 'services', 'features', 'datasources', 'models', 'views', 'menus', 'menubars']
 		let names = []
 		_.forEach(types,
 			(type)=>{

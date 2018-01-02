@@ -21,6 +21,7 @@ let error_msg_bad_templates = context + ':package.templates should be an array'
 let error_msg_bad_includes = context + ':package.includes should be an array'
 
 let error_msg_bad_service = context + ':package.services.* should be an object'
+let error_msg_bad_feature = context + ':package.features.* should be an object'
 let error_msg_bad_command = context + ':package.commands.*. should be an object'
 let error_msg_bad_resource = context + ':package.resources.* should be a string'
 let error_msg_bad_template = context + ':package.templates.* should be a string'
@@ -148,6 +149,7 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 	arg_package_config.base_dir  = arg_package_config.base_dir  ? arg_package_config.base_dir  : ''
 	arg_package_config.commands  = arg_package_config.commands  ? arg_package_config.commands  : {}
 	arg_package_config.services  = arg_package_config.services  ? arg_package_config.services  : {}
+	arg_package_config.features  = arg_package_config.features  ? arg_package_config.features  : {}
 	arg_package_config.resources = arg_package_config.resources ? arg_package_config.resources : {}
 	arg_package_config.templates = arg_package_config.templates ? arg_package_config.templates : {}
 	arg_package_config.includes  = arg_package_config.includes  ? arg_package_config.includes  : {}
@@ -172,9 +174,6 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 		
 		const absolute_path_name = path.join(arg_base_dir, arg_package_config.base_dir, arg_package_config.services)
 		arg_package_config.services = parser.read(absolute_path_name, 'utf8').services
-
-		// const file_path_name = path.join(arg_base_dir, arg_package_config.services)
-		// arg_package_config.services = require(file_path_name).services
 	}
 	if ( T.isObject(arg_package_config.services) )
 	{
@@ -182,6 +181,56 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 		// load_services(arg_package_config.services)
 	}
 	// console.log( Object.keys(arg_package_config.services), 'arg_package_config.services for ' + arg_package_name)
+
+	
+	// LOAD FEATURES FROM A STRING
+	if (T.isString(arg_package_config.features))
+	{
+		logs.info(context, 'loading world...features.' + arg_package_name + '.features is a string')
+		
+		const absolute_path_name = path.join(arg_base_dir, arg_package_config.base_dir, arg_package_config.features)
+		arg_package_config.features = parser.read(absolute_path_name, 'utf8').features
+	}
+
+	// LOAD FEATURES FROM AN ARRAY
+	if (T.isNotEmptyArray(arg_package_config.features))
+	{
+		logs.info(context, 'loading world...features.' + arg_package_name + '.features is an array')
+		
+		const features = arg_package_config.features
+		arg_package_config.features =  {}
+		_.forEach(features,
+			(feature_cfg, feature_key)=>{
+				// LOAD FEATURES FROM A STRING
+				if (T.isString(feature_cfg))
+				{
+					logs.info(context, 'loading world...features.' + arg_package_name + '.features array item string at [' + feature_key + ']')
+					
+					const absolute_path_name = path.join(arg_base_dir, arg_package_config.base_dir, feature_cfg)
+					const loaded_features = parser.read(absolute_path_name, 'utf8').features
+					if ( T.isObject(loaded_features) )
+					{
+						arg_package_config.features = _.merge(arg_package_config.features, loaded_features)
+						return
+					}
+				}
+
+				// LOAD FEATURES FROM AN OBJECT
+				if ( T.isObject(feature_cfg) )
+				{
+					arg_package_config.features = _.merge(arg_package_config.features, feature_cfg)
+				}
+			}
+		)
+	}
+
+	// LOAD FEATURES FROM AN OBJECT
+	if ( T.isObject(arg_package_config.features) )
+	{
+		logs.info(context, 'loading world...packages.' + arg_package_name + '.features is now an object')
+		// features(arg_package_config.features)
+	}
+
 
 	// CHECK ATTRIBUTES
 	assert(T.isString(arg_package_config.base_dir), error_msg_bad_base_dir  + ' for package ' + arg_package_name)
@@ -205,6 +254,7 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 	arg_package_config.resources_by_type.menus = {}
 	arg_package_config.resources_by_type.datasources = {}
 	arg_package_config.resources_by_type.services = {}
+	arg_package_config.resources_by_type.features = {}
 	arg_package_config.resources_by_type.commands = {}
 	arg_package_config.views = {}
 	arg_package_config.models = {}
@@ -225,6 +275,23 @@ function load_package(logs, arg_package_name, arg_package_config, arg_base_dir, 
 
 			arg_package_config.resources_by_name[svc_name] = svc
 			arg_package_config.resources_by_type['services'][svc_name] = svc
+		}
+	)
+
+	// REGISTER FEATURES AS RESOURCES
+	Object.keys(arg_package_config.features).forEach(
+		(feature_name) => {
+			const feature = arg_package_config.features[feature_name]
+			assert(T.isObject(feature), error_msg_bad_feature)
+			logs.info(context, 'loading world...packages.' + arg_package_name + '.features.' + feature_name + ' is registered')
+			
+			// REGISTER BASE DIRECTORIES
+			feature.app_base_dir = arg_base_dir
+			feature.pkg_base_dir = arg_package_config.base_dir
+			feature.name = feature_name
+
+			arg_package_config.resources_by_name[feature_name] = feature
+			arg_package_config.resources_by_type['features'][feature_name] = feature
 		}
 	)
 

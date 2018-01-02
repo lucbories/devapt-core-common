@@ -36,7 +36,7 @@ export default class RegistryStore extends MapStore
 		
 		this.collections = ['nodes', 'servers', 'applications', 'modules', 'plugins',
 			'resources', 'security', 'views', 'models', 'menubars', 'menus', 'loggers',
-			'services', 'transactions', 'datasources']
+			'services', 'features', 'transactions', 'datasources']
 
 		this.register_collection('nodes', 'node')
 		this.register_collection('servers', 'server')
@@ -52,6 +52,7 @@ export default class RegistryStore extends MapStore
 		this.register_resources_collection('menus', 'menu')
 		this.register_resources_collection('loggers', 'logger')
 		this.register_resources_collection('services', 'service')
+		this.register_resources_collection('features', 'feature')
 		this.register_resources_collection('transactions', 'transaction')
 		this.register_resources_collection('datasources', 'datasource')
 	}

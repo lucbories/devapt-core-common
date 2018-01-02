@@ -4,9 +4,9 @@ import {describe, it} from 'mocha'
 import {expect} from 'chai'
 
 // COMMON IMPORTS
-import T from '../utils/types'
-import Collection from '../base/collection'
-import Resource from '../base/resource'
+import T from '../js/utils/types'
+import Collection from '../js/base/collection'
+import Resource from '../js/base/resource'
 
 
 

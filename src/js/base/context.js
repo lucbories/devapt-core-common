@@ -265,22 +265,7 @@ export default class Context
 			catch(e) {}
 		}
 
-		
-		// if (ext == '')
-		// {
-		// 	const path_1_is_directory = path.dirname(arg_relative_path1) == arg_relative_path1
-		// 	const path_2_is_directory = path.dirname(arg_relative_path2) == arg_relative_path2
-		// 	const path_3_is_directory = path.dirname(arg_relative_path3) == arg_relative_path3
-
-		// 	const part_1 = (! path_1_is_directory && arg_relative_path1 && ! arg_relative_path2) ? arg_relative_path1 + '.js' : arg_relative_path1
-		// 	const part_2 = (! path_2_is_directory && arg_relative_path2 && ! arg_relative_path3) ? arg_relative_path2 + '.js' : arg_relative_path2
-		// 	const part_3 = arg_relative_path3 ? arg_relative_path3 + (! path_3_is_directory ? '.js' : '') : undefined
-
-		// 	const absolute_path = this.get_absolute_path(part_1, part_2, part_3)
-		// 	return absolute_path
-		// }
-
-		console.error(context + ':get_absolute_path:path not found [\n%s, \n%s, \n%s\n] for [\n%s, \n%s, \n%s\n]', p0, p1, p2, arg_relative_path1, arg_relative_path2, arg_relative_path3)
+		// console.error(context + ':get_absolute_path:path not found [\n%s, \n%s, \n%s\n] for [\n%s, \n%s, \n%s\n]', p0, p1, p2, arg_relative_path1, arg_relative_path2, arg_relative_path3)
 		return undefined
 	}
 	

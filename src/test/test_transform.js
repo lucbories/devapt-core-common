@@ -5,8 +5,8 @@ import {expect} from 'chai'
 
 
 // COMMON IMPORTS
-import T from '../utils/types'
-import { extract, flat, transform } from '../utils/transform'
+import T from '../js/utils/types'
+import { extract, flat, transform } from '../js/utils/transform'
 
 
 
