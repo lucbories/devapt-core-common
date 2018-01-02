@@ -33,7 +33,7 @@
     "test:todo": "mocha --recursive --reporter spec --compilers js:babel-register src/test",
     "test:empty": "mocha --reporter spec --compilers js:babel-register",
     "test:watch": "npm run test -- --watch",
-    "release-develop": "npm run build && npm test && git commit -am $npm_package_version && git push common develop",
+    "release-develop": "npm run build && npm run test && git commit -am $npm_package_version && git push common develop",
     "release-master": "npm run merge && git tag $npm_package_version && git push --tags && npm publish && git checkout develop",
     "release-maste": "git push common develop && git checkout master && git merge develop && git push common master --tags && git checkout develop",
     "patch": "npm version patch && unix2dos package.json",
