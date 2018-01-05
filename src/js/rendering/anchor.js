@@ -62,8 +62,21 @@ export default (arg_settings, arg_state={}, arg_rendering_context, arg_rendering
 	{
 		tag_props._blank = ''
 	}
-	const tag = h('a', tag_props, tag_children)
-	
+
+	// const tag = h('a', tag_props, tag_children)
+	let tag =undefined
+	if (tag_props._blank) {
+		tag = (
+			<a id={tag_props.id} _blank="" style={tag_props.style} className={tag_props.className} href={tag_props.href} data-devapt-command={cmd_value}>
+				{label_value}
+			</a>)
+	} else {
+		tag = (
+			<a id={tag_props.id} style={tag_props.style} className={tag_props.className} href={tag_props.href} data-devapt-command={cmd_value}>
+				{label_value}
+			</a>)
+	}
+
 	rendering_result.add_vtree(tag_id, tag)
 
 	return rendering_result
