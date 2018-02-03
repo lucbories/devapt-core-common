@@ -119,7 +119,6 @@
     "gulp-sourcemaps": "^2.6.1",
     "gulp-util": "^3.0.7",
     "mocha": "^4.0.1",
-    "nodegit": "^0.20.2",
     "parallelshell": "^2.0.0",
     "requirejs": "^2.3.5",
     "vinyl-buffer": ">=1.0.0",
