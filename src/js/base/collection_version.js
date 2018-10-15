@@ -139,7 +139,7 @@ export default class CollectionVersion extends CollectionBase
 	 */
 	get_version(arg_item)
 	{
-		if ( T.isObject(arg_item) && arg_item instanceof Instance )
+		if ( T.isObject(arg_item) && arg_item.is_instance)
 		{
 			return T.isFunction(this.$version_getter) ? this.$version_getter(arg_item) : undefined
 		}

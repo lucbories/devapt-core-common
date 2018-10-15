@@ -135,7 +135,7 @@ export default class CollectionBase extends Errorable
 		this._items_by_id   = {}
 
 		// ONE INSTANCE IS GIVEN
-		if ( T.isObject(arg_items) && arg_items instanceof Instance )
+		if ( T.isObject(arg_items) && arg_items.is_instance )
 		{
 			this._add(arg_items)
 			return
@@ -146,7 +146,7 @@ export default class CollectionBase extends Errorable
 		{
 			_.forEach(arg_items,
 				(item)=>{
-					if ( T.isObject(item) && item instanceof Instance )
+					if ( T.isObject(item) && item.is_instance )
 					{
 						this._add(item)
 					}
@@ -379,7 +379,7 @@ export default class CollectionBase extends Errorable
 	 */
 	add(arg_item)
 	{
-		if ( T.isObject(arg_item) && arg_item instanceof Instance )
+		if ( T.isObject(arg_item) && arg_item.is_instance)
 		{
 			if ( this.has_accepted_type('*') || this.has_accepted_type( arg_item.get_type() ) )
 			{
@@ -405,7 +405,7 @@ export default class CollectionBase extends Errorable
 	 */
 	add_first(arg_item)
 	{
-		if ( T.isObject(arg_item) && arg_item instanceof Instance )
+		if ( T.isObject(arg_item) && arg_item.is_instance)
 		{
 			if ( this.has_accepted_type('*') || this.has_accepted_type(arg_item.$type) )
 			{
@@ -431,7 +431,7 @@ export default class CollectionBase extends Errorable
 	 */
 	remove(arg_item)
 	{
-		if ( T.isObject(arg_item) && arg_item instanceof Instance )
+		if ( T.isObject(arg_item) && arg_item.is_instance)
 		{
 			const name = arg_item.get_name()
 			if (name in this._items_by_name)
@@ -455,7 +455,7 @@ export default class CollectionBase extends Errorable
 	 */
 	has(arg_item)
 	{
-		if ( T.isObject(arg_item) && arg_item instanceof Instance )
+		if ( T.isObject(arg_item) && arg_item.is_instance)
 		{
 			return this._has(arg_item)
 		}

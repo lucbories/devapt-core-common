@@ -1,7 +1,7 @@
 {
-  "presets": ["env"],
+  "presets": ["@babel/preset-env"],
   "ignore": [],
   "plugins":[
-    ["transform-react-jsx", { "pragma": "h" }]
+    ["@babel/plugin-transform-react-jsx", { "pragma": "h" }]
   ]
 }
